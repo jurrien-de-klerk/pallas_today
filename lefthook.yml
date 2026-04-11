@@ -15,4 +15,4 @@ pre-commit:
       run: docker run --rm -v "$PWD:/work" -w /work cytopia/yamllint:latest {staged_files}
     gitignore_format:
       glob: ".gitignore"
-      run: docker run --rm -v "$PWD:/work" -w /work node:22-alpine sh -lc "npx --yes prettier --write {staged_files}"
+      run: docker run --rm -v "$PWD:/work" -w /work alpine:3.20 sh -lc "for f in {staged_files}; do [ -n \"$f\" ] && [ -f \"$f\" ] && sed -i 's/[[:space:]]*$//' \"$f\"; done; true"

@@ -34,12 +34,12 @@ proceeding.
 
 - Use `lefthook` as the execution entrypoint for linting and formatting.
 - Ensure all text-based file types present in the repository are covered by a
-   linter and a formatter in `lefthook` configuration, except repository ignore
-   files.
+  linter and a formatter in `lefthook` configuration, except repository ignore
+  files.
 - Whenever a new text-based file type is introduced, update `lefthook` in the
-   same change to add matching linter/formatter tooling.
+  same change to add matching linter/formatter tooling.
 - Exception: repository ignore files (for example `.gitignore`) must be
-   formatted but do not require a dedicated lint tool.
+  formatted but do not require a dedicated lint tool.
 - Exclude binary files (for example images) from linting/formatting checks.
 
 ## Workflow: Committing files
