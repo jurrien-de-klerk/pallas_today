@@ -1,0 +1,18 @@
+pre-commit:
+  parallel: false
+  commands:
+    markdown_format:
+      glob: "**/*.md"
+      run: docker run --rm -v "$PWD:/work" -w /work node:22-alpine sh -lc "npx --yes prettier --write {staged_files}"
+    markdown_lint:
+      glob: "**/*.md"
+      run: docker run --rm -v "$PWD:/work" -w /work node:22-alpine sh -lc "npx --yes markdownlint-cli2 {staged_files}"
+    yaml_format:
+      glob: "**/*.{yml,yaml}"
+      run: docker run --rm -v "$PWD:/work" -w /work node:22-alpine sh -lc "npx --yes prettier --write {staged_files}"
+    yaml_lint:
+      glob: "**/*.{yml,yaml}"
+      run: docker run --rm -v "$PWD:/work" -w /work cytopia/yamllint:latest {staged_files}
+    gitignore_format:
+      glob: ".gitignore"
+      run: docker run --rm -v "$PWD:/work" -w /work node:22-alpine sh -lc "npx --yes prettier --write {staged_files}"
