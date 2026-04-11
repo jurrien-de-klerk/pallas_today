@@ -52,5 +52,7 @@ When Copilot commits changes, use this workflow:
 2. Start the commit process with `git commit -m <generated commit message>`.
 3. If `lefthook` runs linting/formatting and reports issues, analyze the output
    and fix all reported suggestions.
-4. Add the changes to git using `git add`
+4. Stage the changed files from the project root:
+   - Use `git add .` when all repository changes should be committed.
+   - Otherwise, use `git add <files to commit>` for a selective commit.
 5. Repeat steps 2 and 4 until the commit succeeds.
