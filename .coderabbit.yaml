@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**/*"
+      instructions: |
+        Enforce ADR compliance for all code changes.
+
+        Review requirements:
+        1) Read all accepted ADRs in doc/adr/*.md before reviewing changed files.
+        2) Verify the pull request implementation is consistent with those ADR decisions.
+        3) If a change conflicts with an accepted ADR, request changes and clearly cite the conflicting ADR file(s).
+        4) If no ADR exists for a significant new architectural direction, suggest adding a new ADR in doc/adr/.
+
+        Focus on actionable comments tied to specific ADR decisions.
+    - path: "doc/adr/*.md"
+      instructions: |
+        For ADR changes:
+        - Verify the ADR follows the existing repository ADR format.
+        - Check that Context, Decision, and Consequences are clear and consistent.
+        - Ensure any ADR that supersedes or changes prior decisions explains migration or impact.
