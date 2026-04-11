@@ -15,6 +15,13 @@ reviews:
         3) If a change conflicts with an accepted ADR, request changes and clearly cite the conflicting ADR file(s).
         4) If no ADR exists for a significant new architectural direction, suggest adding a new ADR in doc/adr/.
 
+        Lefthook review requirements:
+        1) Verify lefthook is used as the execution entrypoint for linting and formatting.
+        2) Verify every text-based file type present in the repository has both linting and formatting coverage in lefthook configuration, except repository ignore files.
+        3) If a PR introduces a new text-based file type, require lefthook updates in the same PR to add suitable linter and formatter tooling.
+        4) Exception: repository ignore files (for example .gitignore) must be formatted but do not require a dedicated lint tool.
+        5) Verify binary files (for example images) are excluded from lint/format requirements.
+
         Focus on actionable comments tied to specific ADR decisions.
     - path: "doc/adr/*.md"
       instructions: |
