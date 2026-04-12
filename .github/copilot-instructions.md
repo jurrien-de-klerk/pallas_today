@@ -21,10 +21,10 @@ proceeding.
 
    Keep the title short (max 7 words).
 
-1. The command creates a new file from the template. Fill in the template
+2. The command creates a new file from the template. Fill in the template
    sections with short, simple text — do not change the structure.
 
-1. From the project root, regenerate the table of contents:
+3. From the project root, regenerate the table of contents:
 
    ```bash
    adr generate toc > doc/adr/readme.md
@@ -49,13 +49,13 @@ When Copilot commits changes, use this workflow:
 1. Stage files from the project root:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
-1. Start the commit process with `git commit -m <generated commit message>`.
-1. If `lefthook` runs linting/formatting and reports issues, analyze the output
+2. Start the commit process with `git commit -m <generated commit message>`.
+3. If `lefthook` runs linting/formatting and reports issues, analyze the output
    and fix all reported suggestions.
-1. Stage the changed files from the project root:
+4. Stage the changed files from the project root:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
-1. Repeat steps 2 and 4 until the commit succeeds.
+5. Repeat steps 2 and 4 until the commit succeeds.
 
 ## Commit troubleshooting requirements
 
@@ -65,3 +65,10 @@ When Copilot commits changes, use this workflow:
   setup or file-level lint/format findings), fix them and retry the commit
   using normal hooks.
 - Only proceed with standard verified commits that pass configured hooks.
+
+## Code review scope
+
+- During code review, do not review generated Flutter platform code.
+- Exclude these generated platform directories from review scope:
+   `pallas_app/ios/`, `pallas_app/android/`, `pallas_app/linux/`,
+   `pallas_app/macos/`, `pallas_app/web/`, `pallas_app/windows/`.

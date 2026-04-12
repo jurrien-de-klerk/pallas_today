@@ -6,7 +6,7 @@ Date: 2026-04-12
 
 Accepted
 
-Supercedes [3. lint and format text files](0003-lint-and-format-text-files.md)
+Supersedes [3. lint and format text files](0003-lint-and-format-text-files.md)
 
 ## Context
 

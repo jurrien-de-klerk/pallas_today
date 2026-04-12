@@ -7,31 +7,32 @@ pre-commit:
     - "**/macos/**"
     - "**/web/**"
     - "**/windows/**"
+    - ".github/copilot-instructions.md"
   jobs:
     - run: >-
         docker run --rm ubuntu echo {staged_files}
-      glob: "*.md"
+      glob: "**/*.md"
       stage_fixed: true
       name: File name printer
     - run: >-
-        docker run --rm --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files} --check
-      glob: "*.md"
+        docker run --rm --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files}
+      glob: "**/*.md"
       stage_fixed: true
       name: Markdown formatter
     - run: >-
         docker run --rm --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0 {staged_files}
-      glob: "*.md"
+      glob: "**/*.md"
       name: Markdown lint
     - run: >-
         docker run --rm --volume $(pwd):/project --workdir /project livewyer/yamlfmt:0.13 -conf /project/tool_config/yamlfmt-config.yml
         {staged_files}
-      glob: "*.{yml,yaml}"
+      glob: "**/*.{yml,yaml}"
       stage_fixed: true
       name: YAML formatter
     - run: >-
         docker run --rm --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine -c /project/tool_config/ymllint-config.yml
         {staged_files}
-      glob: "*.{yml,yaml}"
+      glob: "**/*.{yml,yaml}"
       name: YAML lint
     - run: >-
         cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
