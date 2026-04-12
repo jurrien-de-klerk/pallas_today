@@ -1,5 +1,12 @@
 pre-commit:
   parallel: false
+  exclude:
+    - "**/ios/**"
+    - "**/android/**"
+    - "**/linux/**"
+    - "**/macos/**"
+    - "**/web/**"
+    - "**/windows/**"
   jobs:
     - run: >-
         docker run -it --rm ubuntu echo {staged_files}
@@ -18,11 +25,20 @@ pre-commit:
     - run: >-
         docker run -it --rm --volume $(pwd):/project --workdir /project livewyer/yamlfmt:0.13 -conf /project/tool_config/yamlfmt-config.yml
         {staged_files}
-      glob: "*.yml"
+      glob: "*.{yml,yaml}"
       stage_fixed: true
       name: YAML formatter
     - run: >-
         docker run -it --rm --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine -c /project/tool_config/ymllint-config.yml
         {staged_files}
-      glob: "*.yml"
+      glob: "*.{yml,yaml}"
       name: YAML lint
+    - run: >-
+        docker run -it --rm --volume $(pwd):/project --workdir /project dart:3.11.4 dart format {staged_files}
+      glob: "*.dart"
+      stage_fixed: true
+      name: Dart formatter
+    - run: >-
+        docker run -it --rm --volume $(pwd):/project --workdir /project dart:3.11.4 dart analyze {staged_files}
+      glob: "*.dart"
+      name: Dart lint

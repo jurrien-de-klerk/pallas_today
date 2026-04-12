@@ -4,7 +4,7 @@ Date: 2026-04-11
 
 ## Status
 
-Accepted
+Superceded by [4. Selective linting and formatting of text files](0004-selective-linting-and-formatting-of-text-files.md)
 
 ## Context
 
