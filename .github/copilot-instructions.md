@@ -21,10 +21,10 @@ proceeding.
 
    Keep the title short (max 7 words).
 
-2. The command creates a new file from the template. Fill in the template
+1. The command creates a new file from the template. Fill in the template
    sections with short, simple text — do not change the structure.
 
-3. From the project root, regenerate the table of contents:
+1. From the project root, regenerate the table of contents:
 
    ```bash
    adr generate toc > doc/adr/readme.md
@@ -49,10 +49,19 @@ When Copilot commits changes, use this workflow:
 1. Stage files from the project root:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
-2. Start the commit process with `git commit -m <generated commit message>`.
-3. If `lefthook` runs linting/formatting and reports issues, analyze the output
+1. Start the commit process with `git commit -m <generated commit message>`.
+1. If `lefthook` runs linting/formatting and reports issues, analyze the output
    and fix all reported suggestions.
-4. Stage the changed files from the project root:
+1. Stage the changed files from the project root:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
-5. Repeat steps 2 and 4 until the commit succeeds.
+1. Repeat steps 2 and 4 until the commit succeeds.
+
+## Commit troubleshooting requirements
+
+- Never suggest or use `git commit --no-verify`.
+- If a commit fails, explain the exact hook/tooling errors clearly.
+- If issues are fixable in this repository (for example `lefthook` command
+  setup or file-level lint/format findings), fix them and retry the commit
+  using normal hooks.
+- Only proceed with standard verified commits that pass configured hooks.

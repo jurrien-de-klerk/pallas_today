@@ -34,11 +34,11 @@ pre-commit:
       glob: "*.{yml,yaml}"
       name: YAML lint
     - run: >-
-        docker run -it --rm --volume $(pwd):/project --workdir /project dart:3.11.4 dart format {staged_files}
-      glob: "*.dart"
+        cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
+      glob: "pallas_app/**/*.dart"
       stage_fixed: true
       name: Dart formatter
     - run: >-
-        docker run -it --rm --volume $(pwd):/project --workdir /project dart:3.11.4 dart analyze {staged_files}
-      glob: "*.dart"
+        cd pallas_app && flutter analyze $(echo {staged_files} | sed 's|pallas_app/||g')
+      glob: "pallas_app/**/*.dart"
       name: Dart lint
