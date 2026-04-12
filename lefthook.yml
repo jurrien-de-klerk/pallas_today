@@ -1,7 +1,11 @@
 pre-commit:
   parallel: false
-  exclude:
   jobs:
+    - run: >-
+        docker run -it --rm ubuntu echo {staged_files}
+      glob: "*.md"
+      stage_fixed: true
+      name: File name printer
     - run: >-
         docker run -it --rm --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files} --check
       glob: "*.md"
