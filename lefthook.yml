@@ -7,20 +7,14 @@ pre-commit:
     - "**/macos/**"
     - "**/web/**"
     - "**/windows/**"
-    - ".github/copilot-instructions.md"
   jobs:
-    - run: >-
-        docker run --rm ubuntu echo {staged_files}
-      glob: "**/*.md"
-      stage_fixed: true
-      name: File name printer
     - run: >-
         docker run --rm --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files}
       glob: "**/*.md"
       stage_fixed: true
       name: Markdown formatter
     - run: >-
-        docker run --rm --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0 {staged_files}
+        docker run --rm --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0 --config /project/tool_config/markdownlint-config.rb {staged_files}
       glob: "**/*.md"
       name: Markdown lint
     - run: >-
