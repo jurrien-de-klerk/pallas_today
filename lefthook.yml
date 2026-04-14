@@ -1,6 +1,10 @@
 pre-commit:
   parallel: false
   exclude:
+    - "*.lock"
+    - "**/*.lock"
+    - ".metadata"
+    - "**/.metadata"
     - "**/ios/**"
     - "**/android/**"
     - "**/linux/**"
