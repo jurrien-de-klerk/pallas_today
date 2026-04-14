@@ -1,18 +1,43 @@
 pre-commit:
   parallel: false
-  commands:
-    markdown_format:
+  exclude:
+    - "*.lock"
+    - "**/*.lock"
+    - ".metadata"
+    - "**/.metadata"
+    - "**/ios/**"
+    - "**/android/**"
+    - "**/linux/**"
+    - "**/macos/**"
+    - "**/web/**"
+    - "**/windows/**"
+  jobs:
+    - run: >-
+        docker run --rm --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files}
       glob: "**/*.md"
-      run: docker run --rm -v "$PWD:/work" -w /work node@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3 sh -lc "npx --yes prettier@3.8.2 --write {staged_files}"
-    markdown_lint:
+      stage_fixed: true
+      name: Markdown formatter
+    - run: >-
+        docker run --rm --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0 --config /project/tool_config/markdownlint-config.rb {staged_files}
       glob: "**/*.md"
-      run: docker run --rm -v "$PWD:/work" -w /work node@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3 sh -lc "npx --yes markdownlint-cli2@0.22.0 {staged_files}"
-    yaml_format:
+      name: Markdown lint
+    - run: >-
+        docker run --rm --volume $(pwd):/project --workdir /project livewyer/yamlfmt:0.13 -conf /project/tool_config/yamlfmt-config.yml
+        {staged_files}
       glob: "**/*.{yml,yaml}"
-      run: docker run --rm -v "$PWD:/work" -w /work node@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3 sh -lc "npx --yes prettier@3.8.2 --write {staged_files}"
-    yaml_lint:
+      stage_fixed: true
+      name: YAML formatter
+    - run: >-
+        docker run --rm --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine -c /project/tool_config/ymllint-config.yml
+        {staged_files}
       glob: "**/*.{yml,yaml}"
-      run: docker run --rm -v "$PWD:/work" -w /work cytopia/yamllint@sha256:3e9eb827ab2b12a5ea5f49d4257bb3aca94bba9f1ba427c8bc7f2456385a5204 {staged_files}
-    gitignore_format:
-      glob: "**/.gitignore"
-      run: docker run --rm -v "$PWD:/work" -w /work alpine@sha256:a4f4213abb84c497377b8544c81b3564f313746700372ec4fe84653e4fb03805 sh -lc "for f in {staged_files}; do [ -n \"$f\" ] && [ -f \"$f\" ] && sed -i 's/[[:space:]]*$//' \"$f\"; done; true"
+      name: YAML lint
+    - run: >-
+        cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
+      glob: "pallas_app/**/*.dart"
+      stage_fixed: true
+      name: Dart formatter
+    - run: >-
+        cd pallas_app && flutter analyze $(echo {staged_files} | sed 's|pallas_app/||g')
+      glob: "pallas_app/**/*.dart"
+      name: Dart lint

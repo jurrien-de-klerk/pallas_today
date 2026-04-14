@@ -56,3 +56,19 @@ When Copilot commits changes, use this workflow:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
 5. Repeat steps 2 and 4 until the commit succeeds.
+
+## Commit troubleshooting requirements
+
+- Never suggest or use `git commit --no-verify`.
+- If a commit fails, explain the exact hook/tooling errors clearly.
+- If issues are fixable in this repository (for example `lefthook` command
+  setup or file-level lint/format findings), fix them and retry the commit
+  using normal hooks.
+- Only proceed with standard verified commits that pass configured hooks.
+
+## Code review scope
+
+- During code review, do not review generated Flutter platform code.
+- Exclude these generated platform directories from review scope:
+   `pallas_app/ios/`, `pallas_app/android/`, `pallas_app/linux/`,
+   `pallas_app/macos/`, `pallas_app/web/`, `pallas_app/windows/`.
