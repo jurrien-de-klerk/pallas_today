@@ -4,36 +4,46 @@ Minimal Spring Boot microservice with one endpoint:
 
 - `GET /hello` -> `world!`
 
+## Prerequisites
+
+- Java 21 (eclipse-temurin or similar)
+- Maven 3
+
+## Build locally
+
+From the `StoryService` directory:
+
+```bash
+mvn clean package
+```
+
+This builds the Spring Boot executable JAR in `target/storyservice-0.0.1-SNAPSHOT.jar`.
+
 ## Run in container
 
-From `pallas_server` directory:
+From `pallas_server` directory, after building locally:
 
 ```bash
-docker compose up
+docker compose up --build
 ```
 
-Docker Compose will automatically build the image (using the Dockerfile)
-and start the service. The image includes the compiled Spring Boot
-executable.
-
-### BuildKit caching (optional, for faster rebuilds)
-
-The Dockerfile uses Docker BuildKit cache mounts to cache both Maven
-dependencies and compiled artifacts between builds. Enable BuildKit for
-faster incremental builds:
-
-```bash
-DOCKER_BUILDKIT=1 docker compose up
-```
-
-This caches:
-
-- `~/.m2` (Maven dependency repository) — skips redownloading dependencies
-- `/build/target` (compiled artifacts) — enables incremental compilation
-
-Subsequent builds only recompile changed source files.
+Docker Compose will build the image using the pre-compiled JAR and start the service.
 
 Then test it:
+
+```bash
+curl http://localhost:8080/hello
+```
+
+## Run locally (without Docker)
+
+From `StoryService` directory:
+
+```bash
+mvn spring-boot:run
+```
+
+Then test:
 
 ```bash
 curl http://localhost:8080/hello

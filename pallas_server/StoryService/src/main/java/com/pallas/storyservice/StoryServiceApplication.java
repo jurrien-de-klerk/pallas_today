@@ -14,6 +14,6 @@ public class StoryServiceApplication {
 
   @GetMapping("/hello")
   public String hello() {
-    return "world!";
+    return "hello world!";
   }
 }

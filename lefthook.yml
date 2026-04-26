@@ -59,21 +59,9 @@ pre-commit:
       glob: "**/*.java"
       stage_fixed: true
       name: Java formatter
-    - run: >
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
-        mvn -q checkstyle:check -DskipTests
-      glob: "pallas_server/StoryService/**/*.java"
-      name: Checkstyle
-    - run: >
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
-        mvn -q compile spotbugs:check -DskipTests
-      glob: "pallas_server/StoryService/**/*.java"
-      name: SpotBugs
-    - run: >
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
-        mvn -q pmd:check -DskipTests
-      glob: "pallas_server/StoryService/**/*.java"
-      name: PMD
+    # Note: Removed Maven-based pre-commit hooks (Checkstyle, SpotBugs, PMD)
+    # These are now run during the local Maven build: mvn clean package
+    # This happens before Docker image build, and developers run Maven locally anyway
     # Dockerfile linting with hadolint
     # Note: We lint but do not format Dockerfiles. The Dockerfile formatting ecosystem
     # is immature (no widely-adopted standard formatter). Instead, we rely on hadolint
