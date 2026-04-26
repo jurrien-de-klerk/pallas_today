@@ -42,6 +42,10 @@
       <artifactId>jakarta.validation-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
       <version>4.8.3</version>
@@ -70,6 +74,8 @@
                 <skipDefaultInterface>true</skipDefaultInterface>
                 <useTags>true</useTags>
                 <delegatePattern>false</delegatePattern>
+                <useBeanValidation>true</useBeanValidation>
+                <performBeanValidation>true</performBeanValidation>
               </configOptions>
             </configuration>
           </execution>
