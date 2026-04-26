@@ -96,6 +96,14 @@ Install git hooks from the project root:
 lefthook install
 ```
 
+Verify lefthook is working by running the pre-commit hooks:
+
+```bash
+lefthook run pre-commit
+```
+
+This executes all configured linting and formatting tools. All checks should pass on a clean repository.
+
 #### 6. ADR Tools
 
 ```bash
@@ -118,6 +126,15 @@ java -version
 mvn -version
 docker --version
 docker compose version
-lefthook version
 adr help
 ```
+
+### Development Workflow
+
+Before committing changes, run linting and formatting through lefthook:
+
+```bash
+lefthook run pre-commit
+```
+
+This is the main entrypoint for all lint and format checks. When you commit, these hooks run automatically.
