@@ -74,3 +74,12 @@ pre-commit:
         mvn -q pmd:check -DskipTests
       glob: "pallas_server/StoryService/**/*.java"
       name: PMD
+    # Dockerfile linting with hadolint
+    # Note: We lint but do not format Dockerfiles. The Dockerfile formatting ecosystem
+    # is immature (no widely-adopted standard formatter). Instead, we rely on hadolint
+    # to enforce best practices and conventions, and use editor/IDE auto-formatting for
+    # basic style consistency. If needed in the future, consider prettier-dockerfile.
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project hadolint/hadolint hadolint {staged_files}
+      glob: "**/Dockerfile"
+      name: Dockerfile lint

@@ -1,13 +1,7 @@
 services:
   story-service:
-    image: maven:3-eclipse-temurin-21
-    working_dir: /app
-    command:
-      - sh
-      - -lc
-      - |
-        mvn -q spring-boot:run
+    build:
+      context: ./StoryService
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    volumes:
-      - ./StoryService:/app
