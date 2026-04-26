@@ -52,6 +52,9 @@ pre-commit:
         cd pallas_app && flutter analyze $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       name: Dart lint
+    # Note: Removed Maven-based pre-commit hooks (Checkstyle, SpotBugs, PMD)
+    # These are now run during the local Maven build: mvn clean package
+    # This happens before Docker image build, and developers run Maven locally anyway
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project eclipse-temurin:21-jdk sh -lc
         "curl -fsSL -o /tmp/google-java-format.jar https://repo1.maven.org/maven2/com/google/googlejavaformat/google-java-format/1.24.0/google-java-format-1.24.0-all-deps.jar
@@ -59,9 +62,6 @@ pre-commit:
       glob: "**/*.java"
       stage_fixed: true
       name: Java formatter
-    # Note: Removed Maven-based pre-commit hooks (Checkstyle, SpotBugs, PMD)
-    # These are now run during the local Maven build: mvn clean package
-    # This happens before Docker image build, and developers run Maven locally anyway
     # Dockerfile linting with hadolint
     # Note: We lint but do not format Dockerfiles. The Dockerfile formatting ecosystem
     # is immature (no widely-adopted standard formatter). Instead, we rely on hadolint
