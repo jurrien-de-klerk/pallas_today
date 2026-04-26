@@ -1,13 +1,12 @@
 services:
   story-service:
-    image: eclipse-temurin:21-jdk
+    image: maven:3-eclipse-temurin-21
     working_dir: /app
     command:
       - sh
       - -lc
       - |
-        javac -d /tmp/out src/main/java/com/pallas/storyservice/StoryServiceApplication.java
-        java -cp /tmp/out com.pallas.storyservice.StoryServiceApplication
+        mvn -q spring-boot:run
     ports:
       - "8080:8080"
     volumes:
