@@ -7,16 +7,19 @@ import com.pallas.storyservice.model.StoryInput;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 public class StoriesController implements StoriesApi {
+
+  private static final int DEFAULT_LIMIT = 20;
+  private static final int MAX_LIMIT = 100;
 
   private final ConcurrentHashMap<UUID, Story> storiesDb = new ConcurrentHashMap<>();
 
@@ -29,8 +32,9 @@ public class StoriesController implements StoriesApi {
 
     storiesDb.put(id, story);
 
-    URI location = URI.create("/stories/" + id);
-    return ResponseEntity.created(Objects.requireNonNull(location)).body(story);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
+    return ResponseEntity.created(location).body(story);
   }
 
   @Override
@@ -55,8 +59,10 @@ public class StoriesController implements StoriesApi {
   public ResponseEntity<ListStories200Response> listStories(Integer limit, Integer offset) {
     List<Story> allStories = new ArrayList<>(storiesDb.values());
 
+    // Apply defaults and constraints from OpenAPI spec
+    int actualLimit = limit != null ? Math.min(limit, MAX_LIMIT) : DEFAULT_LIMIT;
     int start = offset != null ? offset : 0;
-    int end = limit != null ? Math.min(start + limit, allStories.size()) : allStories.size();
+    int end = Math.min(start + actualLimit, allStories.size());
 
     if (start > allStories.size()) {
       start = allStories.size();
@@ -70,7 +76,7 @@ public class StoriesController implements StoriesApi {
     ListStories200Response response = new ListStories200Response();
     response.setStories(paginatedStories);
     response.setTotal(allStories.size());
-    response.setLimit(limit != null ? limit : allStories.size());
+    response.setLimit(actualLimit);
     response.setOffset(start);
 
     return ResponseEntity.ok(response);
