@@ -59,4 +59,18 @@ pre-commit:
       glob: "**/*.java"
       stage_fixed: true
       name: Java formatter
-
+    - run: >
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
+        mvn -q checkstyle:check -DskipTests
+      glob: "pallas_server/StoryService/**/*.java"
+      name: Checkstyle
+    - run: >
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
+        mvn -q compile spotbugs:check -DskipTests
+      glob: "pallas_server/StoryService/**/*.java"
+      name: SpotBugs
+    - run: >
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project maven:3-eclipse-temurin-21
+        mvn -q pmd:check -DskipTests
+      glob: "pallas_server/StoryService/**/*.java"
+      name: PMD
