@@ -46,6 +46,7 @@ paths:
                 properties:
                   stories:
                     type: array
+                    maxItems: 100
                     items:
                       $ref: '#/components/schemas/Story'
                   total:
@@ -55,6 +56,12 @@ paths:
                     type: integer
                   offset:
                     type: integer
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error
           content:
