@@ -54,7 +54,7 @@ pre-commit:
       glob: "pallas_app/**/*.dart"
       name: Dart lint
     # Note: Removed Maven-based pre-commit hooks (Checkstyle, SpotBugs, PMD)
-    # These are now run during the local Maven build: mvn clean package
+    # These are now run during the local Maven build: mvn clean verify
     # This happens before Docker image build, and developers run Maven locally anyway
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project eclipse-temurin:21-jdk sh -lc

@@ -31,10 +31,12 @@ lost on restart.
 From the `StoryService` directory:
 
 ```bash
-mvn clean package
+mvn clean verify
 ```
 
-This builds the Spring Boot executable JAR in `target/storyservice-0.0.1-SNAPSHOT.jar`.
+This builds the Spring Boot executable JAR in
+`target/storyservice-0.0.1-SNAPSHOT.jar` and runs quality checks
+(Checkstyle, SpotBugs, PMD).
 
 ## Run in container
 
