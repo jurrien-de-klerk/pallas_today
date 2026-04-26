@@ -35,7 +35,8 @@ pre-commit:
       glob: "**/*.{yml,yaml}"
       name: YAML lint
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint xmllint --format {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint sh -c
+        'for file in {staged_files}; do xmllint --format "$file" --output "$file"; done'
       glob: "**/*.xml"
       stage_fixed: true
       name: XML formatter
