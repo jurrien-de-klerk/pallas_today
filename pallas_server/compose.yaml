@@ -1,0 +1,7 @@
+services:
+  story-service:
+    build:
+      context: ./StoryService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"

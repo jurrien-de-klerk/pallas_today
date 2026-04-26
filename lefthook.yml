@@ -13,12 +13,14 @@ pre-commit:
     - "**/windows/**"
   jobs:
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
+        {staged_files}
       glob: "**/*.md"
       stage_fixed: true
       name: Markdown formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0 --config /project/tool_config/markdownlint-config.rb {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0
+        --config /project/tool_config/markdownlint-config.rb {staged_files}
       glob: "**/*.md"
       name: Markdown lint
     - run: >-
@@ -33,6 +35,16 @@ pre-commit:
       glob: "**/*.{yml,yaml}"
       name: YAML lint
     - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint sh -c
+        'for file in {staged_files}; do xmllint --format "$file" --output "$file"; done'
+      glob: "**/*.xml"
+      stage_fixed: true
+      name: XML formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint xmllint {staged_files}
+      glob: "**/*.xml"
+      name: XML lint
+    - run: >-
         cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       stage_fixed: true
@@ -41,3 +53,15 @@ pre-commit:
         cd pallas_app && flutter analyze $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       name: Dart lint
+    # Note: Removed Maven-based pre-commit hooks (Java formatting, Checkstyle, SpotBugs, PMD)
+    # These are now run during the local Maven build: mvn clean verify
+    # This happens before Docker image build, and developers run Maven locally anyway
+    # Dockerfile linting with hadolint
+    # Note: We lint but do not format Dockerfiles. The Dockerfile formatting ecosystem
+    # is immature (no widely-adopted standard formatter). Instead, we rely on hadolint
+    # to enforce best practices and conventions, and use editor/IDE auto-formatting for
+    # basic style consistency. If needed in the future, consider prettier-dockerfile.
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project hadolint/hadolint hadolint {staged_files}
+      glob: "**/Dockerfile"
+      name: Dockerfile lint

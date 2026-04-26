@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Exclude all auto-generated code from OpenAPI generator -->
+  <Match>
+    <Package name="~com\.pallas\.storyservice\.api.*"/>
+  </Match>
+  <Match>
+    <Package name="~com\.pallas\.storyservice\.model.*"/>
+  </Match>
+</FindBugsFilter>

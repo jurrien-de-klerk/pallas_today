@@ -1,3 +1,5 @@
 # VS Code personal settings
 .vscode/
 *.code-workspace
+# Maven build artifacts
+target/

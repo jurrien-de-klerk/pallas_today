@@ -4,9 +4,9 @@ Date: 2026-04-12
 
 ## Status
 
-Accepted
-
 Supersedes [3. lint and format text files](0003-lint-and-format-text-files.md)
+
+Superceded by [5. Move Java linting and formatting to Maven](0005-move-java-linting-and-formatting-to-maven.md)
 
 ## Context
 
