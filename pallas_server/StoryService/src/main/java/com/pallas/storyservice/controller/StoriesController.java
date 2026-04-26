@@ -57,18 +57,30 @@ public class StoriesController implements StoriesApi {
 
   @Override
   public ResponseEntity<ListStories200Response> listStories(Integer limit, Integer offset) {
-    List<Story> allStories = new ArrayList<>(storiesDb.values());
+    // Validate offset and limit parameters
+    int actualOffset = offset != null ? offset : 0;
+    int actualLimit = limit != null ? limit : DEFAULT_LIMIT;
 
-    // Apply defaults and constraints from OpenAPI spec
-    int actualLimit = limit != null ? Math.min(limit, MAX_LIMIT) : DEFAULT_LIMIT;
-    int start = offset != null ? offset : 0;
+    if (actualOffset < 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "offset must be non-negative");
+    }
+    if (actualLimit < 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "limit must be non-negative");
+    }
+
+    // Apply max limit constraint
+    actualLimit = Math.min(actualLimit, MAX_LIMIT);
+
+    // Get all stories and sort deterministically by UUID
+    List<Story> allStories = new ArrayList<>(storiesDb.values());
+    allStories.sort((s1, s2) -> s1.getId().compareTo(s2.getId()));
+
+    int start = actualOffset;
     int end = Math.min(start + actualLimit, allStories.size());
 
+    // Clamp start to valid range
     if (start > allStories.size()) {
       start = allStories.size();
-    }
-    if (end > allStories.size()) {
-      end = allStories.size();
     }
 
     List<Story> paginatedStories = allStories.subList(start, end);
