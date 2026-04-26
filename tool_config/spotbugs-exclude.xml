@@ -2,9 +2,9 @@
 <FindBugsFilter>
   <!-- Exclude all auto-generated code from OpenAPI generator -->
   <Match>
-    <Package name="~com\.pallas\.storyservice\.api"/>
+    <Package name="~com\.pallas\.storyservice\.api.*"/>
   </Match>
   <Match>
-    <Package name="~com\.pallas\.storyservice\.model"/>
+    <Package name="~com\.pallas\.storyservice\.model.*"/>
   </Match>
 </FindBugsFilter>
