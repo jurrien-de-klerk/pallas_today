@@ -12,7 +12,6 @@ documentation at `http://localhost:8080/swagger-ui.html`
 
 **Current endpoints:**
 
-- `GET /hello` -> `world!` (test endpoint)
 - `POST /stories` - Create a story
 - `GET /stories` - List all stories (with pagination)
 - `GET /stories/{id}` - Get a specific story
