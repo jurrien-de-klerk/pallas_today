@@ -7,6 +7,7 @@ import com.pallas.storyservice.model.StoryInput;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,8 @@ public class StoriesController implements StoriesApi {
 
     storiesDb.put(id, story);
 
-    return ResponseEntity.created(URI.create("/stories/" + id)).body(story);
+    URI location = URI.create("/stories/" + id);
+    return ResponseEntity.created(Objects.requireNonNull(location)).body(story);
   }
 
   @Override
