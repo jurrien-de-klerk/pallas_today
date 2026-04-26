@@ -41,3 +41,12 @@ pre-commit:
         cd pallas_app && flutter analyze $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       name: Dart lint
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project eclipse-temurin:21-jdk sh -lc "curl -fsSL -o /tmp/google-java-format.jar https://repo1.maven.org/maven2/com/google/googlejavaformat/google-java-format/1.24.0/google-java-format-1.24.0-all-deps.jar && java -jar /tmp/google-java-format.jar --replace {staged_files}"
+      glob: "**/*.java"
+      stage_fixed: true
+      name: Java formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project eclipse-temurin:21-jdk javac -Xlint -d /tmp/java-lint-out {staged_files}
+      glob: "**/*.java"
+      name: Java lint
