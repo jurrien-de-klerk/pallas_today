@@ -20,8 +20,8 @@ pre-commit:
       stage_fixed: true
       name: Markdown formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0
-        --config /project/tool_config/markdownlint-config.rb {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project peterdavehello/markdownlint:0.44.0
+        markdownlint --config /project/tool_config/markdownlint-config.json {staged_files}
       glob: "**/*.md"
       name: Markdown lint
     - run: >-
