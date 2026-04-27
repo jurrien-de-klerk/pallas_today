@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Thread-safe singleton FIFO ring buffer that captures every {@link BacktraceRecord} logged by any
- * logger instrumented with {@link BacktraceAppender}.
+ * logger instrumented with {@link BacktraceFilter}.
  *
  * <p>Configure the capacity once at application start — before any logging occurs:
  *
@@ -24,6 +24,7 @@ public final class BacktraceBuffer {
   /** Default number of records held when capacity is not explicitly configured. */
   public static final int DEFAULT_CAPACITY = 100;
 
+  @SuppressWarnings("PMD.AvoidUsingVolatile") // double-checked locking requires volatile
   private static volatile BacktraceBuffer instance;
 
   private final int capacity;
@@ -41,6 +42,8 @@ public final class BacktraceBuffer {
   @SuppressFBWarnings(
       value = "MS_EXPOSE_REP",
       justification = "Intentional singleton exposure; callers need the shared mutable instance")
+  @SuppressWarnings(
+      "PMD.NonThreadSafeSingleton") // double-checked locking with volatile is thread-safe
   public static BacktraceBuffer getInstance() {
     if (instance == null) {
       synchronized (BacktraceBuffer.class) {

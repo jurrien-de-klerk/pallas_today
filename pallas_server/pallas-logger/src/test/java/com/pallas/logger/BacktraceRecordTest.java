@@ -24,8 +24,7 @@ class BacktraceRecordTest {
 
   @Test
   void thrownCanBeNull() {
-    BacktraceRecord record =
-        new BacktraceRecord("L", Level.INFO, "msg", Instant.EPOCH, null);
+    BacktraceRecord record = new BacktraceRecord("L", Level.INFO, "msg", Instant.EPOCH, null);
 
     assertThat(record.thrown()).isNull();
   }
@@ -33,7 +32,8 @@ class BacktraceRecordTest {
   @Test
   void toStringContainsLevelLoggerNameAndMessage() {
     Instant instant = Instant.parse("2024-01-01T00:00:00Z");
-    BacktraceRecord record = new BacktraceRecord("SvcLogger", Level.ERROR, "bad thing", instant, null);
+    BacktraceRecord record =
+        new BacktraceRecord("SvcLogger", Level.ERROR, "bad thing", instant, null);
 
     assertThat(record.toString())
         .contains("ERROR")

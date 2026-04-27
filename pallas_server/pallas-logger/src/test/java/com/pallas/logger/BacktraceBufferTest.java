@@ -43,7 +43,8 @@ class BacktraceBufferTest {
     buffer.add(record("gamma"));
 
     List<BacktraceRecord> records = buffer.getRecords();
-    assertThat(records).extracting(BacktraceRecord::message)
+    assertThat(records)
+        .extracting(BacktraceRecord::message)
         .containsExactly("alpha", "beta", "gamma");
   }
 
@@ -69,7 +70,8 @@ class BacktraceBufferTest {
     buffer.add(record("four")); // evicts "one"
 
     List<BacktraceRecord> records = buffer.getRecords();
-    assertThat(records).extracting(BacktraceRecord::message)
+    assertThat(records)
+        .extracting(BacktraceRecord::message)
         .containsExactly("two", "three", "four");
   }
 

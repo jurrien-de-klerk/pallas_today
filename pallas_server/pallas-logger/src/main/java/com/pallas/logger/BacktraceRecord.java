@@ -5,7 +5,7 @@ import java.time.Instant;
 import org.apache.logging.log4j.Level;
 
 /**
- * Immutable snapshot of a single log event captured by {@link BacktraceAppender}.
+ * Immutable snapshot of a single log event captured by {@link BacktraceFilter}.
  *
  * @param loggerName name of the logger that produced the record
  * @param level severity level of the record
