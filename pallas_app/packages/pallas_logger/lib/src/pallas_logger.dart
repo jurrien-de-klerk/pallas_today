@@ -169,19 +169,21 @@ class PallasLogger {
     final currentLevel = Logger.root.level;
     Logger.root.level = _backtraceLevel.loggingLevel;
 
-    _logger.info(
-      '--- Backtrace start (replaying ${records.length} records) ---',
-    );
-    for (final record in records) {
-      _logger.log(
-        record.level,
-        record.message,
-        record.error,
-        record.stackTrace,
+    try {
+      _logger.info(
+        '--- Backtrace start (replaying ${records.length} records) ---',
       );
+      for (final record in records) {
+        _logger.log(
+          record.level,
+          record.message,
+          record.error,
+          record.stackTrace,
+        );
+      }
+      _logger.info('--- Backtrace end ---');
+    } finally {
+      Logger.root.level = currentLevel;
     }
-    _logger.info('--- Backtrace end ---');
-
-    Logger.root.level = currentLevel;
   }
 }
