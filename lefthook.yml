@@ -11,6 +11,7 @@ pre-commit:
     - "**/macos/**"
     - "**/web/**"
     - "**/windows/**"
+    - "pallas_app/packages/openapi/**"
   jobs:
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
@@ -19,8 +20,8 @@ pre-commit:
       stage_fixed: true
       name: Markdown formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project markdownlint/markdownlint:0.15.0
-        --config /project/tool_config/markdownlint-config.rb {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project peterdavehello/markdownlint:0.44.0
+        markdownlint --config /project/tool_config/markdownlint-config.json {staged_files}
       glob: "**/*.md"
       name: Markdown lint
     - run: >-
@@ -30,7 +31,7 @@ pre-commit:
       stage_fixed: true
       name: YAML formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine -c /project/tool_config/ymllint-config.yml
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine --strict -c /project/tool_config/ymllint-config.yml
         {staged_files}
       glob: "**/*.{yml,yaml}"
       name: YAML lint
@@ -65,3 +66,10 @@ pre-commit:
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project hadolint/hadolint hadolint {staged_files}
       glob: "**/Dockerfile"
       name: Dockerfile lint
+    - run: cd pallas_app && dart run build_runner build --delete-conflicting-outputs
+      glob:
+        - "api-specs/*.yaml"
+        - "api-specs/**/*.yaml"
+        - "pallas_app/packages/openapi/**"
+      stage_fixed: true
+      name: Dart client codegen

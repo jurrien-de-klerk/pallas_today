@@ -1,3 +1,4 @@
+---
 name: pallas_app
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
@@ -34,6 +35,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_quill: ^11.5.0
   flutter_quill_extensions: ^11.0.0
+  openapi_generator_annotations: ^6.1.0
+  dio: ^5.2.0
+  openapi:
+    path: packages/openapi
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,6 +48,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  openapi_generator: ^6.1.0
+  build_runner: ^2.4.13
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

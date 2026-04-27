@@ -4,7 +4,7 @@ Spring Boot microservice for managing stories.
 
 ## API
 
-The service provides a CRUD REST API for stories. See [openapi.yaml](openapi.yaml)
+The service provides a CRUD REST API for stories. See [openapi.yaml](../../api-specs/story-service/openapi.yaml)
 for the complete API specification.
 
 **Swagger UI:** Once the application is running, access the interactive API
