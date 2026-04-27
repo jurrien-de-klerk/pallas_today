@@ -64,7 +64,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/openapi.yaml</inputSpec>
+              <inputSpec>${project.basedir}/../../api-specs/story-service/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
               <apiPackage>com.pallas.storyservice.api</apiPackage>
               <modelPackage>com.pallas.storyservice.model</modelPackage>
