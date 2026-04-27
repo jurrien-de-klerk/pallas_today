@@ -17,7 +17,7 @@ const int _kDefaultCapacity = 100;
 /// PallasLogBuffer.configure(capacity: 200);
 /// ```
 ///
-/// The default capacity is $_kDefaultCapacity records.
+/// The default capacity is 100 records.
 ///
 /// ## Reading the buffer
 ///
