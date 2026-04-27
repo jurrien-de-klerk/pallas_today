@@ -42,6 +42,23 @@ import org.apache.logging.log4j.core.filter.AbstractFilter;
     printObject = true)
 public final class BacktraceFilter extends AbstractFilter {
 
+  /**
+   * Thread-local flag set by {@link PallasBacktrace#backtrace(Logger)} during replay to prevent
+   * replayed records from being re-buffered, which would mutate buffer history and violate the
+   * non-destructive contract of {@link BacktraceBuffer#getRecords()}.
+   */
+  private static final ThreadLocal<Boolean> REPLAYING = ThreadLocal.withInitial(() -> false);
+
+  /** Suppresses buffering on the calling thread. Call before starting a backtrace replay. */
+  static void suppressForReplay() {
+    REPLAYING.set(true);
+  }
+
+  /** Restores buffering on the calling thread. Call after a backtrace replay completes. */
+  static void restoreAfterReplay() {
+    REPLAYING.remove();
+  }
+
   private BacktraceFilter() {
     super(Result.NEUTRAL, Result.NEUTRAL);
   }
@@ -54,6 +71,9 @@ public final class BacktraceFilter extends AbstractFilter {
 
   @Override
   public Result filter(LogEvent event) {
+    if (Boolean.TRUE.equals(REPLAYING.get())) {
+      return Result.NEUTRAL;
+    }
     String message = event.getMessage() != null ? event.getMessage().getFormattedMessage() : "";
     Instant time = Instant.ofEpochMilli(event.getTimeMillis());
     BacktraceBuffer.getInstance()

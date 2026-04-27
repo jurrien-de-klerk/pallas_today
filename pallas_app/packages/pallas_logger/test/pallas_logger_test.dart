@@ -73,12 +73,20 @@ void main() {
   });
 
   group('PallasLogger.setLevel', () {
-    test('records below level are not emitted', () {
+    test('records below level are not emitted to listeners', () {
       PallasLogger.setLevel(PallasLevel.warn);
       log.debug('suppressed');
       log.info('also suppressed');
 
       expect(emitted, isEmpty);
+    });
+
+    test('records below level are still buffered', () {
+      PallasLogger.setLevel(PallasLevel.warn);
+      log.debug('suppressed but buffered');
+      log.info('also suppressed but buffered');
+
+      expect(PallasLogBuffer.instance.length, equals(2));
     });
 
     test('records at or above level are emitted', () {

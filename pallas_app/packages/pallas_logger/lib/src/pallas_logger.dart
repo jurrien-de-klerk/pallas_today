@@ -7,8 +7,10 @@ import 'pallas_log_record.dart';
 /// A logger with a fixed four-level severity API.
 ///
 /// Each instance wraps a [Logger] from the `logging` package. Every log call
-/// is also appended to the shared [PallasLogBuffer] so callers can inspect
-/// recent history regardless of the active log level.
+/// is unconditionally appended to the shared [PallasLogBuffer] regardless of
+/// the active root level, mirroring the Java `BacktraceFilter` design. Only
+/// the emission to [Logger.root] listeners is gated by the root level — the
+/// buffer always holds the full recent history.
 ///
 /// Configure the buffer capacity once at application start:
 ///
@@ -59,8 +61,10 @@ class PallasLogger {
 
   /// Sets the minimum log level for all [PallasLogger] instances.
   ///
-  /// Records below [level] are discarded by the underlying `logging` package
-  /// and will not appear in listeners or be added to [PallasLogBuffer].
+  /// Only records at or above [level] are passed to [Logger.root] listeners
+  /// (e.g. your log-output handler). Records below [level] are still
+  /// unconditionally appended to [PallasLogBuffer] so the full call history
+  /// is always available for backtrace replay.
   ///
   /// Call once at application start, before any logging occurs:
   ///
@@ -78,7 +82,7 @@ class PallasLogger {
   /// — is passed to listeners. After [backtrace] completes the original root
   /// level is restored.
   ///
-  /// Defaults to [PallasLevel.fatal] when not explicitly configured.
+  /// Defaults to [PallasLevel.debug] when not explicitly configured.
   ///
   /// ```dart
   /// PallasLogger.setBacktraceLevel(PallasLevel.warn);
@@ -87,7 +91,7 @@ class PallasLogger {
     _backtraceLevel = level;
   }
 
-  static PallasLevel _backtraceLevel = PallasLevel.fatal;
+  static PallasLevel _backtraceLevel = PallasLevel.debug;
 
   final Logger _logger;
 
@@ -139,7 +143,7 @@ class PallasLogger {
   ///
   /// To ensure all records are visible, [Logger.root.level] is temporarily
   /// lowered to the configured backtrace level (see [setBacktraceLevel],
-  /// default [PallasLevel.fatal]) for the duration of the replay. The original
+  /// default [PallasLevel.debug]) for the duration of the replay. The original
   /// root level is restored afterwards.
   ///
   /// A header and footer are logged at [Level.INFO] to delimit the backtrace

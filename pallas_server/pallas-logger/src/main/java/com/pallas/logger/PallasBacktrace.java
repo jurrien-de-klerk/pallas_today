@@ -93,19 +93,22 @@ public final class PallasBacktrace {
 
     Level currentLevel = LogManager.getRootLogger().getLevel();
     Configurator.setRootLevel(backtraceLevel);
-
-    logger.info("--- Backtrace start (replaying {} records) ---", records.size());
-    for (BacktraceRecord record : records) {
-      logger.log(
-          record.level(),
-          "[backtrace] {} {}: {}",
-          record.time(),
-          record.loggerName(),
-          record.message(),
-          record.thrown());
+    BacktraceFilter.suppressForReplay();
+    try {
+      logger.info("--- Backtrace start (replaying {} records) ---", records.size());
+      for (BacktraceRecord record : records) {
+        logger.log(
+            record.level(),
+            "[backtrace] {} {}: {}",
+            record.time(),
+            record.loggerName(),
+            record.message(),
+            record.thrown());
+      }
+      logger.info("--- Backtrace end ---");
+    } finally {
+      BacktraceFilter.restoreAfterReplay();
+      Configurator.setRootLevel(currentLevel);
     }
-    logger.info("--- Backtrace end ---");
-
-    Configurator.setRootLevel(currentLevel);
   }
 }

@@ -92,6 +92,18 @@ class PallasBacktraceTest {
   }
 
   @Test
+  void backtraceReplayDoesNotReBufferReplayedRecords() {
+    BacktraceBuffer.getInstance().add(record("original", Level.INFO));
+    int sizeBeforeReplay = BacktraceBuffer.getInstance().size();
+
+    PallasBacktrace.setBacktraceLevel(Level.ALL);
+    PallasBacktrace.backtrace(LOG);
+
+    // Buffer must not have grown: replay events must be suppressed by BacktraceFilter.
+    assertThat(BacktraceBuffer.getInstance().size()).isEqualTo(sizeBeforeReplay);
+  }
+
+  @Test
   void rootLevelIsRestoredAfterBacktrace() {
     Configurator.setRootLevel(Level.WARN);
     PallasBacktrace.setBacktraceLevel(Level.ALL);
