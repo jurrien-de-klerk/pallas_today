@@ -14,6 +14,7 @@
 /// [PallasLogBuffer], enabling backtrace inspection of recent history.
 library pallas_logger;
 
+export 'src/pallas_level.dart';
 export 'src/pallas_log_buffer.dart';
 export 'src/pallas_log_record.dart';
 export 'src/pallas_logger.dart';

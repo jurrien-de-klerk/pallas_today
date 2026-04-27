@@ -1,5 +1,6 @@
 import 'package:logging/logging.dart';
 
+import 'pallas_level.dart';
 import 'pallas_log_buffer.dart';
 import 'pallas_log_record.dart';
 
@@ -15,10 +16,15 @@ import 'pallas_log_record.dart';
 /// PallasLogBuffer.configure(capacity: 200);
 /// ```
 ///
+/// Set the application-wide minimum log level once at application start:
+///
+/// ```dart
+/// PallasLogger.setLevel(PallasLevel.info);
+/// ```
+///
 /// Configure log output once at application start:
 ///
 /// ```dart
-/// Logger.root.level = Level.ALL;
 /// Logger.root.onRecord.listen((record) {
 ///   // ignore: avoid_print
 ///   print('${record.level.name}: ${record.time}: ${record.message}');
@@ -40,6 +46,20 @@ class PallasLogger {
   /// The [name] is forwarded to the underlying [Logger] and appears in every
   /// log record, making log output easy to filter by feature.
   PallasLogger(String name) : _logger = Logger(name);
+
+  /// Sets the minimum log level for all [PallasLogger] instances.
+  ///
+  /// Records below [level] are discarded by the underlying `logging` package
+  /// and will not appear in listeners or be added to [PallasLogBuffer].
+  ///
+  /// Call once at application start, before any logging occurs:
+  ///
+  /// ```dart
+  /// PallasLogger.setLevel(PallasLevel.info); // suppress debug in production
+  /// ```
+  static void setLevel(PallasLevel level) {
+    Logger.root.level = level.loggingLevel;
+  }
 
   final Logger _logger;
 
