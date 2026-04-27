@@ -1,3 +1,4 @@
+---
 openapi: 3.0.3
 info:
   title: StoryService API
@@ -227,8 +228,8 @@ components:
           example: 123e4567-e89b-12d3-a456-426614174000
         story:
           type: string
-          description: The story content
-          example: Once upon a time in a land far, far away...
+          description: The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
+          example: '[{"insert":"Once upon a time...\n"}]'
     StoryInput:
       type: object
       required:
@@ -236,10 +237,10 @@ components:
       properties:
         story:
           type: string
-          description: The story content
+          description: The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
           minLength: 1
-          maxLength: 10000
-          example: Once upon a time in a land far, far away...
+          maxLength: 100000
+          example: '[{"insert":"Once upon a time...\n"}]'
     Error:
       type: object
       required:

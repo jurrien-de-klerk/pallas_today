@@ -30,9 +30,10 @@ class _PostStoryScreenState extends State<PostStoryScreen> {
   }
 
   Future<void> _publish() async {
-    final storyText = _controller.document.toPlainText();
+    final document = _controller.document;
+    final isEmpty = document.toPlainText().trim().isEmpty;
     setState(() => _publishing = true);
-    final success = await _storyService.publishStory(storyText);
+    final success = await _storyService.publishStory(document);
     if (!mounted) return;
     setState(() => _publishing = false);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -40,7 +41,7 @@ class _PostStoryScreenState extends State<PostStoryScreen> {
         content: Text(
           success
               ? 'Story published!'
-              : storyText.trim().isEmpty
+              : isEmpty
               ? 'Write something before publishing.'
               : 'Failed to publish. Please try again.',
         ),
