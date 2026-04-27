@@ -7,3 +7,5 @@ environment:
   sdk: ^3.11.4
 dependencies:
   logging: ^1.3.0
+dev_dependencies:
+  test: ^1.25.0
