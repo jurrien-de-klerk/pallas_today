@@ -11,6 +11,7 @@ pre-commit:
     - "**/macos/**"
     - "**/web/**"
     - "**/windows/**"
+    - "pallas_app/lib/proxy/generated/**"
   jobs:
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
@@ -65,3 +66,7 @@ pre-commit:
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project hadolint/hadolint hadolint {staged_files}
       glob: "**/Dockerfile"
       name: Dockerfile lint
+    - run: cd pallas_app && dart run build_runner build --delete-conflicting-outputs
+      glob: "api-specs/**/*.yaml"
+      stage_fixed: true
+      name: Dart client codegen

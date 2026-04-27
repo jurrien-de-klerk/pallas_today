@@ -4,6 +4,8 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+  path_filters:
+    - "!pallas_app/lib/proxy/generated/**"
   path_instructions:
     - path: "**/*"
       instructions: |
@@ -15,6 +17,7 @@ reviews:
         3) If a change conflicts with an accepted ADR, request changes and clearly cite the conflicting ADR file(s).
         4) If no ADR exists for a significant new architectural direction, suggest adding a new ADR in doc/adr/.
         5) Do not review generated Flutter platform code in pallas_app/ios/, pallas_app/android/, pallas_app/linux/, pallas_app/macos/, pallas_app/web/, or pallas_app/windows/.
+        6) Do not review generated Dart client code in pallas_app/lib/proxy/generated/. This code is auto-generated from OpenAPI specs in api-specs/ and must not be manually edited or reviewed.
 
         Lefthook review requirements:
         1) Verify lefthook is used as the execution entrypoint for linting and formatting.
