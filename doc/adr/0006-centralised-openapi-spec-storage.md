@@ -23,7 +23,7 @@ All microservice APIs must be documented using the OpenAPI specification format.
 All OpenAPI specs are stored in a central `api-specs/` directory at the
 repository root. Each service has its own subdirectory:
 
-```
+```text
 pallas_today/
   api-specs/
     story-service/
