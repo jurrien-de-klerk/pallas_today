@@ -1,9 +1,21 @@
 import 'package:logging/logging.dart';
 
+import 'pallas_log_buffer.dart';
+import 'pallas_log_record.dart';
+
 /// A logger with a fixed four-level severity API.
 ///
-/// Each instance wraps a [Logger] from the `logging` package. Configure log
-/// output once at application start:
+/// Each instance wraps a [Logger] from the `logging` package. Every log call
+/// is also appended to the shared [PallasLogBuffer] so callers can inspect
+/// recent history regardless of the active log level.
+///
+/// Configure the buffer capacity once at application start:
+///
+/// ```dart
+/// PallasLogBuffer.configure(capacity: 200);
+/// ```
+///
+/// Configure log output once at application start:
 ///
 /// ```dart
 /// Logger.root.level = Level.ALL;
@@ -31,27 +43,46 @@ class PallasLogger {
 
   final Logger _logger;
 
+  void _log(
+    Level level,
+    Object? message,
+    Object? error,
+    StackTrace? stackTrace,
+  ) {
+    _logger.log(level, message, error, stackTrace);
+    PallasLogBuffer.instance.add(
+      PallasLogRecord(
+        loggerName: _logger.name,
+        level: level,
+        message: message?.toString() ?? '',
+        time: DateTime.now(),
+        error: error,
+        stackTrace: stackTrace,
+      ),
+    );
+  }
+
   /// Logs a debug-level message (maps to [Level.FINE]).
   ///
   /// Use for detailed diagnostic information useful during development.
   void debug(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      _logger.fine(message, error, stackTrace);
+      _log(Level.FINE, message, error, stackTrace);
 
   /// Logs an informational message (maps to [Level.INFO]).
   ///
   /// Use for normal operational events such as user actions or lifecycle steps.
   void info(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      _logger.info(message, error, stackTrace);
+      _log(Level.INFO, message, error, stackTrace);
 
   /// Logs a warning (maps to [Level.WARNING]).
   ///
   /// Use when something unexpected occurred but the application can continue.
   void warn(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      _logger.warning(message, error, stackTrace);
+      _log(Level.WARNING, message, error, stackTrace);
 
   /// Logs a fatal error (maps to [Level.SEVERE]).
   ///
   /// Use for critical failures from which the application cannot recover.
   void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      _logger.severe(message, error, stackTrace);
+      _log(Level.SEVERE, message, error, stackTrace);
 }
