@@ -1,0 +1,9 @@
+---
+name: pallas_logger
+description: Opinionated logger for pallas_app wrapping the logging package.
+version: 0.1.0
+publish_to: 'none'
+environment:
+  sdk: ^3.11.4
+dependencies:
+  logging: ^1.3.0

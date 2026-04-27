@@ -1,0 +1,57 @@
+import 'package:logging/logging.dart';
+
+/// A logger with a fixed four-level severity API.
+///
+/// Each instance wraps a [Logger] from the `logging` package. Configure log
+/// output once at application start:
+///
+/// ```dart
+/// Logger.root.level = Level.ALL;
+/// Logger.root.onRecord.listen((record) {
+///   // ignore: avoid_print
+///   print('${record.level.name}: ${record.time}: ${record.message}');
+/// });
+/// ```
+///
+/// Then obtain a named logger per class or feature:
+///
+/// ```dart
+/// final _log = PallasLogger('MyFeature');
+/// _log.debug('Widget built');
+/// _log.info('User signed in');
+/// _log.warn('Token expiring soon');
+/// _log.fatal('Unrecoverable error', error, stackTrace);
+/// ```
+class PallasLogger {
+  /// Creates a [PallasLogger] with the given [name].
+  ///
+  /// The [name] is forwarded to the underlying [Logger] and appears in every
+  /// log record, making log output easy to filter by feature.
+  PallasLogger(String name) : _logger = Logger(name);
+
+  final Logger _logger;
+
+  /// Logs a debug-level message (maps to [Level.FINE]).
+  ///
+  /// Use for detailed diagnostic information useful during development.
+  void debug(Object? message, [Object? error, StackTrace? stackTrace]) =>
+      _logger.fine(message, error, stackTrace);
+
+  /// Logs an informational message (maps to [Level.INFO]).
+  ///
+  /// Use for normal operational events such as user actions or lifecycle steps.
+  void info(Object? message, [Object? error, StackTrace? stackTrace]) =>
+      _logger.info(message, error, stackTrace);
+
+  /// Logs a warning (maps to [Level.WARNING]).
+  ///
+  /// Use when something unexpected occurred but the application can continue.
+  void warn(Object? message, [Object? error, StackTrace? stackTrace]) =>
+      _logger.warning(message, error, stackTrace);
+
+  /// Logs a fatal error (maps to [Level.SEVERE]).
+  ///
+  /// Use for critical failures from which the application cannot recover.
+  void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
+      _logger.severe(message, error, stackTrace);
+}

@@ -39,6 +39,8 @@ dependencies:
   dio: ^5.2.0
   openapi:
     path: packages/openapi
+  pallas_logger:
+    path: packages/pallas_logger
 dev_dependencies:
   flutter_test:
     sdk: flutter
