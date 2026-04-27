@@ -22,6 +22,14 @@ import 'pallas_log_record.dart';
 /// PallasLogger.setLevel(PallasLevel.info);
 /// ```
 ///
+/// Set the backtrace level — the minimum root level applied temporarily during
+/// a [PallasLogger.backtrace] call so all buffered records are visible
+/// (defaults to [PallasLevel.fatal]):
+///
+/// ```dart
+/// PallasLogger.setBacktraceLevel(PallasLevel.fatal);
+/// ```
+///
 /// Configure log output once at application start:
 ///
 /// ```dart
@@ -39,6 +47,8 @@ import 'pallas_log_record.dart';
 /// _log.info('User signed in');
 /// _log.warn('Token expiring soon');
 /// _log.fatal('Unrecoverable error', error, stackTrace);
+/// // On crash, replay recent history at backtrace level:
+/// _log.backtrace();
 /// ```
 class PallasLogger {
   /// Creates a [PallasLogger] with the given [name].
@@ -60,6 +70,24 @@ class PallasLogger {
   static void setLevel(PallasLevel level) {
     Logger.root.level = level.loggingLevel;
   }
+
+  /// Sets the severity level used as [Logger.root] floor during [backtrace].
+  ///
+  /// While [backtrace] runs, [Logger.root.level] is temporarily set to this
+  /// value so that every buffered record — regardless of the normal log level
+  /// — is passed to listeners. After [backtrace] completes the original root
+  /// level is restored.
+  ///
+  /// Defaults to [PallasLevel.fatal] when not explicitly configured.
+  ///
+  /// ```dart
+  /// PallasLogger.setBacktraceLevel(PallasLevel.warn);
+  /// ```
+  static void setBacktraceLevel(PallasLevel level) {
+    _backtraceLevel = level;
+  }
+
+  static PallasLevel _backtraceLevel = PallasLevel.fatal;
 
   final Logger _logger;
 
@@ -105,4 +133,51 @@ class PallasLogger {
   /// Use for critical failures from which the application cannot recover.
   void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
       _log(Level.SEVERE, message, error, stackTrace);
+
+  /// Replays all records currently in [PallasLogBuffer] at their original
+  /// levels without modifying the buffer.
+  ///
+  /// To ensure all records are visible, [Logger.root.level] is temporarily
+  /// lowered to the configured backtrace level (see [setBacktraceLevel],
+  /// default [PallasLevel.fatal]) for the duration of the replay. The original
+  /// root level is restored afterwards.
+  ///
+  /// A header and footer are logged at [Level.INFO] to delimit the backtrace
+  /// output in the log stream.
+  ///
+  /// Call this when a crash is detected to surface the recent history through
+  /// the normal log output pipeline:
+  ///
+  /// ```dart
+  /// try {
+  ///   ...
+  /// } catch (e, st) {
+  ///   _log.fatal('Unhandled exception', e, st);
+  ///   _log.backtrace();
+  /// }
+  /// ```
+  ///
+  /// The buffer is not cleared, so [backtrace] can be called multiple times
+  /// and will always replay the full current contents.
+  void backtrace() {
+    final records = PallasLogBuffer.instance.records;
+
+    final currentLevel = Logger.root.level;
+    Logger.root.level = _backtraceLevel.loggingLevel;
+
+    _logger.info(
+      '--- Backtrace start (replaying ${records.length} records) ---',
+    );
+    for (final record in records) {
+      _logger.log(
+        record.level,
+        record.message,
+        record.error,
+        record.stackTrace,
+      );
+    }
+    _logger.info('--- Backtrace end ---');
+
+    Logger.root.level = currentLevel;
+  }
 }
