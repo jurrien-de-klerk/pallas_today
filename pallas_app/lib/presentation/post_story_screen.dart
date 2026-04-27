@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
+import '../application/story_service.dart';
+
 class PostStoryScreen extends StatefulWidget {
   const PostStoryScreen({super.key});
 
@@ -12,6 +14,8 @@ class PostStoryScreen extends StatefulWidget {
 
 class _PostStoryScreenState extends State<PostStoryScreen> {
   late final QuillController _controller;
+  final _storyService = StoryService();
+  bool _publishing = false;
 
   @override
   void initState() {
@@ -23,6 +27,26 @@ class _PostStoryScreenState extends State<PostStoryScreen> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _publish() async {
+    final storyText = _controller.document.toPlainText();
+    setState(() => _publishing = true);
+    final success = await _storyService.publishStory(storyText);
+    if (!mounted) return;
+    setState(() => _publishing = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Story published!'
+              : storyText.trim().isEmpty
+              ? 'Write something before publishing.'
+              : 'Failed to publish. Please try again.',
+        ),
+      ),
+    );
+    if (success) _controller.clear();
   }
 
   @override
@@ -68,9 +92,15 @@ class _PostStoryScreenState extends State<PostStoryScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: const Text('Publish'),
-        icon: const Icon(Icons.publish),
+        onPressed: _publishing ? null : _publish,
+        label: _publishing
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Text('Publish'),
+        icon: _publishing ? const SizedBox.shrink() : const Icon(Icons.publish),
       ),
     );
   }

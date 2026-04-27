@@ -36,6 +36,9 @@ dependencies:
   flutter_quill: ^11.5.0
   flutter_quill_extensions: ^11.0.0
   openapi_generator_annotations: ^6.1.0
+  dio: ^5.2.0
+  openapi:
+    path: lib/proxy/generated/story_service
 dev_dependencies:
   flutter_test:
     sdk: flutter
