@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.pallas.logger">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <!--
+      BacktraceAppender feeds every log event into the shared BacktraceBuffer ring buffer.
+      It is attached to the root logger so it captures records from every logger regardless
+      of name. The buffer level is intentionally set to ALL so no records are pre-filtered
+      before reaching the buffer; BacktraceBuffer itself applies the capacity limit.
+    -->
+    <BacktraceAppender name="Backtrace"/>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="Backtrace" level="ALL"/>
+    </Root>
+  </Loggers>
+</Configuration>
