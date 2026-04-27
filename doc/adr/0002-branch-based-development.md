@@ -8,8 +8,8 @@ Accepted
 
 ## Context
 
-We need a clear and consistent Git workflow for parallel issue work,
-controlled integration, and automated pull request quality checks.
+We need a clear and consistent Git workflow for parallel issue work, controlled integration, and automated pull request
+quality checks.
 
 ## Decision
 
@@ -22,8 +22,6 @@ We use a branch-based development approach with these rules:
 
 ## Consequences
 
-This improves traceability per issue, enforces review before merge, and keeps
-`main` protected.
+This improves traceability per issue, enforces review before merge, and keeps `main` protected.
 
-It adds workflow overhead because all changes require a pull request and
-automated review configuration.
+It adds workflow overhead because all changes require a pull request and automated review configuration.
