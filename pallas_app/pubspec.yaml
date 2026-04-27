@@ -38,7 +38,7 @@ dependencies:
   openapi_generator_annotations: ^6.1.0
   dio: ^5.2.0
   openapi:
-    path: lib/proxy/generated/story_service
+    path: packages/openapi
 dev_dependencies:
   flutter_test:
     sdk: flutter

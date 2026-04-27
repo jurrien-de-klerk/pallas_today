@@ -664,7 +664,7 @@ packages:
   openapi:
     dependency: "direct main"
     description:
-      path: "lib/proxy/generated/story_service"
+      path: "packages/openapi"
       relative: true
     source: path
     version: "1.0.0"

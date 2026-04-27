@@ -11,7 +11,7 @@ pre-commit:
     - "**/macos/**"
     - "**/web/**"
     - "**/windows/**"
-    - "pallas_app/lib/proxy/generated/**"
+    - "pallas_app/packages/openapi/**"
   jobs:
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a

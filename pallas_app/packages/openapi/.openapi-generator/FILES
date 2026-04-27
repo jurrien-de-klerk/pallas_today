@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 analysis_options.yaml
 doc/Error.md
@@ -24,8 +23,3 @@ lib/src/model/story.dart
 lib/src/model/story_input.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/error_test.dart
-test/list_stories200_response_test.dart
-test/stories_api_test.dart
-test/story_input_test.dart
-test/story_test.dart

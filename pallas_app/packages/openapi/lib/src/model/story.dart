@@ -6,41 +6,51 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'story_input.g.dart';
+part 'story.g.dart';
 
-/// StoryInput
+/// Story
 ///
 /// Properties:
-/// * [story] - The story content
+/// * [id] - Unique identifier for the story
+/// * [story] - The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
 @BuiltValue()
-abstract class StoryInput implements Built<StoryInput, StoryInputBuilder> {
-  /// The story content
+abstract class Story implements Built<Story, StoryBuilder> {
+  /// Unique identifier for the story
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
+  /// The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
   @BuiltValueField(wireName: r'story')
   String get story;
 
-  StoryInput._();
+  Story._();
 
-  factory StoryInput([void updates(StoryInputBuilder b)]) = _$StoryInput;
+  factory Story([void updates(StoryBuilder b)]) = _$Story;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(StoryInputBuilder b) => b;
+  static void _defaults(StoryBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<StoryInput> get serializer => _$StoryInputSerializer();
+  static Serializer<Story> get serializer => _$StorySerializer();
 }
 
-class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
+class _$StorySerializer implements PrimitiveSerializer<Story> {
   @override
-  final Iterable<Type> types = const [StoryInput, _$StoryInput];
+  final Iterable<Type> types = const [Story, _$Story];
 
   @override
-  final String wireName = r'StoryInput';
+  final String wireName = r'Story';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    StoryInput object, {
+    Story object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
     yield r'story';
     yield serializers.serialize(
       object.story,
@@ -51,7 +61,7 @@ class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
   @override
   Object serialize(
     Serializers serializers,
-    StoryInput object, {
+    Story object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -64,13 +74,20 @@ class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required StoryInputBuilder result,
+    required StoryBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
         case r'story':
           final valueDes = serializers.deserialize(
             value,
@@ -87,12 +104,12 @@ class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
   }
 
   @override
-  StoryInput deserialize(
+  Story deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = StoryInputBuilder();
+    final result = StoryBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

@@ -72,6 +72,6 @@ When Copilot commits changes, use this workflow:
 - Exclude these generated platform directories from review scope:
   `pallas_app/ios/`, `pallas_app/android/`, `pallas_app/linux/`,
   `pallas_app/macos/`, `pallas_app/web/`, `pallas_app/windows/`.
-- Do not review generated Dart client code in `pallas_app/lib/proxy/generated/`.
+- Do not review generated Dart client code in `pallas_app/packages/openapi/`.
   This code is auto-generated from OpenAPI specs in `api-specs/` and must not
   be manually edited or reviewed.
