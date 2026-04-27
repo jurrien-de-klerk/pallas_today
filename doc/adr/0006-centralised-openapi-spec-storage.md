@@ -1,4 +1,4 @@
-# 6. centralized openapi spec storage
+# 6. centralised openapi spec storage
 
 Date: 2026-04-27
 
