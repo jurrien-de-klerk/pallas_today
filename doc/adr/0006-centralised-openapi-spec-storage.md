@@ -42,15 +42,13 @@ The `api-specs/` directory is the single source of truth for all API contracts.
 - Each Java microservice references the spec in `api-specs/<service>/openapi.yaml`
   to generate server-side code via the Maven OpenAPI Generator plugin.
 - The pallas_app references the relevant specs in `api-specs/` to generate a
-  Dart client. A manifest file `api-specs/pallas-app-apis.yaml` lists which
-  specs are exposed to the app, making the app-facing API boundary explicit.
+  Dart client.
 
 ## Consequences
 
 - API contracts are discoverable in one place, independent of implementation.
 - Both server codegen and client codegen are driven from the same spec,
   eliminating drift between server and client.
-- The app-facing API boundary is explicit and auditable via the manifest file.
 - Moving an existing spec (such as `pallas_server/StoryService/openapi.yaml`)
   to `api-specs/story-service/openapi.yaml` is a one-time migration cost.
 - All contributors must place new specs in `api-specs/` rather than inside the

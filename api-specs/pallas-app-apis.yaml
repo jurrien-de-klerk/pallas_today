@@ -1,4 +1,0 @@
-# Lists the OpenAPI specs that are exposed to the pallas_app.
-# The app client code is generated from these specs.
-specs:
-  - story-service/openapi.yaml
