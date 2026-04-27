@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:openapi/openapi.dart';
 
+import '../config/api_config.dart';
+
 /// Application service that bridges the presentation layer and the proxy layer.
 /// Transforms presentation data into proxy calls and translates proxy results
 /// back into application-level outcomes.
@@ -12,8 +14,8 @@ class StoryService {
     : _api =
           api ??
           StoriesApi(
-            Dio(BaseOptions(baseUrl: 'http://localhost:8080')),
-            serializers,
+            Dio(BaseOptions(baseUrl: storyServiceBaseUrl)),
+            standardSerializers,
           );
 
   final StoriesApi _api;
@@ -30,7 +32,16 @@ class StoryService {
       final input = StoryInputBuilder()..story = deltaJson;
       await _api.createStory(storyInput: input.build());
       return true;
-    } catch (_) {
+    } on DioException catch (e) {
+      // ignore: avoid_print
+      print(
+        '[StoryService] publishStory failed: ${e.message} '
+        '(status ${e.response?.statusCode}) — ${e.response?.data}',
+      );
+      return false;
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('[StoryService] publishStory unexpected error: $e\n$st');
       return false;
     }
   }
