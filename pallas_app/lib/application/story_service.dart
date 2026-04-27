@@ -12,11 +12,7 @@ import '../config/api_config.dart';
 class StoryService {
   StoryService({StoriesApi? api})
     : _api =
-          api ??
-          StoriesApi(
-            Dio(BaseOptions(baseUrl: storyServiceBaseUrl)),
-            standardSerializers,
-          );
+          api ?? Openapi(basePathOverride: storyServiceBaseUrl).getStoriesApi();
 
   final StoriesApi _api;
 

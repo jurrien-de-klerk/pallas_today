@@ -67,6 +67,7 @@ class _StoryCard extends StatefulWidget {
 class _StoryCardState extends State<_StoryCard> {
   late final QuillController _controller;
   late final FocusNode _focusNode;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
@@ -77,12 +78,14 @@ class _StoryCardState extends State<_StoryCard> {
       readOnly: true,
     );
     _focusNode = FocusNode(canRequestFocus: false);
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -93,7 +96,7 @@ class _StoryCardState extends State<_StoryCard> {
         padding: const EdgeInsets.all(12),
         child: QuillEditor(
           controller: _controller,
-          scrollController: ScrollController(),
+          scrollController: _scrollController,
           focusNode: _focusNode,
           config: const QuillEditorConfig(showCursor: false, autoFocus: false),
         ),
