@@ -67,6 +67,9 @@ pre-commit:
       glob: "**/Dockerfile"
       name: Dockerfile lint
     - run: cd pallas_app && dart run build_runner build --delete-conflicting-outputs
-      glob: "api-specs/**/*.yaml"
+      glob:
+        - "api-specs/*.yaml"
+        - "api-specs/**/*.yaml"
+        - "pallas_app/packages/openapi/**"
       stage_fixed: true
       name: Dart client codegen
