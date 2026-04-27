@@ -1,3 +1,5 @@
+---
 formatter:
   type: basic
   max_line_length: 120
+  include_document_start: true

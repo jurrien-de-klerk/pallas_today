@@ -30,7 +30,7 @@ pre-commit:
       stage_fixed: true
       name: YAML formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine -c /project/tool_config/ymllint-config.yml
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine --strict -c /project/tool_config/ymllint-config.yml
         {staged_files}
       glob: "**/*.{yml,yaml}"
       name: YAML lint
