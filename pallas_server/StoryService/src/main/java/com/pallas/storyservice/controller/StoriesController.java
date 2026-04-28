@@ -92,7 +92,12 @@ public class StoriesController implements StoriesApi {
     }
 
     List<Story> paginatedStories = allStories.subList(start, end);
-    log.debug("Returning {} of {} stories (offset={}, limit={})", paginatedStories.size(), allStories.size(), start, actualLimit);
+    log.debug(
+        "Returning {} of {} stories (offset={}, limit={})",
+        paginatedStories.size(),
+        allStories.size(),
+        start,
+        actualLimit);
 
     ListStories200Response response = new ListStories200Response();
     response.setStories(paginatedStories);
