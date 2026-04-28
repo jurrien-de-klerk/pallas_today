@@ -5,3 +5,5 @@ rules:
     max: 120
   document-start: enable
   comments: disable
+  truthy:
+    check-keys: false

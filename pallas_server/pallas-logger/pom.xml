@@ -10,6 +10,10 @@
   <artifactId>pallas-logger</artifactId>
   <name>pallas-logger</name>
   <description>Reusable backtrace logging library for Pallas server-side services</description>
+  <properties>
+    <!-- Set to true in CI to skip auto-formatting (fmt:check still runs). -->
+    <fmt.format.skip>false</fmt.format.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -108,6 +112,9 @@
             <goals>
               <goal>format</goal>
             </goals>
+            <configuration>
+              <skip>${fmt.format.skip}</skip>
+            </configuration>
           </execution>
           <execution>
             <id>format-check</id>
@@ -119,7 +126,6 @@
         </executions>
         <configuration>
           <sourceDirectory>src/main/java</sourceDirectory>
-          <skip>false</skip>
         </configuration>
       </plugin>
     </plugins>
