@@ -34,7 +34,7 @@ class StoryService {
       return true;
     } on DioException catch (e) {
       _log.warn(
-        'publishStory failed: ${e.message} (status ${e.response?.statusCode})',
+        'publishStory failed: ${e.type} (status ${e.response?.statusCode})',
       );
       return false;
     } catch (e, st) {
