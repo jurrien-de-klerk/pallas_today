@@ -2,8 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:pallas_logger/pallas_logger.dart';
 
 import '../application/story_service.dart';
+
+final _log = PallasLogger('PostStoryScreen');
 
 class PostStoryScreen extends StatefulWidget {
   const PostStoryScreen({super.key});
@@ -30,6 +33,7 @@ class _PostStoryScreenState extends State<PostStoryScreen> {
   }
 
   Future<void> _publish() async {
+    _log.info('Publish story button pressed');
     final document = _controller.document;
     final isEmpty = document.toPlainText().trim().isEmpty;
     setState(() => _publishing = true);

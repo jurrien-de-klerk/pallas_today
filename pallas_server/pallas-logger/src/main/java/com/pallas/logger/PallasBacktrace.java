@@ -88,7 +88,7 @@ public final class PallasBacktrace {
    * @param logger the logger instance used to emit the replayed records
    */
   @SuppressWarnings("PMD.GuardLogStatement") // root level is explicitly lowered before these calls
-  public static void backtrace(Logger logger) {
+  public static synchronized void backtrace(Logger logger) {
     List<BacktraceRecord> records = BacktraceBuffer.getInstance().getRecords();
 
     Level currentLevel = LogManager.getRootLogger().getLevel();

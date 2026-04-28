@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:pallas_logger/pallas_logger.dart';
 
 import '../application/story_service.dart';
+
+final _log = PallasLogger('MyBubbleStoryScreen');
 
 class MyBubbleStoryScreen extends StatefulWidget {
   const MyBubbleStoryScreen({super.key});
@@ -22,6 +25,7 @@ class _MyBubbleStoryScreenState extends State<MyBubbleStoryScreen> {
   }
 
   Future<void> _loadStories() async {
+    _log.info('Loading stories');
     final stories = await _storyService.listStories();
     if (mounted) {
       setState(() {
