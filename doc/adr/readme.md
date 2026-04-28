@@ -6,3 +6,4 @@
 - [4. Selective linting and formatting of text files](0004-selective-linting-and-formatting-of-text-files.md)
 - [5. Move Java linting and formatting to Maven](0005-move-java-linting-and-formatting-to-maven.md)
 - [6. centralised openapi spec storage](0006-centralised-openapi-spec-storage.md)
+- [7. No data in log records](0007-no-data-in-log-records.md)

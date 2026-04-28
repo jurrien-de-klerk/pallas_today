@@ -26,10 +26,10 @@ import 'pallas_log_record.dart';
 ///
 /// Set the backtrace level — the minimum root level applied temporarily during
 /// a [PallasLogger.backtrace] call so all buffered records are visible
-/// (defaults to [PallasLevel.fatal]):
+/// (defaults to [PallasLevel.debug]):
 ///
 /// ```dart
-/// PallasLogger.setBacktraceLevel(PallasLevel.fatal);
+/// PallasLogger.setBacktraceLevel(PallasLevel.debug);
 /// ```
 ///
 /// Configure log output once at application start:
