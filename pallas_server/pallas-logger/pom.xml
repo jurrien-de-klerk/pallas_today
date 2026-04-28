@@ -103,6 +103,13 @@
         <version>2.24</version>
         <executions>
           <execution>
+            <id>format</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>format-check</id>
             <phase>verify</phase>
             <goals>
