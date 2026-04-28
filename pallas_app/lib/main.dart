@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -16,6 +19,18 @@ void main() {
       '${record.level.name}: ${record.time}: [${record.loggerName}] ${record.message}',
     ),
   );
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    _log.fatal('Uncaught Flutter error', details.exception, details.stack);
+    _log.backtrace();
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    _log.fatal('Uncaught async error', error, stack);
+    _log.backtrace();
+    return true;
+  };
+
   _log.info('Application starting');
   runApp(const MyApp());
 }
