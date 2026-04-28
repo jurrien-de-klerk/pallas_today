@@ -15,7 +15,7 @@ pre-commit:
   jobs:
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
-        {staged_files}
+        --wrap 120 {staged_files}
       glob: "**/*.md"
       stage_fixed: true
       name: Markdown formatter

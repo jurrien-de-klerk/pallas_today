@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.pallas.logger">
+  <!--
+    BacktraceFilter is a context-level filter: it intercepts every log event before the root
+    logger's level check, so it captures records at all severity levels without changing what
+    other appenders receive.
+  -->
+  <Filters>
+    <BacktraceFilter/>
+  </Filters>
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

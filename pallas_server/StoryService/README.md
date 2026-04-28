@@ -4,11 +4,11 @@ Spring Boot microservice for managing stories.
 
 ## API
 
-The service provides a CRUD REST API for stories. See [openapi.yaml](../../api-specs/story-service/openapi.yaml)
-for the complete API specification.
+The service provides a CRUD REST API for stories. See [openapi.yaml](../../api-specs/story-service/openapi.yaml) for the
+complete API specification.
 
-**Swagger UI:** Once the application is running, access the interactive API
-documentation at `http://localhost:8080/swagger-ui.html`
+**Swagger UI:** Once the application is running, access the interactive API documentation at
+`http://localhost:8080/swagger-ui.html`
 
 **Current endpoints:**
 
@@ -18,8 +18,7 @@ documentation at `http://localhost:8080/swagger-ui.html`
 - `PUT /stories/{id}` - Update a story
 - `DELETE /stories/{id}` - Delete a story
 
-**Storage:** Currently using in-memory storage (ConcurrentHashMap). Data is
-lost on restart.
+**Storage:** Currently using in-memory storage (ConcurrentHashMap). Data is lost on restart.
 
 ## Prerequisites
 
@@ -34,9 +33,8 @@ From the `StoryService` directory:
 mvn clean verify
 ```
 
-This builds the Spring Boot executable JAR in
-`target/storyservice-0.0.1-SNAPSHOT.jar` and runs quality checks
-(Java formatting, Checkstyle, SpotBugs, PMD).
+This builds the Spring Boot executable JAR in `target/storyservice-0.0.1-SNAPSHOT.jar` and runs quality checks (Java
+formatting, Checkstyle, SpotBugs, PMD).
 
 ## Run in container
 
@@ -74,8 +72,7 @@ Once the application is running, open your browser to:
 
 `http://localhost:8080/swagger-ui.html`
 
-This provides an interactive API documentation where you can test all CRUD
-operations.
+This provides an interactive API documentation where you can test all CRUD operations.
 
 ### Test the API
 
