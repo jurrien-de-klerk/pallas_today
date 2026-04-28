@@ -1,6 +1,7 @@
 package com.pallas.storyservice.exception;
 
 import com.pallas.storyservice.model.Error;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,11 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(ResponseStatusException.class)
   public ResponseEntity<Error> handleResponseStatusException(ResponseStatusException ex) {
+    log.warn("Request failed with status {}", ex.getStatusCode());
     Error error = new Error();
     error.setMessage(ex.getReason() != null ? ex.getReason() : ex.getMessage());
     error.setCode(ex.getStatusCode().toString());
@@ -21,6 +24,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Error> handleValidationException(MethodArgumentNotValidException ex) {
+    log.warn("Request validation failed: {} field error(s)", ex.getBindingResult().getErrorCount());
     Error error = new Error();
     String message =
         ex.getBindingResult().getFieldErrors().stream()
@@ -34,6 +38,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleGenericException(Exception ex) {
+    log.error("Unhandled exception", ex);
     Error error = new Error();
     error.setMessage("Internal server error");
     error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
