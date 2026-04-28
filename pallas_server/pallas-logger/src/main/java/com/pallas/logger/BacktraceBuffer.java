@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Thread-safe singleton FIFO ring buffer that captures every {@link BacktraceRecord} logged by any
@@ -103,6 +104,7 @@ public final class BacktraceBuffer {
    * <p>When the buffer is full the oldest record is evicted to make room.
    */
   public synchronized void add(BacktraceRecord record) {
+    Objects.requireNonNull(record, "record must not be null");
     if (queue.size() >= capacity) {
       queue.removeFirst();
     }

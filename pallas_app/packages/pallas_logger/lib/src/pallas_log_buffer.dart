@@ -5,7 +5,7 @@ import 'pallas_log_record.dart';
 /// Default number of records the buffer holds when not explicitly configured.
 const int _kDefaultCapacity = 100;
 
-/// A shared, process-wide FIFO ring buffer that captures every record logged
+/// A shared, isolate-wide FIFO ring buffer that captures every record logged
 /// by any [PallasLogger] instance, regardless of level.
 ///
 /// ## Configuration
