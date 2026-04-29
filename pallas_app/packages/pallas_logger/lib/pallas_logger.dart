@@ -12,7 +12,7 @@
 ///
 /// Every log call also appends a [PallasLogRecord] to the shared
 /// [PallasLogBuffer], enabling backtrace inspection of recent history.
-library pallas_logger;
+library;
 
 export 'src/pallas_level.dart';
 export 'src/pallas_log_buffer.dart';
