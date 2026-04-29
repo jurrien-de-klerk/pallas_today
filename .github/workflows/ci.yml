@@ -16,15 +16,27 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Install dependencies
+      - name: Install dependencies (pallas_app)
         run: flutter pub get
         working-directory: pallas_app
+      - name: Install dependencies (pallas_logger)
+        run: flutter pub get
+        working-directory: pallas_app/packages/pallas_logger
+      - name: Install dependencies (openapi)
+        run: flutter pub get
+        working-directory: pallas_app/packages/openapi
       - name: Analyse
         run: flutter analyze
         working-directory: pallas_app
-      - name: Test
+      - name: Test (pallas_app)
         run: flutter test
         working-directory: pallas_app
+      - name: Test (pallas_logger)
+        run: flutter test
+        working-directory: pallas_app/packages/pallas_logger
+      - name: Test (openapi)
+        run: flutter test
+        working-directory: pallas_app/packages/openapi
   java:
     name: Java (pallas_server)
     runs-on: ubuntu-latest
