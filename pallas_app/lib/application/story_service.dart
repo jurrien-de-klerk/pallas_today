@@ -21,7 +21,8 @@ class StoryService {
       basePathOverride: storyServiceBaseUrl,
       interceptors: [
         InterceptorsWrapper(
-          onRequest: (options, handler) {
+          onRequest: (options, handler) async {
+            await AuthService.instance.refreshIfNeeded();
             final token = AuthService.instance.accessToken;
             if (token != null) {
               options.headers['Authorization'] = 'Bearer $token';
