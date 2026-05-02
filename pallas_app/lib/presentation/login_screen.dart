@@ -90,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     obscureText: true,
                     textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _submit(),
+                    onFieldSubmitted: (_) {
+                      if (!_loading) _submit();
+                    },
                     validator: (v) =>
                         (v == null || v.isEmpty) ? 'Required' : null,
                   ),
