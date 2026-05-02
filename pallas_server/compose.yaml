@@ -17,7 +17,7 @@ services:
       retries: 25
   keycloak:
     image: quay.io/keycloak/keycloak:26.2
-    command: start-dev --health-enabled=true
+    command: start-dev --health-enabled=true --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
@@ -28,6 +28,8 @@ services:
       KC_HEALTH_ENABLED: "true"
     ports:
       - "8180:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     networks:
       - keycloak-internal
       - services
@@ -46,6 +48,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
+      KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
+      KEYCLOAK_REALM: pallas
     networks:
       - services
     depends_on:
