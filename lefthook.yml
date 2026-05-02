@@ -46,6 +46,16 @@ pre-commit:
       glob: "**/*.xml"
       name: XML lint
     - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jqlang/jq sh -c
+        'for file in {staged_files}; do tmp=$(mktemp) && jq . "$file" > "$tmp" && mv "$tmp" "$file"; done'
+      glob: "**/*.json"
+      stage_fixed: true
+      name: JSON formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/jsonlint jsonlint {staged_files}
+      glob: "**/*.json"
+      name: JSON lint
+    - run: >-
         cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       stage_fixed: true
