@@ -46,8 +46,9 @@ pre-commit:
       glob: "**/*.xml"
       name: XML lint
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jqlang/jq sh -c
-        'for file in {staged_files}; do tmp=$(mktemp) && jq . "$file" > "$tmp" && mv "$tmp" "$file"; done'
+        for file in {staged_files}; do
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jqlang/jq . "$file"
+        > /tmp/_lefthook_jq.json && mv /tmp/_lefthook_jq.json "$file"; done
       glob: "**/*.json"
       stage_fixed: true
       name: JSON formatter
