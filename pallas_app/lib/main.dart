@@ -6,7 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:logging/logging.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
-import 'presentation/home_shell.dart';
+import 'presentation/login_screen.dart';
 
 final _log = PallasLogger('main');
 
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
-      home: const HomeShell(),
+      home: const LoginScreen(),
     );
   }
 }
