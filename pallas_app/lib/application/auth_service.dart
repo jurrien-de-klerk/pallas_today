@@ -35,7 +35,10 @@ class AuthService {
       _accessToken = response.data['access_token'] as String;
     } on DioException catch (e) {
       final status = e.response?.statusCode;
-      if (status == 401) {
+      final error = e.response?.data is Map
+          ? (e.response!.data as Map)['error']
+          : null;
+      if (status == 400 && error == 'invalid_grant') {
         throw LoginException('Invalid username or password.');
       }
       throw LoginException('Could not reach authentication server.');
