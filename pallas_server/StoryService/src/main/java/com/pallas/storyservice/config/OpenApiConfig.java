@@ -34,7 +34,7 @@ public class OpenApiConfig {
                                     new OAuthFlow()
                                         .authorizationUrl(authUrl + "/auth")
                                         .tokenUrl(authUrl + "/token")
-                                        .scopes(new Scopes())))));  
+                                        .scopes(new Scopes())))));
   }
 
   @Bean
