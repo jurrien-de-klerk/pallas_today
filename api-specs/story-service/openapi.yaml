@@ -9,6 +9,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
+security:
+  - oauth2: []
 paths:
   /stories:
     get:
@@ -214,6 +216,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/token
+          scopes: {}
   schemas:
     Story:
       type: object
