@@ -6,6 +6,7 @@ import 'package:openapi/openapi.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
 import '../config/api_config.dart';
+import 'auth_service.dart';
 
 final _log = PallasLogger('StoryService');
 
@@ -13,9 +14,25 @@ final _log = PallasLogger('StoryService');
 /// Transforms presentation data into proxy calls and translates proxy results
 /// back into application-level outcomes.
 class StoryService {
-  StoryService({StoriesApi? api})
-    : _api =
-          api ?? Openapi(basePathOverride: storyServiceBaseUrl).getStoriesApi();
+  StoryService({StoriesApi? api}) : _api = api ?? _buildApi();
+
+  static StoriesApi _buildApi() {
+    return Openapi(
+      basePathOverride: storyServiceBaseUrl,
+      interceptors: [
+        InterceptorsWrapper(
+          onRequest: (options, handler) async {
+            await AuthService.instance.refreshIfNeeded();
+            final token = AuthService.instance.accessToken;
+            if (token != null) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
+            handler.next(options);
+          },
+        ),
+      ],
+    ).getStoriesApi();
+  }
 
   final StoriesApi _api;
 

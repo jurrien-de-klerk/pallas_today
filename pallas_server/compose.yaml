@@ -1,7 +1,63 @@
+---
 services:
+  keycloak-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    networks:
+      - keycloak-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 2s
+      timeout: 5s
+      retries: 25
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    command: start-dev --health-enabled=true --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    networks:
+      - keycloak-internal
+      - services
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/realms/pallas/.well-known/openid-configuration"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
   story-service:
     build:
       context: ./StoryService
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
+      KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
+      KEYCLOAK_REALM: pallas
+    networks:
+      - services
+    depends_on:
+      keycloak:
+        condition: service_healthy
+networks:
+  keycloak-internal:
+    driver: bridge
+    internal: true
+  services:
+    driver: bridge

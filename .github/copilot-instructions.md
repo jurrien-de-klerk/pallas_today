@@ -52,6 +52,40 @@ When Copilot commits changes, use this workflow:
    - Otherwise, use `git add <files to commit>` for a selective commit.
 1. Repeat steps 2 and 4 until the commit succeeds.
 
+## Workflow: Dart client codegen changes
+
+When the `Dart client codegen guard` hook blocks a commit because `pallas_app/packages/openapi/` changed:
+
+1. Run `git diff --stat pallas_app/packages/openapi/` to see which files changed.
+1. **If only documentation files changed** (i.e. all changed files are `*.md`):
+   - These are expected, low-risk doc updates that correspond directly to the spec change.
+   - Stage them with `git add pallas_app/packages/openapi/` and retry the commit without asking.
+1. **If code files changed alongside or instead of docs** (e.g. `lib/src/**/*.dart`), run
+   `git diff pallas_app/packages/openapi/` to read the full diff, then apply the rules below.
+   - **Small and clearly spec-driven** (e.g. a new field on one model, a new operation method, the `secure` metadata
+     updated on existing operations — all directly traceable to the OpenAPI spec change in the same commit):
+     - Stage with `git add pallas_app/packages/openapi/` and retry the commit without asking.
+   - **Large or wide-ranging** (e.g. many files regenerated, structural client changes, dependency version bumps,
+     changes in files unrelated to the current spec diff):
+     - Do **not** stage and commit.
+
+     - Stop and report to the programmer with the following structure:
+
+       ```text
+       Dart client codegen produced changes that require your review before committing.
+
+       Changed files:
+       - <file path>: <one-line description of what changed>
+       - ...
+
+       Likely cause: <which part of the OpenAPI spec change triggered this>
+
+       Unexpected changes (no obvious spec cause):
+       - <file path>: <description> — please verify this is not a generator side-effect
+
+       To proceed: review the changes above, then ask to commit changes again."
+       ```
+
 ## Commit troubleshooting requirements
 
 - Never suggest or use `git commit --no-verify`.
