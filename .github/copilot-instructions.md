@@ -94,6 +94,100 @@ When the `Dart client codegen guard` hook blocks a commit because `pallas_app/pa
   fix them and retry the commit using normal hooks.
 - Only proceed with standard verified commits that pass configured hooks.
 
+## Workflow: Creating an issue
+
+The developer describes the intended change; the AI guides the process and drafts the issue. The developer must review
+and confirm before the issue is created.
+
+### Step 1 — Build context
+
+Use the developer's prompt to understand the description and scope of the change. Apply the following rules:
+
+- If the **description** is unclear, ask the developer specifically to clarify what the feature or bug fix is about
+  before proceeding.
+- If the **scope** is unclear, ask specifically what is in scope and what is out of scope. Use the following areas as a
+  checklist to prompt the conversation:
+  - Documentation
+  - Tool setup (linters, formatters, CI hooks)
+  - `pallas_app` (Flutter frontend)
+  - Microservices in `pallas_server/` (ask which subfolder(s))
+  - Infrastructure changes (Docker, Kubernetes, `compose.yaml`)
+  - API definitions in `api-specs/`
+
+Do not proceed to the next step until the description and scope are clear.
+
+### Step 2 — Estimate size and adjust scope
+
+Estimate the number of lines of code that the in-scope changes are likely to require. If the estimate exceeds 200 lines:
+
+1. Explain to the developer that the scope appears large.
+1. Suggest concrete ways to split the work: which areas could be deferred to a separate issue while still delivering
+   something meaningful.
+1. Adjust the scope based on the developer's response before continuing.
+
+### Step 3 — Ensure out-of-scope work is tracked
+
+For each item listed as out of scope, check whether an existing open issue already covers it. Ask the developer if
+unsure. If no issue exists for an out-of-scope item:
+
+- Suggest creating a placeholder issue for it (using `.github/ISSUE_TEMPLATE/placeholder.md`).
+- Do not create the placeholder automatically; let the developer decide.
+- Once the developer confirms, note any placeholder issue numbers so they can be referenced in the feature issue.
+
+### Step 4 — Determine labels
+
+Assign one or more of the following labels based on what is in scope:
+
+| Area | Label | |---|---| | `pallas_app` (Flutter frontend) | `frontend` | | A microservice implemented in the
+`pallas_server/` codebase | `backend` | | Installing or configuring a third-party service | `third-party-service` | |
+Documentation | `documentation` |
+
+### Step 5 — Draft and create the issue
+
+Fill in `.github/ISSUE_TEMPLATE/feature.md`:
+
+- **Description**: short description of what the feature or bug fix is about.
+- **In scope**: bullet list of what is included, using the areas confirmed in step 1.
+- **Out of scope**: bullet list of what is explicitly not included; link to tracking issues where they exist.
+
+Present the filled-in draft and the proposed labels to the developer for confirmation before creating the issue.
+
+## Workflow: Creating a pull request
+
+Use this workflow when the developer asks to create a GitHub pull request.
+
+1. Identify the linked issue number. If no issue exists, ask the developer to create one first.
+1. Read the linked issue in full to establish the planned scope: description and in/out-of-scope sections.
+1. Run `git diff main...HEAD` (or the appropriate base branch) to read the actual code changes.
+1. Cross-check planned scope against actual changes:
+   - List changes that are within the in-scope items.
+   - List changes that fall outside the in-scope items.
+   - List in-scope items that appear unaddressed by the diff.
+1. Present the cross-check findings to the developer and wait for their response before filling in the PR template. The
+   developer may confirm, adjust scope, or create placeholder issues for out-of-scope work.
+1. Fill in `.github/PULL_REQUEST_TEMPLATE.md` using the issue, the diff, and the confirmed cross-check outcome:
+   - **Related issue**: set `Closes #<number>`.
+   - **Original scope / In scope**: copy the in-scope items from the linked issue.
+   - **Original scope / Out of scope**: copy the out-of-scope items from the linked issue.
+   - **Scope changes**: describe any differences between the planned scope and the actual changes. If out-of-scope
+     changes exist, create a placeholder issue first (using `.github/ISSUE_TEMPLATE/placeholder.md`) and reference it
+     here.
+1. After the pull request is created, perform a code review (see Workflow: AI code review below).
+
+## Workflow: AI code review
+
+Perform this review after a pull request is created or when explicitly asked.
+
+1. Read the linked issue in full to understand the description and in/out-of-scope sections.
+1. Read all changed files in the pull request, excluding generated code (see Code review scope below).
+1. For each changed file, check:
+   - Is the change within the declared in-scope items?
+   - Does it violate any ADR in `doc/adr/`?
+   - Are there obvious correctness issues, security concerns, or missing error handling?
+1. Flag any in-scope items not addressed by the diff.
+1. Flag any changes that fall outside the in-scope items; suggest they move to a separate issue.
+1. Present findings grouped as: **Scope issues**, **ADR violations**, **Code issues**. If a group is empty, omit it.
+
 ## Code review scope
 
 - During code review, do not review generated Flutter platform code.
