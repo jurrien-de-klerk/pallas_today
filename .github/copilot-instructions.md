@@ -136,11 +136,14 @@ unsure. If no issue exists for an out-of-scope item:
 
 ### Step 4 — Determine labels
 
-Assign one or more of the following labels based on what is in scope:
+Assign one or more of the following labels based on what is in scope. **Only use labels from this table — do not suggest
+any label not listed here:**
 
 | Area | Label | |---|---| | `pallas_app` (Flutter frontend) | `frontend` | | A microservice implemented in the
 `pallas_server/` codebase | `backend` | | Installing or configuring a third-party service | `third-party-service` | |
-Documentation | `documentation` |
+Documentation | `documentation` | | CI/CD | `ci-cd` |
+
+If you are unsure whether a label exists in the repository, check the repository's label list before suggesting it.
 
 ### Step 5 — Draft and create the issue
 
@@ -150,7 +153,11 @@ Fill in `.github/ISSUE_TEMPLATE/feature.md`:
 - **In scope**: bullet list of what is included, using the areas confirmed in step 1.
 - **Out of scope**: bullet list of what is explicitly not included; link to tracking issues where they exist.
 
-Present the filled-in draft and the proposed labels to the developer for confirmation before creating the issue.
+Present the draft to the developer for review using a YAML code block with `type="draft-issue"` — **never use raw
+Markdown for the draft**. Include the proposed labels in the draft.
+
+**Do not call any tool to create the issue until the developer explicitly confirms the draft.** Only after confirmation,
+call the GitHub issue creation tool with the repository and issue details.
 
 ## Workflow: Creating a pull request
 
