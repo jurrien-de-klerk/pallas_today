@@ -6,8 +6,6 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
-    volumes:
-      - keycloak-db-data:/var/lib/postgresql/data
     networks:
       - keycloak-internal
     healthcheck:
@@ -63,5 +61,3 @@ networks:
     internal: true
   services:
     driver: bridge
-volumes:
-  keycloak-db-data:
