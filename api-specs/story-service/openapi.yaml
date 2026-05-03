@@ -220,8 +220,7 @@ components:
     oauth2:
       type: oauth2
       flows:
-        authorizationCode:
-          authorizationUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/auth
+        password:
           tokenUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/token
           scopes: {}
   schemas:

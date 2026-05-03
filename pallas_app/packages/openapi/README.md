@@ -87,8 +87,8 @@ Authentication schemes defined for the API:
 ### oauth2
 
 - **Type**: OAuth
-- **Flow**: accessCode
-- **Authorization URL**: http://localhost:8180/realms/pallas/protocol/openid-connect/auth
+- **Flow**: password
+- **Authorization URL**: 
 - **Scopes**: N/A
 
 
