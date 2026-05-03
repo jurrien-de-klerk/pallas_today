@@ -17,14 +17,16 @@ pre-commit:
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
         --wrap 120 {staged_files}
       glob: "**/*.md"
-      exclude: ".github/ISSUE_TEMPLATE/**"
+      exclude:
+        - ".github/ISSUE_TEMPLATE/**"
       stage_fixed: true
       name: Markdown formatter
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project peterdavehello/markdownlint:0.44.0
         markdownlint --config /project/tool_config/markdownlint-config.json {staged_files}
       glob: "**/*.md"
-      exclude: ".github/ISSUE_TEMPLATE/**"
+      exclude:
+        - ".github/ISSUE_TEMPLATE/**"
       name: Markdown lint
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project livewyer/yamlfmt:0.13 -conf /project/tool_config/yamlfmt-config.yml
