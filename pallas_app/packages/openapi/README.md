@@ -82,7 +82,14 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Authorization
 
-Endpoints do not require authorization.
+
+Authentication schemes defined for the API:
+### oauth2
+
+- **Type**: OAuth
+- **Flow**: accessCode
+- **Authorization URL**: http://localhost:8180/realms/pallas/protocol/openid-connect/auth
+- **Scopes**: N/A
 
 
 ## Author

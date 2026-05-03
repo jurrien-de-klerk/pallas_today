@@ -82,5 +82,15 @@ pre-commit:
         - "api-specs/*.yaml"
         - "api-specs/**/*.yaml"
         - "pallas_app/packages/openapi/**"
-      stage_fixed: true
       name: Dart client codegen
+    - run: >-
+        if ! git diff --quiet -- pallas_app/packages/openapi/; then
+        echo "ERROR: Dart client codegen produced changes in pallas_app/packages/openapi/.
+        Review the diff with: git diff pallas_app/packages/openapi/
+        If the changes are expected, stage them and retry the commit.
+        See copilot-instructions.md for the review workflow." >&2; exit 1; fi
+      glob:
+        - "api-specs/*.yaml"
+        - "api-specs/**/*.yaml"
+        - "pallas_app/packages/openapi/**"
+      name: Dart client codegen guard

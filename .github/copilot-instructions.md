@@ -52,6 +52,23 @@ When Copilot commits changes, use this workflow:
    - Otherwise, use `git add <files to commit>` for a selective commit.
 1. Repeat steps 2 and 4 until the commit succeeds.
 
+## Workflow: Dart client codegen changes
+
+When the `Dart client codegen guard` hook blocks a commit because `pallas_app/packages/openapi/` changed:
+
+1. Run `git diff pallas_app/packages/openapi/` to inspect the generated diff.
+1. **If the changes are small** (e.g. a new field added to an existing model, a new operation method, a security scheme
+   added — limited to files that directly correspond to the OpenAPI spec change in the same commit):
+   - The changes are expected. Stage them with `git add pallas_app/packages/openapi/` and retry the commit.
+1. **If the changes are large or wide-ranging** (e.g. many files regenerated, structural changes to the client package,
+   dependency version bumps, changes unrelated to the current spec diff):
+   - Do not stage and commit automatically.
+   - Stop and report to the programmer. Include:
+     - Which files changed and a brief description of what changed in each.
+     - Which part of the OpenAPI spec change caused it.
+     - Any files that changed without an obvious corresponding spec change (potential generator side-effects).
+   - The programmer must review and explicitly confirm before the generated code is staged and committed.
+
 ## Commit troubleshooting requirements
 
 - Never suggest or use `git commit --no-verify`.
