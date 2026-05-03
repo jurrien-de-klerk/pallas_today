@@ -164,14 +164,18 @@ Use this workflow when the developer asks to create a GitHub pull request.
    - List changes that fall outside the in-scope items.
    - List in-scope items that appear unaddressed by the diff.
 1. Present the cross-check findings to the developer and wait for their response before filling in the PR template. The
-   developer may confirm, adjust scope, or create placeholder issues for out-of-scope work.
+   developer may:
+   - Confirm that the actual changes match the planned scope.
+   - Adjust the scope by adding or removing items; these go into the **Scope changes** section of the PR and are treated
+     as agreed deviations — they will not be flagged during review.
+   - Create placeholder issues for work that is out of scope and should be tracked separately.
 1. Fill in `.github/PULL_REQUEST_TEMPLATE.md` using the issue, the diff, and the confirmed cross-check outcome:
    - **Related issue**: set `Closes #<number>`.
    - **Original scope / In scope**: copy the in-scope items from the linked issue.
    - **Original scope / Out of scope**: copy the out-of-scope items from the linked issue.
-   - **Scope changes**: describe any differences between the planned scope and the actual changes. If out-of-scope
-     changes exist, create a placeholder issue first (using `.github/ISSUE_TEMPLATE/placeholder.md`) and reference it
-     here.
+   - **Scope changes**: list each agreed deviation confirmed by the developer. For added scope, describe what was added
+     and why. For removed scope, describe what was dropped and link to a follow-up issue if applicable. Leave blank if
+     there are no deviations.
 1. After the pull request is created, perform a code review (see Workflow: AI code review below).
 
 ## Workflow: AI code review

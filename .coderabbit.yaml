@@ -27,6 +27,24 @@ reviews:
         5) Verify binary files (for example images) are excluded from lint/format requirements.
 
         Focus on actionable comments tied to specific ADR decisions.
+
+        Scope review requirements:
+        1) Read the pull request description before reviewing any file.
+        2) Extract the declared scope from the "Original scope" section of the PR description:
+           the "In scope" items define what this PR is expected to change, and the "Out of scope"
+           items define what it must not change.
+        3) For each changed file, verify the change is covered by an in-scope item.
+        4) Flag any changes that fall outside the declared in-scope items as scope violations and
+           suggest they are moved to a separate issue.
+        5) Flag any in-scope items that are not addressed by any change in the PR.
+        6) The developer is allowed to adjust the scope of the PR by filling in the "Scope changes"
+           section of the PR description. Items listed there are agreed deviations from the original
+           issue scope: added items extend the in-scope set, and removed items reduce it. Treat the
+           effective scope as the original in-scope items plus any additions minus any removals stated
+           in "Scope changes". Do not raise violations for changes that are covered by this adjusted
+           scope.
+        7) Report scope findings under a "Scope issues" heading. If there are no scope issues,
+           omit the heading.
     - path: "doc/adr/*.md"
       instructions: |
         For ADR changes:
