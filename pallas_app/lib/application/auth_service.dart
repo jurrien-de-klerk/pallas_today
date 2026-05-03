@@ -8,9 +8,21 @@ class AuthService {
 
   static final AuthService instance = AuthService._();
 
+  /// Shared Dio used for all Keycloak token requests.
+  final Dio _authDio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      sendTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
+
   String? _accessToken;
   String? _refreshToken;
   DateTime? _tokenExpiry;
+
+  /// In-flight refresh, shared across concurrent callers.
+  Future<void>? _refreshFuture;
 
   /// The current access token, or null if not authenticated.
   String? get accessToken => _accessToken;
@@ -28,9 +40,8 @@ class AuthService {
   /// Throws a [LoginException] when the credentials are invalid or the
   /// server is unreachable.
   Future<void> login(String username, String password) async {
-    final dio = Dio();
     try {
-      final response = await dio.post(
+      final response = await _authDio.post(
         '$keycloakBaseUrl/realms/$keycloakRealm/protocol/openid-connect/token',
         data: {
           'grant_type': 'password',
@@ -55,18 +66,27 @@ class AuthService {
 
   /// Refreshes the access token if it is expired or about to expire.
   ///
+  /// Concurrent callers share a single in-flight refresh request — only one
+  /// HTTP call is made regardless of how many callers invoke this at once.
+  ///
   /// If no refresh token is available, or the refresh fails, the session is
   /// cleared so the app can redirect to the login screen.
-  Future<void> refreshIfNeeded() async {
-    if (!_isExpired) return;
+  Future<void> refreshIfNeeded() {
+    if (!_isExpired) return Future.value();
+    // Reuse an in-flight refresh instead of starting a parallel one.
+    return _refreshFuture ??= _doRefresh().whenComplete(() {
+      _refreshFuture = null;
+    });
+  }
+
+  Future<void> _doRefresh() async {
     final token = _refreshToken;
     if (token == null) {
       logout();
       return;
     }
-    final dio = Dio();
     try {
-      final response = await dio.post(
+      final response = await _authDio.post(
         '$keycloakBaseUrl/realms/$keycloakRealm/protocol/openid-connect/token',
         data: {
           'grant_type': 'refresh_token',
@@ -92,6 +112,7 @@ class AuthService {
     _accessToken = null;
     _refreshToken = null;
     _tokenExpiry = null;
+    _refreshFuture = null;
   }
 }
 
