@@ -139,9 +139,13 @@ unsure. If no issue exists for an out-of-scope item:
 Assign one or more of the following labels based on what is in scope. **Only use labels from this table — do not suggest
 any label not listed here:**
 
-| Area | Label | |---|---| | `pallas_app` (Flutter frontend) | `frontend` | | A microservice implemented in the
-`pallas_server/` codebase | `backend` | | Installing or configuring a third-party service | `third-party-service` | |
-Documentation | `documentation` | | CI/CD | `ci-cd` |
+| Area                                                        | Label                 |
+| ----------------------------------------------------------- | --------------------- |
+| `pallas_app` (Flutter frontend)                             | `frontend`            |
+| A microservice implemented in the `pallas_server/` codebase | `backend`             |
+| Installing or configuring a third-party service             | `third-party-service` |
+| Documentation                                               | `documentation`       |
+| CI/CD                                                       | `ci-cd`               |
 
 If you are unsure whether a label exists in the repository, check the repository's label list before suggesting it.
 
