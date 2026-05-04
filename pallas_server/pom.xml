@@ -58,7 +58,7 @@
           <effort>Max</effort>
           <threshold>Low</threshold>
           <failOnError>true</failOnError>
-          <excludeFilterFile>${project.basedir}/../../tool_config/spotbugs-exclude.xml</excludeFilterFile>
+          <excludeFilterFile>${project.basedir}/../../tool_config/maven/spotbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
       <plugin>
