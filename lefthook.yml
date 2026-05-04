@@ -81,7 +81,7 @@ pre-commit:
       name: Shell formatter
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
-        shellcheck -x {staged_files}
+        shellcheck -x --severity=style --source-path=SCRIPTDIR {staged_files}
       glob: "**/*.sh"
       name: Shell lint
     - run: >-
