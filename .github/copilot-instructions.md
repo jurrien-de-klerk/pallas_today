@@ -1,4 +1,47 @@
-# Copilot Instructions
+# Copilot PR workflow (MANDATORY)
+
+## PR-trigger phrases
+
+Whenever the user's request contains any of the following phrases — **"create a PR"**, **"open a PR"**, **"make a pull
+request"**, **"generate a pull request"**, **"PR for issue"** — the rules in this section apply **immediately and
+without exception**.
+
+## Rule 0 — Always read these instructions first (ORDERING CONSTRAINT)
+
+When the user asks to create, open, make, or generate a pull request, you MUST first open and read **all** of the
+following files before taking any other action:
+
+1. `.github/copilot-instructions.md` (this file)
+1. `.github/PULL_REQUEST_TEMPLATE.md`
+
+Only AFTER you have read every file listed above, proceed with the PR creation steps described in
+`.github/copilot-workflows/create-pr.md`.
+
+If any of the above files cannot be accessed or read, you MUST STOP and ask the user to provide them or grant access
+before continuing.
+
+## Rule 1 — Pre-flight checklist (MUST complete before touching any code or description)
+
+1. Confirm the `owner/repo` and the target base branch.
+1. Open and read the referenced issue in full; extract the acceptance criteria, in-scope, and out-of-scope items.
+1. Identify the tests that need to pass and the hook/lint commands that must run (this repo uses `lefthook`).
+
+## Rule 2 — Hook / formatting gate
+
+All changes MUST pass `lefthook run pre-commit` before the PR is created or updated. If any new text-based file types
+are introduced by the change, you MUST update `lefthook.yml` in the same commit to add matching linter/formatter tooling
+for those types (repository ignore files are exempt from linting but must still be formatted).
+
+## Rule 3 — PR description requirements
+
+The PR description MUST:
+
+- Include `Closes #<issue-number>` in the **Related issue** section.
+- Fill in the **In scope** and **Out of scope** sections from the linked issue.
+- Describe any deviations from planned scope under **Scope changes**.
+- Include a short **Testing** section listing the commands you ran and what was verified.
+
+______________________________________________________________________
 
 ## Architecture Decision Records
 
