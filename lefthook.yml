@@ -23,20 +23,20 @@ pre-commit:
       name: Markdown-formatter
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
-        markdownlint-cli2 --config /project/tool_config/lefthook/markdownlint-config.json {staged_files}
+        markdownlint-cli2 --config /project/tool/lefthook/markdownlint-config.json {staged_files}
       glob: "**/*.md"
       exclude:
         - ".github/ISSUE_TEMPLATE/**"
       name: Markdown lint
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
-        yamlfmt -conf /project/tool_config/lefthook/yamlfmt-config.yml {staged_files}
+        yamlfmt -conf /project/tool/lefthook/yamlfmt-config.yml {staged_files}
       glob: "**/*.{yml,yaml}"
       stage_fixed: true
       name: YAML formatter
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
-        yamllint --strict -c /project/tool_config/lefthook/ymllint-config.yml {staged_files}
+        yamllint --strict -c /project/tool/lefthook/ymllint-config.yml {staged_files}
       glob: "**/*.{yml,yaml}"
       name: YAML lint
     - run: >-
