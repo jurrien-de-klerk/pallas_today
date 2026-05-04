@@ -11,11 +11,16 @@ jobs:
   flutter:
     name: Flutter (pallas_app)
     runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:stable
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
         with:
-          channel: stable
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml', '**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
       - name: Install dependencies (pallas_app)
         run: flutter pub get
         working-directory: pallas_app
