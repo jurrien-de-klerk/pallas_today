@@ -75,6 +75,17 @@ pre-commit:
     # This happens before Docker image build, and developers run Maven locally anyway
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
+        shfmt --write {staged_files}
+      glob: "**/*.sh"
+      stage_fixed: true
+      name: Shell formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
+        shellcheck -x {staged_files}
+      glob: "**/*.sh"
+      name: Shell lint
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pallas.today/commit-hook-tool
         sh -c 'for file in {staged_files}; do dockerfmt --write "$file"; done'
       glob: "**/Dockerfile"
       stage_fixed: true

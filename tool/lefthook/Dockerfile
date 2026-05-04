@@ -32,4 +32,13 @@ RUN apt-get update \
     # Install dockerfmt
     && curl -fsSL \
         https://github.com/reteps/dockerfmt/releases/download/v0.5.2/dockerfmt-v0.5.2-linux-amd64.tar.gz \
-    | tar -xz -C /usr/local/bin dockerfmt
+    | tar -xz -C /usr/local/bin dockerfmt \
+    # Install shfmt
+    && curl -fsSL \
+        https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64 \
+        -o /usr/local/bin/shfmt \
+    && chmod +x /usr/local/bin/shfmt \
+    # Install shellcheck
+    && curl -fsSL \
+        https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz \
+    | tar -xJ --strip-components=1 -C /usr/local/bin shellcheck-v0.11.0/shellcheck
