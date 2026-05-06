@@ -28,6 +28,8 @@ meaningfully with those who matter while contributing to a collective search for
 
 ## Architecture
 
+The architecture of Pallas Today is documented in [doc/architecture/readme.md](doc/architecture/readme.md).
+
 All architectural decisions for this project are documented as Architecture Decision Records (ADRs).
 
 See [doc/adr/readme.md](doc/adr/readme.md) for the complete list of ADRs.
