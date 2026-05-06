@@ -25,9 +25,9 @@ microservices. This section introduces the overall structure from two complement
 decomposition (vertical slices) and the internal layering within each component (horizontal slices).
 
 A key architectural principle follows directly from this structure: **all domain logic resides in the backend**. The
-Pallas Today App contains no business rules; it is solely responsible for presenting information and translating user
+Pallas App contains no business rules; it is solely responsible for presenting information and translating user
 interactions into API calls. This keeps the domain model coherent and backend-authoritative, regardless of which client
-or platform accesses it.
+or platform accesses it. See [ADR-0010](../adr/0010-domain-logic-belongs-in-domain-layer.md).
 
 ### Services and Components
 
@@ -83,7 +83,8 @@ hand-written application logic.
 | Data        | Manages interaction with persistent storage.          |
 
 The API layer, like the proxy layer in the app, is a technical addition that keeps transport concerns separate from the
-domain model.
+domain model. The rule that domain logic belongs in the domain layer is recorded in
+[ADR-0010](../adr/0010-domain-logic-belongs-in-domain-layer.md).
 
 ```mermaid
 graph TD
@@ -109,7 +110,8 @@ domain model and its language are self-contained and consistent; concepts are no
 Components communicate through a **shared kernel**: the OpenAPI specifications stored in `api-specs/`. These
 specifications define the contract between contexts — the data structures and operations that cross a boundary. Keeping
 the shared kernel minimal and explicitly versioned prevents tight coupling between services while still enabling
-structured collaboration.
+structured collaboration. The decision to centralise OpenAPI specs is recorded in
+[ADR-0006](../adr/0006-centralised-openapi-spec-storage.md).
 
 This means:
 
