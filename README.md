@@ -2,31 +2,19 @@
 
 ## Introduction
 
-Pallas Today is a social media platform that helps you stay connected with friends and family while building a community
-focused on truth and authenticity.
+Pallas Today is a European social media platform built on the values of privacy, security, and intellectual honesty. It
+is designed to bring people together and support collective pursuit of truth — independent of the commercial and
+political pressures that shape existing platforms.
 
-### Finding Truth Together
+**Vision:** A secure, privacy-respecting social media platform that connects people across Europe and empowers them to
+seek truth together, free from the influence of large commercial platforms.
 
-We harness the wisdom of the crowd to evaluate content reliability. Like Wikipedia uses collective knowledge to create
-trustworthy information, we apply the same principle to social media—when most people agree, we're likely closer to
-truth.
-
-Our AI learns from user posts and engagement patterns to provide real-time feedback on content reliability. Readers see
-indicators showing how the community views a post's trustworthiness. Writers receive guidance encouraging accuracy and
-thoughtful contribution. The more people engage authentically, the better the system becomes at surfacing truth.
-
-This isn't censorship—it's empowerment through context and collective wisdom.
-
-### European Values First
-
-Pallas Today is built on European standards, putting people before profits. Your privacy is paramount—we don't sell your
-data or commodify your attention. Communities matter more than corporate interests. We believe social media should serve
-humanity, not exploit it.
-
-In a landscape dominated by misinformation and data exploitation, Pallas Today offers an alternative: connect
-meaningfully with those who matter while contributing to a collective search for truth.
+**Mission:** To build an open, trustworthy social platform that prioritises user privacy and security, fosters genuine
+connection, and is developed and hosted independently within Europe.
 
 ## Architecture
+
+The architecture of Pallas Today is documented in [doc/architecture/readme.md](doc/architecture/readme.md).
 
 All architectural decisions for this project are documented as Architecture Decision Records (ADRs).
 
