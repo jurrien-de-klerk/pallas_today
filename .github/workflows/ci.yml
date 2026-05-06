@@ -45,7 +45,7 @@ jobs:
   java:
     name: Java (pallas_server)
     runs-on: ubuntu-latest
-    container: maven:3.9.15-amazoncorretto-21
+    container: maven:3.9.15-eclipse-temurin-21
     steps:
       - uses: actions/checkout@v4
       - name: Cache Maven repository
