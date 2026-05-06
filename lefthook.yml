@@ -14,50 +14,51 @@ pre-commit:
     - "pallas_app/packages/openapi/**"
   jobs:
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project letompouce/mdformat:e424a94a
-        --wrap 120 {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        mdformat --wrap 120 {staged_files}
       glob: "**/*.md"
       exclude:
         - ".github/ISSUE_TEMPLATE/**"
       stage_fixed: true
-      name: Markdown formatter
+      name: Markdown-formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project peterdavehello/markdownlint:0.44.0
-        markdownlint --config /project/tool_config/markdownlint-config.json {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        markdownlint-cli2 --config /project/tool/lefthook/markdownlint-config.json {staged_files}
       glob: "**/*.md"
       exclude:
         - ".github/ISSUE_TEMPLATE/**"
       name: Markdown lint
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project livewyer/yamlfmt:0.13 -conf /project/tool_config/yamlfmt-config.yml
-        {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        yamlfmt -conf /project/tool/lefthook/yamlfmt-config.yml {staged_files}
       glob: "**/*.{yml,yaml}"
       stage_fixed: true
       name: YAML formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project cytopia/yamllint:alpine --strict -c /project/tool_config/ymllint-config.yml
-        {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        yamllint --strict -c /project/tool/lefthook/ymllint-config.yml {staged_files}
       glob: "**/*.{yml,yaml}"
       name: YAML lint
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint sh -c
-        'for file in {staged_files}; do xmllint --format "$file" --output "$file"; done'
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        sh -c 'for file in {staged_files}; do xmllint --format "$file" --output "$file"; done'
       glob: "**/*.xml"
       stage_fixed: true
       name: XML formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/xmllint xmllint {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        xmllint {staged_files}
       glob: "**/*.xml"
       name: XML lint
     - run: >-
-        for file in {staged_files}; do
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jqlang/jq . "$file"
-        > /tmp/_lefthook_jq.json && mv /tmp/_lefthook_jq.json "$file"; done
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        sh -c 'for file in {staged_files}; do jq . "$file" > /tmp/_jq.json && mv /tmp/_jq.json "$file"; done'
       glob: "**/*.json"
       stage_fixed: true
       name: JSON formatter
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project pipelinecomponents/jsonlint jsonlint {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        sh -c 'for file in {staged_files}; do jsonlint "$file"; done'
       glob: "**/*.json"
       name: JSON lint
     - run: >-
@@ -72,13 +73,26 @@ pre-commit:
     # Note: Removed Maven-based pre-commit hooks (Java formatting, Checkstyle, SpotBugs, PMD)
     # These are now run during the local Maven build: mvn clean verify
     # This happens before Docker image build, and developers run Maven locally anyway
-    # Dockerfile linting with hadolint
-    # Note: We lint but do not format Dockerfiles. The Dockerfile formatting ecosystem
-    # is immature (no widely-adopted standard formatter). Instead, we rely on hadolint
-    # to enforce best practices and conventions, and use editor/IDE auto-formatting for
-    # basic style consistency. If needed in the future, consider prettier-dockerfile.
     - run: >-
-        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project hadolint/hadolint hadolint {staged_files}
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        shfmt --write {staged_files}
+      glob: "**/*.sh"
+      stage_fixed: true
+      name: Shell formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        shellcheck -x --severity=style --source-path=SCRIPTDIR {staged_files}
+      glob: "**/*.sh"
+      name: Shell lint
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        sh -c 'for file in {staged_files}; do dockerfmt --write "$file"; done'
+      glob: "**/Dockerfile"
+      stage_fixed: true
+      name: Dockerfile formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
+        hadolint {staged_files}
       glob: "**/Dockerfile"
       name: Dockerfile lint
     - run: cd pallas_app && dart run build_runner build --delete-conflicting-outputs
