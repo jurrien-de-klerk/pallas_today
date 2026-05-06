@@ -4,7 +4,7 @@
 
 Pallas Today is a European social media platform built on the values of privacy, security, and intellectual honesty. It
 is designed to bring people together and support collective pursuit of truth — independent of the commercial and
-political pressures that shape existing platforms.
+political pressures that shape existing platforms. The domain vision concept is described in [1].
 
 ## Vision
 
@@ -38,7 +38,7 @@ The system is composed of the following main building blocks:
 - **Ingress** — acts as an API gateway, routing client requests to the appropriate backend service.
 
 Functionality is distributed across microservices along vertical slices: each service owns a distinct piece of domain
-behaviour end-to-end.
+behaviour end-to-end [3].
 
 ```mermaid
 graph TD
@@ -60,7 +60,7 @@ graph TD
 ### Layering Within Components
 
 While the system is decomposed into microservices, each component still follows a layered internal structure inspired by
-Domain-Driven Design.
+Domain-Driven Design [1, 4].
 
 **Pallas App** is organised in three layers:
 
@@ -104,8 +104,9 @@ graph TD
 
 ### Bounded Contexts
 
-Each component — the Pallas App and every microservice — defines its own bounded context. Within a bounded context, the
-domain model and its language are self-contained and consistent; concepts are not shared across context boundaries.
+Each component — the Pallas App and every microservice — defines its own bounded context [1, 2]. Within a bounded
+context, the domain model and its language are self-contained and consistent; concepts are not shared across context
+boundaries.
 
 Components communicate through a **shared kernel**: the OpenAPI specifications stored in `api-specs/`. These
 specifications define the contract between contexts — the data structures and operations that cross a boundary. Keeping
@@ -119,3 +120,12 @@ This means:
 - The OpenAPI spec for a service is the single authoritative definition of what it exposes to the outside world.
 - The Pallas App consumes these contracts via generated proxy code, ensuring client and server always agree on the
   interface without sharing implementation.
+
+______________________________________________________________________
+
+## Bibliography
+
+- [1] Eric Evans, *Domain-Driven Design: Tackling Complexity in the Heart of Software*, Addison-Wesley, 2003.
+- [2] DDD Crew, *Context Mapping*, <https://github.com/ddd-crew/context-mapping>
+- [3] Baeldung, *Vertical Slice Architecture in Java*, <https://www.baeldung.com/java-vertical-slice-architecture>
+- [4] DDD Practitioners, *Layered Architecture*, <https://ddd-practitioners.com/home/glossary/layered-architecture/>
