@@ -20,6 +20,7 @@
   <properties>
     <!-- Set to true in CI to skip auto-formatting (fmt:check still runs). -->
     <fmt.format.skip>false</fmt.format.skip>
+    <dependency-check.version>10.0.4</dependency-check.version>
   </properties>
   <build>
     <plugins>
@@ -84,7 +85,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>10.0.4</version>
+        <version>${dependency-check.version}</version>
         <executions>
           <execution>
             <id>dependency-check</id>
@@ -96,6 +97,7 @@
         </executions>
         <configuration>
           <failBuildOnCVSS>7.0</failBuildOnCVSS>
+          <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
         </configuration>
       </plugin>
       <plugin>

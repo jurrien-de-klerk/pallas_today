@@ -46,6 +46,8 @@ jobs:
     name: Java (pallas_server)
     runs-on: ubuntu-latest
     container: maven:3.9.15-eclipse-temurin-21
+    env:
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Cache Maven repository
