@@ -5,10 +5,16 @@ ARG JAR_FILE=target/storyservice-${VERSION}.jar
 
 WORKDIR /app
 
+RUN groupadd --system --gid 1001 appgroup \
+    && useradd --system --uid 1001 --gid 1001 appuser \
+    && chown appuser:appgroup /app
+
 # Copy the pre-built Spring Boot JAR (built locally with Maven)
 # Using explicit version to avoid ambiguity with -sources.jar or -javadoc.jar
-COPY ${JAR_FILE} app.jar
+COPY --chown=appuser:appgroup ${JAR_FILE} app.jar
 
 EXPOSE 8080
+
+USER appuser
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
