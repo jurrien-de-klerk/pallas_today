@@ -16,3 +16,11 @@ assignees: ""
 ## Out of scope
 
 - <!-- what is explicitly not included; link to a tracking issue where possible, e.g. #123 -->
+
+## Security risk
+
+<!-- No security risk identified. -->
+<!-- OR: -->
+<!-- **Risk**: ... -->
+<!-- **Impact**: ... -->
+<!-- **Mitigation**: ... -->
