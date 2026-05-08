@@ -39,7 +39,22 @@ lefthook run pre-commit
 
 All checks must pass. Fix any reported issues and re-run until clean.
 
-## Step 4 — Fill in the PR template
+## Step 4 — Security risk notice
+
+There are two sources of security risk to check.
+
+**1. Risk from the linked issue** — check whether the linked issue carries the `security-risk` label. If yes, the PR
+description must include a security risk notice that restates the risk, describes what was done to mitigate it, and
+directs the reviewer to the relevant files or patterns.
+
+**2. Risk introduced by scope changes** — review the items listed under Scope changes (changes that fall outside the
+planned issue scope). Assess each scope change for security risk using the same checklist as the issue workflow
+(authentication, authorisation, input handling, secrets, dependencies, access control). If any scope change introduces a
+risk, it must also be covered in the security risk notice.
+
+If neither source produces a risk, omit the Security risk notice section entirely.
+
+## Step 5 — Fill in the PR template
 
 Using `.github/PULL_REQUEST_TEMPLATE.md` as the structure:
 
@@ -48,12 +63,14 @@ Using `.github/PULL_REQUEST_TEMPLATE.md` as the structure:
 - **Out of scope**: bullet list copied from the linked issue; link to tracking issues where they exist
 - **Scope changes**: describe any differences between planned scope and actual changes; create placeholder issues for
   out-of-scope work found in the diff
+- **Security risk notice**: include when the linked issue has the `security-risk` label or when a scope change
+  introduces a risk (see step 4); omit otherwise
 - **Testing**: list every command run and what was verified (e.g. `lefthook run pre-commit` — all hooks passed)
 
-## Step 5 — Create the pull request
+## Step 6 — Create the pull request
 
 Only after the developer confirms the draft, create the pull request using the filled-in template.
 
-## Step 6 — Perform AI code review
+## Step 7 — Perform AI code review
 
 After the PR is created, follow the **Workflow: AI code review** steps in `.github/copilot-instructions.md`.

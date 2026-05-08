@@ -46,7 +46,24 @@ unsure. If no issue exists for an out-of-scope item:
 - Do not create the placeholder automatically; let the developer decide.
 - Once the developer confirms, note any placeholder issue numbers so they can be referenced in the feature issue.
 
-## Step 4 — Determine labels
+## Step 4 — Security risk analysis
+
+Assess whether the in-scope changes carry a security risk. Consider at minimum:
+
+- Does the change affect authentication, authorisation, or session handling?
+- Does the change handle user input, file uploads, or external data?
+- Does the change expose new endpoints or modify access control rules?
+- Does the change affect secrets, credentials, or sensitive configuration?
+- Does the change introduce or update third-party dependencies?
+
+If a risk is identified, add a **Security risk** section to the issue description stating the risk, its potential
+impact, and how it is mitigated within this issue's scope. Also add the `security-risk` label.
+
+If no risk is identified, add a **Security risk** section with the text: "No security risk identified."
+
+Issues created from the `placeholder` template are exempt from this step.
+
+## Step 5 — Determine labels
 
 Assign one or more of the following labels based on what is in scope. **Only use labels from this table — do not suggest
 any label not listed here:**
@@ -58,16 +75,19 @@ any label not listed here:**
 | Installing or configuring a third-party service             | `third-party-service` |
 | Documentation                                               | `documentation`       |
 | CI/CD                                                       | `ci-cd`               |
+| Issue carries an identified security risk (see step 4)      | `security-risk`       |
 
 If you are unsure whether a label exists in the repository, check the repository's label list before suggesting it.
 
-## Step 5 — Draft and create the issue
+## Step 6 — Draft and create the issue
 
 Fill in `.github/ISSUE_TEMPLATE/feature.md`:
 
 - **Description**: short description of what the feature or bug fix is about.
 - **In scope**: bullet list of what is included, using the areas confirmed in step 1.
 - **Out of scope**: bullet list of what is explicitly not included; link to tracking issues where they exist.
+- **Security risk**: outcome of step 4 — either the identified risk with impact and mitigation, or "No security risk
+  identified."
 
 Present the draft to the developer for review using a YAML code block with `type="draft-issue"` — **never use raw
 Markdown for the draft**. Include the proposed labels in the draft.
