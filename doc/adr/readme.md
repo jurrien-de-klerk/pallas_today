@@ -11,3 +11,4 @@
 - [9. Issue and pull request workflow](0009-issue-and-pull-request-workflow.md)
 - [10. Domain Logic Belongs in the Domain Layer](0010-domain-logic-belongs-in-domain-layer.md)
 - [11. Secure by Design](0011-secure-by-design.md)
+- [12. Security Risk Analysis in Issues and Pull Requests](0012-security-risk-analysis-in-issues-and-pull-requests.md)

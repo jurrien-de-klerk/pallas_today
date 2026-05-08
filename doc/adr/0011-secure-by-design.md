@@ -6,6 +6,9 @@ Date: 2026-05-07
 
 Accepted
 
+Implemented by
+[12. Security Risk Analysis in Issues and Pull Requests](0012-security-risk-analysis-in-issues-and-pull-requests.md)
+
 ## Context
 
 Security vulnerabilities are significantly cheaper to fix when addressed during design and development rather than after
