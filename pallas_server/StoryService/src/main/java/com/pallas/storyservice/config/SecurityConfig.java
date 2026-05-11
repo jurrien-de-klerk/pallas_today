@@ -20,7 +20,10 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/actuator/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                        "/actuator/health",
+                        "/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
