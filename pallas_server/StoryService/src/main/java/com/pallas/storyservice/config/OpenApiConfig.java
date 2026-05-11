@@ -32,8 +32,9 @@ public class OpenApiConfig {
                         .type(SecurityScheme.Type.OAUTH2)
                         .flows(
                             new OAuthFlows()
-                                .password(
+                                .authorizationCode(
                                     new OAuthFlow()
+                                        .authorizationUrl(authUrl + "/auth")
                                         .tokenUrl(authUrl + "/token")
                                         .scopes(new Scopes())))));
   }

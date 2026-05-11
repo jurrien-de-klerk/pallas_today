@@ -52,6 +52,7 @@ services:
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
       KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
       KEYCLOAK_REALM: pallas
+      SPRING_PROFILES_ACTIVE: dev
     networks:
       - services
     depends_on:
