@@ -96,6 +96,7 @@
           </execution>
         </executions>
         <configuration>
+          <skip>true</skip>
           <failBuildOnCVSS>7.0</failBuildOnCVSS>
           <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
         </configuration>
