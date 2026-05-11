@@ -95,6 +95,17 @@ pre-commit:
         hadolint {staged_files}
       glob: "**/Dockerfile"
       name: Dockerfile lint
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/astral-sh/ruff:latest
+        format {staged_files}
+      glob: "**/*.py"
+      stage_fixed: true
+      name: Python formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/astral-sh/ruff:latest
+        check {staged_files}
+      glob: "**/*.py"
+      name: Python lint
     - run: cd pallas_app && dart run build_runner build --delete-conflicting-outputs
       glob:
         - "api-specs/*.yaml"
