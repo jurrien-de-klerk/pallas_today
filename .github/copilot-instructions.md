@@ -74,6 +74,15 @@ All architecture decisions for this project are documented as ADRs in [`doc/adr/
 tooling, or patterns, ensure your output is consistent with the decisions recorded there. If a new request conflicts
 with an existing ADR, point out the conflict explicitly before proceeding.
 
+## Ubiquitous Language
+
+The shared domain vocabulary is maintained in
+[`doc/architecture/ubiquitous-language.md`](../doc/architecture/ubiquitous-language.md).
+
+**Always read `doc/architecture/ubiquitous-language.md` before responding to any prompt.** Use the terms defined there
+consistently in code, comments, and documentation. If a response introduces a name for a new core domain concept, add
+that term to `doc/architecture/ubiquitous-language.md` in the same change.
+
 ## Workflow: Creating a New ADR
 
 1. From the project root, run:
@@ -112,6 +121,7 @@ When Copilot commits changes, use this workflow:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
 1. Start the commit process with `git commit -m <generated commit message>`.
+   - Use a commit message of at most 100 characters.
 1. If `lefthook` runs linting/formatting and reports issues, analyze the output and fix all reported suggestions.
 1. Stage the changed files from the project root:
    - Use `git add .` when all repository changes should be committed.
