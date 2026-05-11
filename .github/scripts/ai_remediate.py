@@ -15,13 +15,17 @@ from pathlib import Path
 
 
 def load_json_file(path: str) -> dict | list | None:
-    """Load a JSON file, returning None if the file does not exist."""
+    """Load a JSON file, returning None if the file does not exist or is malformed."""
     p = Path(path)
     if not p.exists():
         print(f"[warn] report not found: {path}")
         return None
     with p.open() as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"[warn] report at {path} is not valid JSON, skipping: {e}")
+            return None
 
 
 def extract_owasp_vulnerabilities(report: dict) -> list[dict]:

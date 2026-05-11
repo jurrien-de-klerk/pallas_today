@@ -71,7 +71,7 @@ jobs:
         id: scan
         run: |
           set +e
-          dart pub audit --json > /tmp/dart-audit.json 2>&1
+          dart pub audit --json > /tmp/dart-audit.json 2>/tmp/dart-audit-err.log
           EXIT=$?
           cat /tmp/dart-audit.json
           if [ $EXIT -ne 0 ]; then
