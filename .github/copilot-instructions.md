@@ -112,6 +112,7 @@ When Copilot commits changes, use this workflow:
    - Use `git add .` when all repository changes should be committed.
    - Otherwise, use `git add <files to commit>` for a selective commit.
 1. Start the commit process with `git commit -m <generated commit message>`.
+   - Use a commit message of at most 100 characters.
 1. If `lefthook` runs linting/formatting and reports issues, analyze the output and fix all reported suggestions.
 1. Stage the changed files from the project root:
    - Use `git add .` when all repository changes should be committed.
