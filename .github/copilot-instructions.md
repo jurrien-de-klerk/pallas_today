@@ -77,11 +77,11 @@ with an existing ADR, point out the conflict explicitly before proceeding.
 ## Ubiquitous Language
 
 The shared domain vocabulary is maintained in
-[`doc/architecture/ubiquitous_language.md`](../doc/architecture/ubiquitous_language.md).
+[`doc/architecture/ubiquitous-language.md`](../doc/architecture/ubiquitous-language.md).
 
-**Always read `doc/architecture/ubiquitous_language.md` before responding to any prompt.** Use the terms defined there
+**Always read `doc/architecture/ubiquitous-language.md` before responding to any prompt.** Use the terms defined there
 consistently in code, comments, and documentation. If a response introduces a name for a new core domain concept, add
-that term to `doc/architecture/ubiquitous_language.md` in the same change.
+that term to `doc/architecture/ubiquitous-language.md` in the same change.
 
 ## Workflow: Creating a New ADR
 
