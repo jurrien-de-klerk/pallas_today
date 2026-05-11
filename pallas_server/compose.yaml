@@ -35,7 +35,9 @@ services:
       keycloak-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/realms/pallas/.well-known/openid-configuration"]
+      test:
+        - "CMD-SHELL"
+        - exec 3<>/dev/tcp/localhost/9000;printf 'GET /health/ready HTTP/1.0\r\n\r\n'>&3;grep -q UP <&3
       interval: 15s
       timeout: 10s
       retries: 10
@@ -50,6 +52,7 @@ services:
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
       KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
       KEYCLOAK_REALM: pallas
+      SPRING_PROFILES_ACTIVE: dev
     networks:
       - services
     depends_on:

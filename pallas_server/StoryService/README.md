@@ -60,8 +60,8 @@ From `StoryService` directory:
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-The `dev` profile enables Swagger UI and the API docs endpoint. It must **never** be activated in
-production environments.
+The `dev` profile enables Swagger UI and the API docs endpoint. It must **never** be activated in production
+environments.
 
 Then test it:
 
@@ -78,8 +78,7 @@ Once the application is running with the `dev` profile, open your browser to:
 This provides an interactive API documentation where you can test all CRUD operations.
 
 > **Note:** Swagger UI and `/api-docs/**` are disabled in all non-`dev` profiles. Running without
-> `-Dspring-boot.run.profiles=dev` (or without setting `SPRING_PROFILES_ACTIVE=dev`) will return
-> 404 for those paths.
+> `-Dspring-boot.run.profiles=dev` (or without setting `SPRING_PROFILES_ACTIVE=dev`) will return 404 for those paths.
 
 ### Test the API
 
