@@ -305,11 +305,13 @@ components:
       properties:
         trustedCircle:
           type: array
+          maxItems: 1000
           description: Members in the authenticated member's trusted circle
           items:
             $ref: '#/components/schemas/MemberReference'
         connectedCircle:
           type: array
+          maxItems: 1000
           description: Members in the authenticated member's connected circle
           items:
             $ref: '#/components/schemas/MemberReference'
