@@ -1,0 +1,341 @@
+---
+openapi: 3.0.3
+info:
+  title: CommunityService API
+  description: API for managing member relationships within the Pallas Community
+  version: 0.0.1-SNAPSHOT
+  contact:
+    name: Pallas Team
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+security:
+  - oauth2: []
+paths:
+  /connection-suggestions:
+    post:
+      summary: Create a connection suggestion
+      description: >-
+        Suggest strengthening the bond with another member. The target must accept before the relationship changes.
+      operationId: createConnectionSuggestion
+      tags:
+        - connection-suggestions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionSuggestionInput'
+      responses:
+        '201':
+          description: Connection suggestion created successfully
+          headers:
+            Location:
+              description: URI of the created connection suggestion
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionSuggestion'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: A pending suggestion between these members already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: List incoming connection suggestions
+      description: Retrieve all pending connection suggestions received by the authenticated member.
+      operationId: listConnectionSuggestions
+      tags:
+        - connection-suggestions
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    maxItems: 100
+                    items:
+                      $ref: '#/components/schemas/ConnectionSuggestion'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /connection-suggestions/{id}/response:
+    put:
+      summary: Respond to a connection suggestion
+      description: >-
+        Accept or reject a connection suggestion. Only the recipient may respond. Accepting updates the relationship.
+      operationId: respondToConnectionSuggestion
+      tags:
+        - connection-suggestions
+      parameters:
+        - name: id
+          in: path
+          description: Connection suggestion ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionSuggestionResponse'
+      responses:
+        '200':
+          description: Response recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionSuggestion'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The authenticated member is not the recipient of this suggestion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Connection suggestion not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Suggestion has already been responded to
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /me/circles:
+    get:
+      summary: Retrieve my circles
+      description: >-
+        Retrieve all members of both the trusted and connected circles. Both lists are always returned together.
+      operationId: getMyCircles
+      tags:
+        - circles
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circles'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /members/{memberId}/relationship:
+    get:
+      summary: Get the relationship with a member
+      description: Returns the relationship type between the authenticated member and the specified member.
+      operationId: getRelationship
+      tags:
+        - relationships
+      parameters:
+        - name: memberId
+          in: path
+          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+        '404':
+          description: Member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/token
+          scopes: {}
+  schemas:
+    CircleType:
+      type: string
+      description: The target circle for a connection suggestion
+      enum:
+        - trusted
+        - connected
+    RelationshipType:
+      type: string
+      description: |
+        The relationship type between two parties:
+        trusted (in each other's trusted circle),
+        connected (in each other's connected circle),
+        community (Pallas members with no direct circle).
+      enum:
+        - trusted
+        - connected
+        - community
+    SuggestionDecision:
+      type: string
+      description: The decision made in response to a connection suggestion
+      enum:
+        - accepted
+        - rejected
+    ConnectionSuggestionInput:
+      type: object
+      required:
+        - targetMemberId
+        - targetCircle
+      properties:
+        targetMemberId:
+          type: string
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member to whom the suggestion is sent
+        targetCircle:
+          $ref: '#/components/schemas/CircleType'
+    ConnectionSuggestion:
+      type: object
+      required:
+        - id
+        - initiatorId
+        - targetMemberId
+        - targetCircle
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the connection suggestion
+          example: 123e4567-e89b-12d3-a456-426614174000
+        initiatorId:
+          type: string
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member who initiated the suggestion
+        targetMemberId:
+          type: string
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member who received the suggestion
+        targetCircle:
+          $ref: '#/components/schemas/CircleType'
+        status:
+          type: string
+          description: Current status of the suggestion
+          enum:
+            - pending
+            - accepted
+            - rejected
+        createdAt:
+          type: string
+          format: date-time
+          description: When the suggestion was created
+        respondedAt:
+          type: string
+          format: date-time
+          description: When the suggestion was responded to, if applicable
+    ConnectionSuggestionResponse:
+      type: object
+      required:
+        - decision
+      properties:
+        decision:
+          $ref: '#/components/schemas/SuggestionDecision'
+    MemberReference:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          maxLength: 255
+          description: Opaque OIDC sub claim identifying the member (up to 255 ASCII characters)
+    Circles:
+      type: object
+      required:
+        - trustedCircle
+        - connectedCircle
+      properties:
+        trustedCircle:
+          type: array
+          maxItems: 1000
+          description: Members in the authenticated member's trusted circle
+          items:
+            $ref: '#/components/schemas/MemberReference'
+        connectedCircle:
+          type: array
+          maxItems: 1000
+          description: Members in the authenticated member's connected circle
+          items:
+            $ref: '#/components/schemas/MemberReference'
+    Relationship:
+      type: object
+      required:
+        - memberId
+        - relationshipType
+      properties:
+        memberId:
+          type: string
+          maxLength: 255
+          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
+        relationshipType:
+          $ref: '#/components/schemas/RelationshipType'
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: string
+          description: Additional error details
