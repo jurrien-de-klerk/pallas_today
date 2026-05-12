@@ -5,14 +5,6 @@ referenced across all services.
 
 ______________________________________________________________________
 
-## Member
-
-A **member** is a registered participant of Pallas Today.
-
-- Needs further refinement.
-
-______________________________________________________________________
-
 ## Member Network
 
 Every member belongs to the **Pallas Community**: the complete set of all registered members. Within this community,
@@ -59,7 +51,7 @@ classDiagram
     ConnectedCircle "0..*" --> "0..*" Member : connected members (bidirectional)
 ```
 
-### Relation modification
+### Relationship modification
 
 Changing the relationship between two members follows different flows depending on the direction of the change:
 
