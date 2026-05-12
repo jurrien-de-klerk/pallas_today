@@ -58,3 +58,19 @@ have the most limited mutual access.
 ### Guests
 
 People who are not members of the Pallas Community. They have the least access to platform content and features.
+
+### Connection suggestion
+
+A request sent by one member to another to upgrade their relationship to a closer circle. The receiving member must
+explicitly accept or reject it. A connection suggestion is only created when moving to a closer relationship;
+downgrading a connection requires no suggestion and no consent.
+
+### Strengthening the bond
+
+The act of moving a relationship with another member to a closer circle. Requires the other member's consent via a
+connection suggestion.
+
+### Easing the relationship
+
+The act of moving a relationship with another member to a more distant circle, or removing it entirely. Applied
+immediately without requiring consent from the other member.
