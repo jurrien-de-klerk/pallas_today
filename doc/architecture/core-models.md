@@ -63,7 +63,7 @@ classDiagram
 
 Changing the relationship between two members follows different flows depending on the direction of the change:
 
-- **Upgrading a connection** (moving to a closer circle): the initiating member sends a **connection suggestion** to the
+- **Strengthening the bond** (moving to a closer circle): the initiating member sends a **connection suggestion** to the
   other member. The receiving member must explicitly accept or reject it. The relationship only changes upon acceptance.
-- **Downgrading a connection** (moving to a more distant circle or removing it): the change is applied immediately and
+- **Easing the relationship** (moving to a more distant circle or removing it): the change is applied immediately and
   without requiring consent from the other member.
