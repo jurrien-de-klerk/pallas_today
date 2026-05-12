@@ -171,11 +171,11 @@ paths:
       parameters:
         - name: memberId
           in: path
-          description: The user ID of the other member
+          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
           required: true
           schema:
             type: string
-            format: uuid
+            maxLength: 255
       responses:
         '200':
           description: Successful response
@@ -237,9 +237,8 @@ components:
       properties:
         targetMemberId:
           type: string
-          format: uuid
-          description: The user ID of the member to whom the suggestion is sent
-          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member to whom the suggestion is sent
         targetCircle:
           $ref: '#/components/schemas/CircleType'
     ConnectionSuggestion:
@@ -259,14 +258,12 @@ components:
           example: 123e4567-e89b-12d3-a456-426614174000
         initiatorId:
           type: string
-          format: uuid
-          description: The user ID of the member who initiated the suggestion
-          example: 123e4567-e89b-12d3-a456-426614174001
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member who initiated the suggestion
         targetMemberId:
           type: string
-          format: uuid
-          description: The user ID of the member who received the suggestion
-          example: 123e4567-e89b-12d3-a456-426614174002
+          maxLength: 255
+          description: Opaque OIDC sub claim of the member who received the suggestion
         targetCircle:
           $ref: '#/components/schemas/CircleType'
         status:
@@ -298,9 +295,8 @@ components:
       properties:
         userId:
           type: string
-          format: uuid
-          description: Opaque user identifier (OIDC sub claim)
-          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 255
+          description: Opaque OIDC sub claim identifying the member (up to 255 ASCII characters)
     Circles:
       type: object
       required:
@@ -325,9 +321,8 @@ components:
       properties:
         memberId:
           type: string
-          format: uuid
-          description: The user ID of the other member
-          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 255
+          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
         relationshipType:
           $ref: '#/components/schemas/RelationshipType'
     Error:
