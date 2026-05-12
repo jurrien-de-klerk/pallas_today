@@ -216,13 +216,11 @@ components:
         The relationship type between two parties:
         trusted (in each other's trusted circle),
         connected (in each other's connected circle),
-        community (Pallas members with no direct circle),
-        guest (not a Pallas member).
+        community (Pallas members with no direct circle).
       enum:
         - trusted
         - connected
         - community
-        - guest
     SuggestionDecision:
       type: string
       description: The decision made in response to a connection suggestion
