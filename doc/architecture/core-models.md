@@ -39,16 +39,24 @@ config:
     hideEmptyMembersBox: true
 ---
 classDiagram
-    class PallasCommunity
     class Member
-    class TrustedCircle
-    class ConnectedCircle
+    class Relation {
+        + RelationType type
+        + boolean isAccepted
+        + DateTime acceptedSince
+    }
 
-    PallasCommunity "1" o-- "0..*" Member : contains
-    Member "1" --> "1" TrustedCircle : maintains
-    Member "1" --> "1" ConnectedCircle : maintains
-    TrustedCircle "0..*" --> "0..*" Member : trusted members (bidirectional)
-    ConnectedCircle "0..*" --> "0..*" Member : connected members (bidirectional)
+    class RelationType {
+        <<enum>>
+        Trusted,
+        Connected,
+        Community,
+        Public
+    }
+
+    Member "1" o-- "0..*" Relation
+    Relation "1" --> "1" Member
+    Relation "1" --> "1" RelationType
 ```
 
 ### Relationship modification
