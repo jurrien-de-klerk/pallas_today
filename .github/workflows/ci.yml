@@ -27,9 +27,12 @@ jobs:
       - name: Install dependencies (pallas_logger)
         run: flutter pub get
         working-directory: pallas_app/packages/pallas_logger
-      - name: Install dependencies (openapi)
+      - name: Install dependencies (openapi_story)
         run: flutter pub get
-        working-directory: pallas_app/packages/openapi
+        working-directory: pallas_app/packages/openapi_story
+      - name: Install dependencies (openapi_image)
+        run: flutter pub get
+        working-directory: pallas_app/packages/openapi_image
       - name: Analyse
         run: flutter analyze
         working-directory: pallas_app
@@ -39,9 +42,12 @@ jobs:
       - name: Test (pallas_logger)
         run: flutter test
         working-directory: pallas_app/packages/pallas_logger
-      - name: Test (openapi)
+      - name: Test (openapi_story)
         run: flutter test
-        working-directory: pallas_app/packages/openapi
+        working-directory: pallas_app/packages/openapi_story
+      - name: Test (openapi_image)
+        run: flutter test
+        working-directory: pallas_app/packages/openapi_image
   java:
     name: Java (pallas_server)
     runs-on: ubuntu-latest
