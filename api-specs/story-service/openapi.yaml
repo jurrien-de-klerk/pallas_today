@@ -101,7 +101,9 @@ paths:
       summary: Update a story
       description: >-
         Update the content or Shared With level of an existing story. Only the
-        author of the story may update it.
+        author of the story may update it. If the story exists but the
+        requesting member is not the author, a 404 is returned so as not to
+        reveal the story's existence to non-authors.
       operationId: updateStory
       tags:
         - stories
@@ -132,14 +134,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden — the requesting member is not the author of the story
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
-          description: Story not found or not visible to the requesting member
+          description: >-
+            Story not found, not visible to the requesting member, or the
+            requesting member is not the author.
           content:
             application/json:
               schema:
@@ -154,7 +152,9 @@ paths:
       summary: Delete a story
       description: >-
         Delete a story and all images associated with it. Only the author of
-        the story may delete it.
+        the story may delete it. If the story exists but the requesting member
+        is not the author, a 404 is returned so as not to reveal the story's
+        existence to non-authors.
       operationId: deleteStory
       tags:
         - stories
@@ -169,14 +169,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden — the requesting member is not the author of the story
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
-          description: Story not found or not visible to the requesting member
+          description: >-
+            Story not found, not visible to the requesting member, or the
+            requesting member is not the author.
           content:
             application/json:
               schema:
