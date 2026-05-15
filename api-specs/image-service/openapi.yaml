@@ -42,6 +42,9 @@ paths:
                   description: >-
                     The image file to upload. Supported formats: JPEG, PNG, WebP.
                     Maximum file size: 10 MB.
+            encoding:
+              file:
+                contentType: image/jpeg, image/png, image/webp
       responses:
         '201':
           description: Image uploaded successfully
