@@ -1,8 +1,8 @@
-# openapi.model.Error
+# openapi_image.model.Error
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:openapi_image/api.dart';
 ```
 
 ## Properties

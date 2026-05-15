@@ -1,9 +1,10 @@
-// Openapi Generator last run: : 2026-05-15T11:32:53.146178
+// Openapi Generator last run: : 2026-05-15T12:00:28.109949
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 
 @Openapi(
   inputSpec: InputSpec(path: '../api-specs/story-service/openapi.yaml'),
   generatorName: Generator.dio,
-  outputDirectory: 'packages/openapi',
+  outputDirectory: 'packages/openapi_story',
+  additionalProperties: AdditionalProperties(pubName: 'openapi_story'),
 )
 class ApiClient {}
