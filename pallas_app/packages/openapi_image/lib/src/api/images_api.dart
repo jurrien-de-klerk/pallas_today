@@ -9,9 +9,9 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'dart:typed_data';
-import 'package:openapi/src/api_util.dart';
-import 'package:openapi/src/model/error.dart';
-import 'package:openapi/src/model/image.dart';
+import 'package:openapi_image/src/api_util.dart';
+import 'package:openapi_image/src/model/error.dart';
+import 'package:openapi_image/src/model/image.dart';
 
 class ImagesApi {
   final Dio _dio;

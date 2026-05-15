@@ -4,7 +4,7 @@ analysis_options.yaml
 doc/Error.md
 doc/Image.md
 doc/ImagesApi.md
-lib/openapi.dart
+lib/openapi_image.dart
 lib/src/api.dart
 lib/src/api/images_api.dart
 lib/src/api_util.dart

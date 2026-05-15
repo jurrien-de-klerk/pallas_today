@@ -1,8 +1,8 @@
-# openapi.api.ImagesApi
+# openapi_image.api.ImagesApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:openapi_image/api.dart';
 ```
 
 All URIs are relative to *http://localhost:8081*
@@ -23,11 +23,11 @@ Upload a new image and associate it with the specified story.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:openapi_image/api.dart';
 // TODO Configure OAuth2 access token for authorization: oauth2
 //defaultApiClient.getAuthentication<OAuth>('oauth2').accessToken = 'YOUR_ACCESS_TOKEN';
 
-final api = Openapi().getImagesApi();
+final api = OpenapiImage().getImagesApi();
 final String storyId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | The ID of the story that owns this image
 final MultipartFile file = BINARY_DATA_HERE; // MultipartFile | The image file to upload. Supported formats: JPEG, PNG, WebP. Maximum file size: 10 MB.
 
@@ -70,11 +70,11 @@ Download the image file belonging to the specified story.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:openapi_image/api.dart';
 // TODO Configure OAuth2 access token for authorization: oauth2
 //defaultApiClient.getAuthentication<OAuth>('oauth2').accessToken = 'YOUR_ACCESS_TOKEN';
 
-final api = Openapi().getImagesApi();
+final api = OpenapiImage().getImagesApi();
 final String storyId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | The ID of the story that owns this image
 final String imageId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | The ID of the image to download
 
@@ -117,11 +117,11 @@ Delete an image belonging to the specified story from file storage.
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:openapi_image/api.dart';
 // TODO Configure OAuth2 access token for authorization: oauth2
 //defaultApiClient.getAuthentication<OAuth>('oauth2').accessToken = 'YOUR_ACCESS_TOKEN';
 
-final api = Openapi().getImagesApi();
+final api = OpenapiImage().getImagesApi();
 final String storyId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | The ID of the story that owns this image
 final String imageId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | The ID of the image to delete
 
