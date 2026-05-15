@@ -12,6 +12,7 @@ pre-commit:
     - "**/web/**"
     - "**/windows/**"
     - "pallas_app/packages/openapi/**"
+    - "pallas_app/packages/openapi_image/**"
   jobs:
     - run: >-
         docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project ghcr.io/jurrien-de-klerk/commit-hook-tool:1.x
@@ -111,15 +112,17 @@ pre-commit:
         - "api-specs/*.yaml"
         - "api-specs/**/*.yaml"
         - "pallas_app/packages/openapi/**"
+        - "pallas_app/packages/openapi_image/**"
       name: Dart client codegen
     - run: >-
-        if ! git diff --quiet -- pallas_app/packages/openapi/; then
-        echo "ERROR: Dart client codegen produced changes in pallas_app/packages/openapi/.
-        Review the diff with: git diff pallas_app/packages/openapi/
+        if ! git diff --quiet -- pallas_app/packages/openapi/ pallas_app/packages/openapi_image/; then
+        echo "ERROR: Dart client codegen produced changes in pallas_app/packages/openapi/ or pallas_app/packages/openapi_image/.
+        Review the diff with: git diff pallas_app/packages/openapi/ pallas_app/packages/openapi_image/
         If the changes are expected, stage them and retry the commit.
         See copilot-instructions.md for the review workflow." >&2; exit 1; fi
       glob:
         - "api-specs/*.yaml"
         - "api-specs/**/*.yaml"
         - "pallas_app/packages/openapi/**"
+        - "pallas_app/packages/openapi_image/**"
       name: Dart client codegen guard
