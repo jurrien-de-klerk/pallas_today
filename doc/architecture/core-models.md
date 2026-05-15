@@ -127,7 +127,7 @@ classDiagram
         Trusted,
         Connected,
         Community,
-        Public
+        Guest
     }
 
     Member "1" --> "0..*" Story
