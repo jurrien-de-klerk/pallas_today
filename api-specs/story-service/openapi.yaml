@@ -346,7 +346,9 @@ components:
           maxLength: 100000
           example: '[{"insert":"Today was a great day.\n"}]'
         sharedWith:
-          $ref: '#/components/schemas/SharedWith'
+          allOf:
+            - $ref: '#/components/schemas/SharedWith'
+          default: TRUSTED
     StoriesNearYouPage:
       type: object
       required:
