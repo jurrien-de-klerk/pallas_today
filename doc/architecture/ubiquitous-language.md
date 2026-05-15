@@ -9,15 +9,35 @@ ______________________________________________________________________
 
 ### Story
 
-A piece of user-authored rich text published to the platform and visible to other users.
+A piece of user-authored rich-text content published to the platform. A story can describe an event in a member's life,
+express an emotion, or convey anything the author wishes to share. Visibility is governed by its **Shared With**
+modifier.
 
 ### Story content
 
-The textual body of a story, authored by a user.
+The body of a story, authored by a member using a structured rich-text editor. Stored as a **JSON Delta** document.
+
+### Shared With
+
+The access modifier attached to a story that defines the audience permitted to read it. One of four levels must be
+chosen when publishing a story:
+
+- **Trusted** — members in the author's trusted circle (default).
+- **Connected** — members in the author's connected circle.
+- **Community** — all registered members of the Pallas Community.
+- **Public** — everyone, including guests.
+
+Images that belong to a story inherit the same Shared With level as their owning story.
+
+### Stories near you
+
+The personalised feed shown to a member, aggregating stories published by the member themselves and by members in their
+trusted and connected circles. Stories are ordered chronologically, newest first. When browsing another member's Stories
+near you board, only stories whose Shared With level permits the visiting member to see them are included.
 
 ### Publish a story
 
-The action a user takes to create a new story and make it available on the platform.
+The action a member takes to create a new story and make it available to their selected audience on the platform.
 
 ______________________________________________________________________
 

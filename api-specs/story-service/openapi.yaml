@@ -2,7 +2,7 @@
 openapi: 3.0.3
 info:
   title: StoryService API
-  description: CRUD API for managing stories
+  description: API for managing stories and retrieving personalised story feeds.
   version: 0.0.1-SNAPSHOT
   contact:
     name: Pallas Team
@@ -13,67 +13,12 @@ security:
   - oauth2: []
 paths:
   /stories:
-    get:
-      summary: List all stories
-      description: Retrieve a list of all stories
-      operationId: listStories
-      tags:
-        - stories
-      parameters:
-        - name: limit
-          in: query
-          description: Maximum number of stories to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 20
-        - name: offset
-          in: query
-          description: Number of stories to skip
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            default: 0
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  stories:
-                    type: array
-                    maxItems: 100
-                    items:
-                      $ref: '#/components/schemas/Story'
-                  total:
-                    type: integer
-                    description: Total number of stories
-                  limit:
-                    type: integer
-                  offset:
-                    type: integer
-        '400':
-          description: Invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new story
-      description: Create a new story with the provided content
+      summary: Publish a story
+      description: >-
+        Create a new story for the authenticated member. The caller must supply
+        the story content as a JSON Delta string and choose a Shared With level.
+        Defaults to TRUSTED when no level is provided.
       operationId: createStory
       tags:
         - stories
@@ -85,7 +30,7 @@ paths:
               $ref: '#/components/schemas/StoryInput'
       responses:
         '201':
-          description: Story created successfully
+          description: Story published successfully
           headers:
             Location:
               description: URI of the created story
@@ -101,36 +46,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /stories/{id}:
+  /stories/{storyId}:
     get:
-      summary: Get a story by ID
-      description: Retrieve a specific story by its unique identifier
+      summary: Get a story
+      description: >-
+        Retrieve a specific story by its ID. The story is only returned when
+        the requesting member's relationship with the author satisfies the
+        story's Shared With level. If the story exists but the member is not
+        permitted to see it, a 404 is returned so as not to reveal its
+        existence.
       operationId: getStory
       tags:
         - stories
       parameters:
-        - name: id
-          in: path
-          description: Story ID
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/storyId'
       responses:
         '200':
-          description: Successful response
+          description: Story found and visible to the requesting member
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Story'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Story not found
+          description: Story not found or not visible to the requesting member
           content:
             application/json:
               schema:
@@ -143,18 +99,16 @@ paths:
                 $ref: '#/components/schemas/Error'
     put:
       summary: Update a story
-      description: Update an existing story with new content
+      description: >-
+        Update the content or Shared With level of an existing story. Only the
+        author of the story may update it. If the story exists but the
+        requesting member is not the author, a 404 is returned so as not to
+        reveal the story's existence to non-authors.
       operationId: updateStory
       tags:
         - stories
       parameters:
-        - name: id
-          in: path
-          description: Story ID
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/storyId'
       requestBody:
         required: true
         content:
@@ -174,8 +128,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Story not found
+          description: >-
+            Story not found, not visible to the requesting member, or the
+            requesting member is not the author.
           content:
             application/json:
               schema:
@@ -188,23 +150,107 @@ paths:
                 $ref: '#/components/schemas/Error'
     delete:
       summary: Delete a story
-      description: Delete a specific story by its unique identifier
+      description: >-
+        Delete a story and all images associated with it. Only the author of
+        the story may delete it. If the story exists but the requesting member
+        is not the author, a 404 is returned so as not to reveal the story's
+        existence to non-authors.
       operationId: deleteStory
       tags:
         - stories
       parameters:
-        - name: id
+        - $ref: '#/components/parameters/storyId'
+      responses:
+        '204':
+          description: Story deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: >-
+            Story not found, not visible to the requesting member, or the
+            requesting member is not the author.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /stories/near/{memberId}:
+    get:
+      summary: Get Stories near you for a member
+      description: >-
+        Returns the Stories near you feed for the member identified by
+        `memberId`. The feed aggregates stories published by that member, by
+        members in their trusted circle, and by members in their connected
+        circle, ordered by publication time descending (newest first).
+
+        When a requesting member browses another member's feed, stories are
+        filtered by their Shared With level: only stories visible to the
+        requesting member are included. Stories the requesting member is not
+        permitted to see are silently excluded.
+      operationId: getStoriesNearYou
+      tags:
+        - stories-near-you
+      parameters:
+        - name: memberId
           in: path
-          description: Story ID
+          description: >-
+            The ID of the member whose Stories near you feed is being
+            requested. Use the authenticated member's own ID to get their
+            personal feed.
           required: true
           schema:
             type: string
             format: uuid
+        - name: limit
+          in: query
+          description: Maximum number of stories to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: before
+          in: query
+          description: >-
+            Return only stories published before this timestamp (ISO 8601).
+            Use for cursor-based pagination: pass the `publishedAt` value of
+            the last story received to fetch the next page.
+          required: false
+          schema:
+            type: string
+            format: date-time
       responses:
-        '204':
-          description: Story deleted successfully
+        '200':
+          description: Stories near you feed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoriesNearYouPage'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Story not found
+          description: Member not found
           content:
             application/json:
               schema:
@@ -223,33 +269,105 @@ components:
         password:
           tokenUrl: http://localhost:8180/realms/pallas/protocol/openid-connect/token
           scopes: {}
+  parameters:
+    storyId:
+      name: storyId
+      in: path
+      description: Unique identifier of the story
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
+    SharedWith:
+      type: string
+      description: >-
+        The audience permitted to read a story.
+
+        - TRUSTED: members in the author's trusted circle (default).
+        - CONNECTED: members in the author's connected circle.
+        - COMMUNITY: all registered members of the Pallas Community.
+        - PUBLIC: everyone, including guests.
+      enum:
+        - TRUSTED
+        - CONNECTED
+        - COMMUNITY
+        - PUBLIC
+      example: TRUSTED
     Story:
       type: object
       required:
         - id
-        - story
+        - authorId
+        - content
+        - sharedWith
+        - publishedAt
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the story
+          description: Unique identifier of the story
           example: 123e4567-e89b-12d3-a456-426614174000
-        story:
+        authorId:
           type: string
-          description: The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
-          example: '[{"insert":"Once upon a time...\n"}]'
+          format: uuid
+          description: The userId of the member who published the story
+          example: 987fcdeb-51a2-43d7-b012-345678901234
+        content:
+          type: string
+          description: >-
+            The story body as a JSON-serialised Quill Delta array of insert
+            operations. Image references within the Delta are URLs pointing to
+            file storage; raw image data is never embedded.
+          minLength: 1
+          maxLength: 100000
+          example: '[{"insert":"Today was a great day.\n"}]'
+        sharedWith:
+          $ref: '#/components/schemas/SharedWith'
+        publishedAt:
+          type: string
+          format: date-time
+          description: >-
+            The date and time at which the story was published (ISO 8601, UTC).
+            Used to order stories in the Stories near you feed.
+          example: '2026-05-15T10:00:00Z'
     StoryInput:
       type: object
       required:
-        - story
+        - content
       properties:
-        story:
+        content:
           type: string
-          description: The story content as a Quill Delta JSON string (JSON-serialised array of Delta ops).
+          description: >-
+            The story body as a JSON-serialised Quill Delta array of insert
+            operations. Image references within the Delta must be URLs pointing
+            to file storage; inline base64 image data is not permitted.
           minLength: 1
           maxLength: 100000
-          example: '[{"insert":"Once upon a time...\n"}]'
+          example: '[{"insert":"Today was a great day.\n"}]'
+        sharedWith:
+          allOf:
+            - $ref: '#/components/schemas/SharedWith'
+    StoriesNearYouPage:
+      type: object
+      required:
+        - stories
+      properties:
+        stories:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Story'
+          description: >-
+            Stories ordered by publishedAt descending. Only stories visible to
+            the requesting member are included.
+        nextBefore:
+          type: string
+          format: date-time
+          description: >-
+            Pass this value as the `before` query parameter to fetch the next
+            page. Absent when there are no more stories to return.
+          example: '2026-05-14T18:32:00Z'
     Error:
       type: object
       required:
@@ -258,9 +376,12 @@ components:
         message:
           type: string
           description: Error message
+          maxLength: 256
         code:
           type: string
           description: Error code
+          maxLength: 64
         details:
           type: string
           description: Additional error details
+          maxLength: 1024

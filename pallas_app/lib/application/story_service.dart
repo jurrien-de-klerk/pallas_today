@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:openapi/openapi.dart';
+import 'package:openapi_story/openapi.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
 import '../config/api_config.dart';
@@ -17,7 +17,7 @@ class StoryService {
   StoryService({StoriesApi? api}) : _api = api ?? _buildApi();
 
   static StoriesApi _buildApi() {
-    return Openapi(
+    return OpenapiStory(
       basePathOverride: storyServiceBaseUrl,
       interceptors: [
         InterceptorsWrapper(
@@ -45,8 +45,8 @@ class StoryService {
     if (document.toPlainText().trim().isEmpty) return false;
     try {
       final deltaJson = jsonEncode(document.toDelta().toJson());
-      final input = StoryInputBuilder()..story = deltaJson;
-      await _api.createStory(storyInput: input.build());
+      final input = StoryInput((b) => b..content = deltaJson);
+      await _api.createStory(storyInput: input);
       _log.info('Story published');
       return true;
     } on DioException catch (e) {
@@ -63,28 +63,11 @@ class StoryService {
 
   /// Fetches all stories from the StoryService microservice.
   ///
-  /// Each story's Delta JSON string is deserialised back into a [Document].
-  /// Returns an empty list on failure.
+  /// Returns an empty list — the list endpoint has been removed from the
+  /// StoryService spec. Use [getStoriesNearYou] once it is implemented.
+  // TODO: replace with getStoriesNearYou once the backend is implemented.
   Future<List<Document>> listStories() async {
-    _log.info('Fetching stories');
-    try {
-      final response = await _api.listStories();
-      final stories = response.data?.stories?.toList() ?? <Story>[];
-      _log.debug('Received ${stories.length} stories');
-      return stories.map((s) {
-        try {
-          final ops = jsonDecode(s.story) as List<dynamic>;
-          return Document.fromJson(ops);
-        } catch (_) {
-          // Fall back to plain text when the stored value is not Delta JSON.
-          return Document.fromJson([
-            {'insert': '${s.story}\n'},
-          ]);
-        }
-      }).toList();
-    } catch (_) {
-      _log.warn('listStories failed');
-      return [];
-    }
+    _log.warn('listStories is not available: endpoint removed from spec');
+    return [];
   }
 }
