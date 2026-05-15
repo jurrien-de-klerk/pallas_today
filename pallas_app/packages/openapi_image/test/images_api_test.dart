@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
-import 'package:openapi/openapi.dart';
+import 'package:openapi_image/openapi_image.dart';
 
 /// tests for ImagesApi
 void main() {
-  final instance = Openapi().getImagesApi();
+  final instance = OpenapiImage().getImagesApi();
 
   group(ImagesApi, () {
     // Upload an image for a story

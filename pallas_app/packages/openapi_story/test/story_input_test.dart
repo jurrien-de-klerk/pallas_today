@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:openapi_story/openapi.dart';
+import 'package:openapi_story/openapi_story.dart';
 
 // tests for StoryInput
 void main() {
@@ -7,9 +7,14 @@ void main() {
   // TODO add properties to the builder and call build()
 
   group(StoryInput, () {
-    // The story content
-    // String story
-    test('to test the property `story`', () async {
+    // The story body as a JSON-serialised Quill Delta array of insert operations. Image references within the Delta must be URLs pointing to file storage; inline base64 image data is not permitted.
+    // String content
+    test('to test the property `content`', () async {
+      // TODO
+    });
+
+    // SharedWith sharedWith
+    test('to test the property `sharedWith`', () async {
       // TODO
     });
   });

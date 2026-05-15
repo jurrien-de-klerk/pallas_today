@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
-import 'package:openapi_story/openapi.dart';
+import 'package:openapi_story/openapi_story.dart';
 
 /// tests for StoriesNearYouApi
 void main() {
-  final instance = Openapi().getStoriesNearYouApi();
+  final instance = OpenapiStory().getStoriesNearYouApi();
 
   group(StoriesNearYouApi, () {
     // Get Stories near you for a member

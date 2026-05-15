@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:openapi_story/openapi.dart';
+import 'package:openapi_story/openapi_story.dart';
 
 // tests for Error
 void main() {

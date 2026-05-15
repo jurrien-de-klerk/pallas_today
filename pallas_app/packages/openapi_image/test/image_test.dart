@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:openapi/openapi.dart';
+import 'package:openapi_image/openapi_image.dart';
 
 // tests for Image
 void main() {

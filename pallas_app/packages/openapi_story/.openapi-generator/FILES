@@ -27,3 +27,10 @@ lib/src/model/story.dart
 lib/src/model/story_input.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/error_test.dart
+test/shared_with_test.dart
+test/stories_api_test.dart
+test/stories_near_you_api_test.dart
+test/stories_near_you_page_test.dart
+test/story_input_test.dart
+test/story_test.dart

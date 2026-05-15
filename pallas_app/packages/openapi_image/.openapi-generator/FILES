@@ -19,3 +19,6 @@ lib/src/model/error.dart
 lib/src/model/image.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/error_test.dart
+test/image_test.dart
+test/images_api_test.dart

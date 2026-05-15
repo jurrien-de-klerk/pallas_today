@@ -45,8 +45,8 @@ class StoryService {
     if (document.toPlainText().trim().isEmpty) return false;
     try {
       final deltaJson = jsonEncode(document.toDelta().toJson());
-      final input = StoryInputBuilder()..content = deltaJson;
-      await _api.createStory(storyInput: input.build());
+      final input = StoryInput((b) => b..content = deltaJson);
+      await _api.createStory(storyInput: input);
       _log.info('Story published');
       return true;
     } on DioException catch (e) {

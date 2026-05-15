@@ -121,7 +121,7 @@ class StoriesApi {
   }
 
   /// Delete a story
-  /// Delete a story and all images associated with it. Only the author of the story may delete it.
+  /// Delete a story and all images associated with it. Only the author of the story may delete it. If the story exists but the requesting member is not the author, a 404 is returned so as not to reveal the story&#39;s existence to non-authors.
   ///
   /// Parameters:
   /// * [storyId] - Unique identifier of the story
@@ -260,7 +260,7 @@ class StoriesApi {
   }
 
   /// Update a story
-  /// Update the content or Shared With level of an existing story. Only the author of the story may update it.
+  /// Update the content or Shared With level of an existing story. Only the author of the story may update it. If the story exists but the requesting member is not the author, a 404 is returned so as not to reveal the story&#39;s existence to non-authors.
   ///
   /// Parameters:
   /// * [storyId] - Unique identifier of the story

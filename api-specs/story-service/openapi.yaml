@@ -348,7 +348,6 @@ components:
         sharedWith:
           allOf:
             - $ref: '#/components/schemas/SharedWith'
-          default: TRUSTED
     StoriesNearYouPage:
       type: object
       required:
