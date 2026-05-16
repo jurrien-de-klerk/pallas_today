@@ -49,7 +49,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleGenericException(Exception ex) {
-    log.error("Unhandled exception of type {}", ex.getClass().getName());
+    log.error("Unhandled exception of type {}: {}", ex.getClass().getName(), ex.getMessage());
+    Throwable cause = ex.getCause();
+    if (cause != null) {
+      log.error("Caused by {}: {}", cause.getClass().getName(), cause.getMessage());
+    }
     PallasBacktrace.backtrace(log);
     Error error = new Error();
     error.setMessage("Internal server error");
