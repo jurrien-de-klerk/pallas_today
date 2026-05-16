@@ -10,15 +10,24 @@ A **member** is the representation of a registered person on the platform. The c
 Keycloak: it exposes a stable domain model without leaking the internal structure or full data set of the identity
 provider.
 
+Every member is assigned an opaque **memberId** owned and issued by the Member Service. This identifier is the single,
+stable reference used to identify a member across all services. No service stores or passes the member's personal
+details when referring to authorship or membership; they store and exchange only the `memberId`.
+
+The Member Service resolves the relationship between the Keycloak identity (OIDC `sub` claim) and the `memberId`
+internally. This means the rest of the platform is fully decoupled from the identity provider: if Keycloak is ever
+replaced, only the Member Service needs to be updated — no other service is affected.
+
 The Member model exposes only the information required by the domain:
 
-| Field         | Description               |
-| ------------- | ------------------------- |
-| **firstName** | The member's given name.  |
-| **lastName**  | The member's family name. |
+| Field         | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| **memberId**  | Opaque unique identifier owned by the Member Service. |
+| **firstName** | The member's given name.                              |
+| **lastName**  | The member's family name.                             |
 
-Although Keycloak holds additional profile attributes, the Member Service deliberately limits its exposure to first and
-last name. All other personal data remains within the identity provider and is never propagated to other services.
+Although Keycloak holds additional profile attributes, the Member Service deliberately limits its exposure to the fields
+above. All other personal data remains within the identity provider and is never propagated to other services.
 
 ______________________________________________________________________
 

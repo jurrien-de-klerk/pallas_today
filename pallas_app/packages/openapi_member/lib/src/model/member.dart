@@ -11,14 +11,14 @@ part 'member.g.dart';
 /// Member
 ///
 /// Properties:
-/// * [userId] - The unique identifier of the member. Corresponds to the OIDC `sub` claim issued by Keycloak.
+/// * [memberId] - The unique identifier of the member. Owned and issued by the Member Service. Opaque to all other services; the mapping to the Keycloak identity is an internal implementation detail of the Member Service.
 /// * [firstName] - The member's given name.
 /// * [lastName] - The member's family name.
 @BuiltValue()
 abstract class Member implements Built<Member, MemberBuilder> {
-  /// The unique identifier of the member. Corresponds to the OIDC `sub` claim issued by Keycloak.
-  @BuiltValueField(wireName: r'userId')
-  String get userId;
+  /// The unique identifier of the member. Owned and issued by the Member Service. Opaque to all other services; the mapping to the Keycloak identity is an internal implementation detail of the Member Service.
+  @BuiltValueField(wireName: r'memberId')
+  String get memberId;
 
   /// The member's given name.
   @BuiltValueField(wireName: r'firstName')
@@ -51,9 +51,9 @@ class _$MemberSerializer implements PrimitiveSerializer<Member> {
     Member object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'userId';
+    yield r'memberId';
     yield serializers.serialize(
-      object.userId,
+      object.memberId,
       specifiedType: const FullType(String),
     );
     yield r'firstName';
@@ -91,12 +91,12 @@ class _$MemberSerializer implements PrimitiveSerializer<Member> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'userId':
+        case r'memberId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.userId = valueDes;
+          result.memberId = valueDes;
           break;
         case r'firstName':
           final valueDes = serializers.deserialize(

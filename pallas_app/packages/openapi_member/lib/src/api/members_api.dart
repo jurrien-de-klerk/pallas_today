@@ -101,10 +101,10 @@ class MembersApi {
   }
 
   /// Get a member
-  /// Retrieve a single member by their user ID. Returns first and last name only. Returns 404 when no member with the given ID exists.
+  /// Retrieve a single member by their member ID. Returns first and last name only. Returns 404 when no member with the given ID exists.
   ///
   /// Parameters:
-  /// * [userId] - The unique identifier of the member (OIDC sub claim).
+  /// * [memberId] - The unique identifier of the member, owned and issued by the Member Service.
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -115,7 +115,7 @@ class MembersApi {
   /// Returns a [Future] containing a [Response] with a [Member] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<Member>> getMember({
-    required String userId,
+    required String memberId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -123,9 +123,9 @@ class MembersApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/members/{userId}'.replaceAll(
-        '{' r'userId' '}',
-        encodeQueryParameter(_serializers, userId, const FullType(String))
+    final _path = r'/members/{memberId}'.replaceAll(
+        '{' r'memberId' '}',
+        encodeQueryParameter(_serializers, memberId, const FullType(String))
             .toString());
     final _options = Options(
       method: r'GET',
@@ -185,10 +185,10 @@ class MembersApi {
   }
 
   /// Get a batch of members
-  /// Retrieve multiple members by their user IDs in a single request. IDs are supplied as repeated &#x60;userId&#x60; query parameters. Members not found for a given ID are silently omitted from the response; no error is returned for unknown IDs.
+  /// Retrieve multiple members by their member IDs in a single request. IDs are supplied as repeated &#x60;memberId&#x60; query parameters. Members not found for a given ID are silently omitted from the response; no error is returned for unknown IDs.
   ///
   /// Parameters:
-  /// * [userId] - One or more user IDs to look up. Repeat this parameter for each requested user ID.
+  /// * [memberId] - One or more member IDs to look up. Repeat this parameter for each requested member ID.
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -199,7 +199,7 @@ class MembersApi {
   /// Returns a [Future] containing a [Response] with a [MemberBatch] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<MemberBatch>> getMembers({
-    required BuiltList<String> userId,
+    required BuiltList<String> memberId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -226,9 +226,9 @@ class MembersApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      r'userId': encodeCollectionQueryParameter<String>(
+      r'memberId': encodeCollectionQueryParameter<String>(
         _serializers,
-        userId,
+        memberId,
         const FullType(BuiltList, [FullType(String)]),
         format: ListFormat.multi,
       ),

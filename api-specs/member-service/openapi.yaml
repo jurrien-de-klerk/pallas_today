@@ -44,17 +44,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /members/{userId}:
+  /members/{memberId}:
     get:
       summary: Get a member
       description: >-
-        Retrieve a single member by their user ID. Returns first and last name
+        Retrieve a single member by their member ID. Returns first and last name
         only. Returns 404 when no member with the given ID exists.
       operationId: getMember
       tags:
         - members
       parameters:
-        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/memberId'
       responses:
         '200':
           description: Member found
@@ -84,20 +84,20 @@ paths:
     get:
       summary: Get a batch of members
       description: >-
-        Retrieve multiple members by their user IDs in a single request. IDs are
-        supplied as repeated `userId` query parameters. Members not found for a
+        Retrieve multiple members by their member IDs in a single request. IDs are
+        supplied as repeated `memberId` query parameters. Members not found for a
         given ID are silently omitted from the response; no error is returned for
         unknown IDs.
       operationId: getMembers
       tags:
         - members
       parameters:
-        - name: userId
+        - name: memberId
           in: query
           required: true
           description: >-
-            One or more user IDs to look up. Repeat this parameter for each
-            requested user ID.
+            One or more member IDs to look up. Repeat this parameter for each
+            requested member ID.
           schema:
             type: array
             minItems: 1
@@ -145,11 +145,11 @@ components:
           tokenUrl: http://localhost:9090/realms/pallas/protocol/openid-connect/token
           scopes: {}
   parameters:
-    userId:
-      name: userId
+    memberId:
+      name: memberId
       in: path
       required: true
-      description: The unique identifier of the member (OIDC sub claim).
+      description: The unique identifier of the member, owned and issued by the Member Service.
       schema:
         type: string
         format: uuid
@@ -158,16 +158,17 @@ components:
     Member:
       type: object
       required:
-        - userId
+        - memberId
         - firstName
         - lastName
       properties:
-        userId:
+        memberId:
           type: string
           format: uuid
           description: >-
-            The unique identifier of the member. Corresponds to the OIDC `sub`
-            claim issued by Keycloak.
+            The unique identifier of the member. Owned and issued by the Member
+            Service. Opaque to all other services; the mapping to the Keycloak
+            identity is an internal implementation detail of the Member Service.
           example: 987fcdeb-51a2-43d7-b012-345678901234
         firstName:
           type: string

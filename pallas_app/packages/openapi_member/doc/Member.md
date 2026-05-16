@@ -8,7 +8,7 @@ import 'package:openapi_member/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**userId** | **String** | The unique identifier of the member. Corresponds to the OIDC `sub` claim issued by Keycloak. | 
+**memberId** | **String** | The unique identifier of the member. Owned and issued by the Member Service. Opaque to all other services; the mapping to the Keycloak identity is an internal implementation detail of the Member Service. | 
 **firstName** | **String** | The member's given name. | 
 **lastName** | **String** | The member's family name. | 
 

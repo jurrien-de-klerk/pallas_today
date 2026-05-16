@@ -8,7 +8,7 @@ part of 'member.dart';
 
 class _$Member extends Member {
   @override
-  final String userId;
+  final String memberId;
   @override
   final String firstName;
   @override
@@ -18,7 +18,7 @@ class _$Member extends Member {
       (MemberBuilder()..update(updates))._build();
 
   _$Member._(
-      {required this.userId, required this.firstName, required this.lastName})
+      {required this.memberId, required this.firstName, required this.lastName})
       : super._();
   @override
   Member rebuild(void Function(MemberBuilder) updates) =>
@@ -31,7 +31,7 @@ class _$Member extends Member {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is Member &&
-        userId == other.userId &&
+        memberId == other.memberId &&
         firstName == other.firstName &&
         lastName == other.lastName;
   }
@@ -39,7 +39,7 @@ class _$Member extends Member {
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, userId.hashCode);
+    _$hash = $jc(_$hash, memberId.hashCode);
     _$hash = $jc(_$hash, firstName.hashCode);
     _$hash = $jc(_$hash, lastName.hashCode);
     _$hash = $jf(_$hash);
@@ -49,7 +49,7 @@ class _$Member extends Member {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'Member')
-          ..add('userId', userId)
+          ..add('memberId', memberId)
           ..add('firstName', firstName)
           ..add('lastName', lastName))
         .toString();
@@ -59,9 +59,9 @@ class _$Member extends Member {
 class MemberBuilder implements Builder<Member, MemberBuilder> {
   _$Member? _$v;
 
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
+  String? _memberId;
+  String? get memberId => _$this._memberId;
+  set memberId(String? memberId) => _$this._memberId = memberId;
 
   String? _firstName;
   String? get firstName => _$this._firstName;
@@ -78,7 +78,7 @@ class MemberBuilder implements Builder<Member, MemberBuilder> {
   MemberBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _userId = $v.userId;
+      _memberId = $v.memberId;
       _firstName = $v.firstName;
       _lastName = $v.lastName;
       _$v = null;
@@ -102,8 +102,8 @@ class MemberBuilder implements Builder<Member, MemberBuilder> {
   _$Member _build() {
     final _$result = _$v ??
         _$Member._(
-          userId: BuiltValueNullFieldError.checkNotNull(
-              userId, r'Member', 'userId'),
+          memberId: BuiltValueNullFieldError.checkNotNull(
+              memberId, r'Member', 'memberId'),
           firstName: BuiltValueNullFieldError.checkNotNull(
               firstName, r'Member', 'firstName'),
           lastName: BuiltValueNullFieldError.checkNotNull(
