@@ -24,10 +24,14 @@ Pallas Today consists of a cross-platform mobile and desktop application backed 
 microservices. This section introduces the overall structure from two complementary perspectives: the service
 decomposition (vertical slices) and the internal layering within each component (horizontal slices).
 
-A key architectural principle follows directly from this structure: **all domain logic resides in the backend**. The
-Pallas App contains no business rules; it is solely responsible for presenting information and translating user
-interactions into API calls. This keeps the domain model coherent and backend-authoritative, regardless of which client
-or platform accesses it. See [ADR-0010](../adr/0010-domain-logic-belongs-in-domain-layer.md).
+Two complementary principles govern where logic lives:
+
+- **Backend services own their domain logic.** Each microservice encapsulates and enforces its own business rules. Logic
+  belongs in the domain layer of the service that owns the data. See
+  [ADR-0013](../adr/0013-app-domain-layer-for-data-aggregation.md).
+- **The app domain layer is for aggregation only.** The Pallas App adds a domain layer whose sole responsibility is
+  combining data from multiple backend services into composite models for progressive loading. No other business rules
+  belong in the app. See [ADR-0013](../adr/0013-app-domain-layer-for-data-aggregation.md).
 
 ### Services and Components
 
@@ -62,16 +66,18 @@ graph TD
 While the system is decomposed into microservices, each component still follows a layered internal structure inspired by
 Domain-Driven Design [1, 4].
 
-**Pallas App** is organised in three layers:
+**Pallas App** is organised in four layers:
 
-| Layer        | Responsibility                                                       |
-| ------------ | -------------------------------------------------------------------- |
-| Presentation | Implements the user interface.                                       |
-| Application  | Translates UI interactions into calls to the backend.                |
-| Proxy        | Generated HTTP client code, derived from the OpenAPI specifications. |
+| Layer        | Responsibility                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| Presentation | Implements the user interface; renders aggregated models progressively as data becomes available. |
+| Application  | Translates UI interactions into calls to the domain layer.                                        |
+| Domain       | Aggregates data from multiple backend services into composite models. Contains no other logic.    |
+| Proxy        | Generated HTTP client code, derived from the OpenAPI specifications.                              |
 
 The proxy layer is a technical addition outside the DDD model; it keeps generated code clearly separated from
-hand-written application logic.
+hand-written application logic. The domain layer is restricted to aggregation; all other business rules stay in the
+corresponding backend microservice (see [ADR-0013](../adr/0013-app-domain-layer-for-data-aggregation.md)).
 
 **Each microservice** is organised in four layers:
 
@@ -83,14 +89,15 @@ hand-written application logic.
 | Data        | Manages interaction with persistent storage.          |
 
 The API layer, like the proxy layer in the app, is a technical addition that keeps transport concerns separate from the
-domain model. The rule that domain logic belongs in the domain layer is recorded in
-[ADR-0010](../adr/0010-domain-logic-belongs-in-domain-layer.md).
+domain model. The rule that domain logic belongs in the domain layer of the owning microservice is recorded in
+[ADR-0013](../adr/0013-app-domain-layer-for-data-aggregation.md).
 
 ```mermaid
 graph TD
     subgraph Pallas App
         Presentation --> Application_App[Application]
-        Application_App --> Proxy
+        Application_App --> Domain_App[Domain]
+        Domain_App --> Proxy
     end
 
     subgraph Microservice

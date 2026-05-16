@@ -4,7 +4,7 @@ Date: 2026-05-06
 
 ## Status
 
-Accepted
+Superseded by [13. App Domain Layer for Data Aggregation](0013-app-domain-layer-for-data-aggregation.md)
 
 ## Context
 

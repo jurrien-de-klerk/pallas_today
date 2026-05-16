@@ -6,6 +6,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:logging/logging.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
+import 'package:pallas_app/config/theme/lib/theme.dart';
+import 'package:pallas_app/config/theme/lib/util.dart';
 import 'presentation/login_screen.dart';
 
 final _log = PallasLogger('main');
@@ -39,6 +41,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = createTextTheme(context, 'Inter', 'Work Sans');
+    final materialTheme = MaterialTheme(textTheme);
     return MaterialApp(
       title: 'Pallas Today',
       localizationsDelegates: const [
@@ -48,9 +52,9 @@ class MyApp extends StatelessWidget {
         FlutterQuillLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-      ),
+      theme: materialTheme.light(),
+      darkTheme: materialTheme.dark(),
+      themeMode: ThemeMode.system,
       home: const LoginScreen(),
     );
   }
