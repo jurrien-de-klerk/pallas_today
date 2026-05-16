@@ -50,8 +50,6 @@ public class OpenApiConfig {
                     pathItem
                         .readOperations()
                         .forEach(
-                            op ->
-                                op.addSecurityItem(
-                                    new SecurityRequirement().addList("oauth2"))));
+                            op -> op.addSecurityItem(new SecurityRequirement().addList("oauth2"))));
   }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Pallas PMD ruleset" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0                         https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+  <description>Pallas quickstart ruleset with project-specific exclusions.</description>
+  <rule ref="rulesets/java/quickstart.xml">
+    <!--
+      GuardLogStatement fires on every parameterised log call (e.g. log.warn("…", arg))
+      even though Log4j2 / SLF4J already evaluates arguments lazily via {} placeholders.
+      Wrapping every log call in isXxxEnabled() guards would be unnecessary boilerplate.
+    -->
+    <exclude name="GuardLogStatement"/>
+  </rule>
+</ruleset>
