@@ -24,9 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
 class MembersControllerTest {
 
-  private static final UUID MEMBER_ID = UUID.fromString("987fcdeb-51a2-43d7-b012-345678901234");
   private static final String KEYCLOAK_SUB = "user-sub-123";
-  private static final Member MEMBER = new Member(MEMBER_ID, "Alice", "Smith");
+  private static final Member MEMBER =
+      new Member(UUID.fromString("987fcdeb-51a2-43d7-b012-345678901234"), "Alice", "Smith");
 
   @Autowired private MockMvc mockMvc;
 
@@ -41,9 +41,9 @@ class MembersControllerTest {
     mockMvc
         .perform(get("/members/me").with(jwt().jwt(j -> j.subject(KEYCLOAK_SUB))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.memberId").value(MEMBER_ID.toString()))
-        .andExpect(jsonPath("$.firstName").value("Alice"))
-        .andExpect(jsonPath("$.lastName").value("Smith"));
+        .andExpect(jsonPath("$.memberId").value(MEMBER.getMemberId().toString()))
+        .andExpect(jsonPath("$.firstName").value(MEMBER.getFirstName()))
+        .andExpect(jsonPath("$.lastName").value(MEMBER.getLastName()));
   }
 
   @Test
@@ -55,29 +55,32 @@ class MembersControllerTest {
 
   @Test
   void getMember_returnsMember_whenFound() throws Exception {
-    when(memberService.getMember(MEMBER_ID)).thenReturn(MEMBER);
+    when(memberService.getMember(MEMBER.getMemberId())).thenReturn(MEMBER);
 
     mockMvc
-        .perform(get("/members/member/{id}", MEMBER_ID).with(jwt()))
+        .perform(get("/members/member/{id}", MEMBER.getMemberId()).with(jwt()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.memberId").value(MEMBER_ID.toString()))
-        .andExpect(jsonPath("$.firstName").value("Alice"))
-        .andExpect(jsonPath("$.lastName").value("Smith"));
+        .andExpect(jsonPath("$.memberId").value(MEMBER.getMemberId().toString()))
+        .andExpect(jsonPath("$.firstName").value(MEMBER.getFirstName()))
+        .andExpect(jsonPath("$.lastName").value(MEMBER.getLastName()));
   }
 
   @Test
   void getMember_returns404_whenNotFound() throws Exception {
-    when(memberService.getMember(MEMBER_ID)).thenThrow(new MemberNotFoundException(MEMBER_ID));
+    when(memberService.getMember(MEMBER.getMemberId()))
+        .thenThrow(new MemberNotFoundException(MEMBER.getMemberId()));
 
     mockMvc
-        .perform(get("/members/member/{id}", MEMBER_ID).with(jwt()))
+        .perform(get("/members/member/{id}", MEMBER.getMemberId()).with(jwt()))
         .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("Member not found: " + MEMBER_ID));
+        .andExpect(jsonPath("$.message").value("Member not found: " + MEMBER.getMemberId()));
   }
 
   @Test
   void getMember_returns401_whenNoToken() throws Exception {
-    mockMvc.perform(get("/members/member/{id}", MEMBER_ID)).andExpect(status().isUnauthorized());
+    mockMvc
+        .perform(get("/members/member/{id}", MEMBER.getMemberId()))
+        .andExpect(status().isUnauthorized());
   }
 
   // --- GET /members/batch ---
@@ -86,26 +89,28 @@ class MembersControllerTest {
   void getMembers_returnsBatch_whenAllFound() throws Exception {
     UUID id2 = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
     Member member2 = new Member(id2, "Bob", "Jones");
-    when(memberService.getMembers(List.of(MEMBER_ID, id2))).thenReturn(List.of(MEMBER, member2));
+    when(memberService.getMembers(List.of(MEMBER.getMemberId(), id2)))
+        .thenReturn(List.of(MEMBER, member2));
 
     mockMvc
         .perform(
             get("/members/batch")
-                .param("memberId", MEMBER_ID.toString())
+                .param("memberId", MEMBER.getMemberId().toString())
                 .param("memberId", id2.toString())
                 .with(jwt()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.members.length()").value(2))
-        .andExpect(jsonPath("$.members[0].memberId").value(MEMBER_ID.toString()))
-        .andExpect(jsonPath("$.members[1].memberId").value(id2.toString()));
+        .andExpect(jsonPath("$.members[0].memberId").value(MEMBER.getMemberId().toString()))
+        .andExpect(jsonPath("$.members[1].memberId").value(member2.getMemberId().toString()));
   }
 
   @Test
   void getMembers_returnsEmptyBatch_whenNoneFound() throws Exception {
-    when(memberService.getMembers(List.of(MEMBER_ID))).thenReturn(List.of());
+    when(memberService.getMembers(List.of(MEMBER.getMemberId()))).thenReturn(List.of());
 
     mockMvc
-        .perform(get("/members/batch").param("memberId", MEMBER_ID.toString()).with(jwt()))
+        .perform(
+            get("/members/batch").param("memberId", MEMBER.getMemberId().toString()).with(jwt()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.members.length()").value(0));
   }
@@ -113,7 +118,7 @@ class MembersControllerTest {
   @Test
   void getMembers_returns401_whenNoToken() throws Exception {
     mockMvc
-        .perform(get("/members/batch").param("memberId", MEMBER_ID.toString()))
+        .perform(get("/members/batch").param("memberId", MEMBER.getMemberId().toString()))
         .andExpect(status().isUnauthorized());
   }
 }
