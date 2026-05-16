@@ -2,11 +2,12 @@
 README.md
 analysis_options.yaml
 doc/Error.md
-doc/Image.md
-doc/ImagesApi.md
-lib/openapi_image.dart
+doc/Member.md
+doc/MemberBatch.md
+doc/MembersApi.md
+lib/openapi_member.dart
 lib/src/api.dart
-lib/src/api/images_api.dart
+lib/src/api/members_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
 lib/src/auth/auth.dart
@@ -16,6 +17,7 @@ lib/src/auth/oauth.dart
 lib/src/date_serializer.dart
 lib/src/model/date.dart
 lib/src/model/error.dart
-lib/src/model/image.dart
+lib/src/model/member.dart
+lib/src/model/member_batch.dart
 lib/src/serializers.dart
 pubspec.yaml

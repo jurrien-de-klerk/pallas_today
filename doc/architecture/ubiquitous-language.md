@@ -46,7 +46,9 @@ ______________________________________________________________________
 ### Member
 
 A registered participant of Pallas Today. The primary identity within the domain. Identified across all services by an
-opaque `userId` (the OIDC `sub` claim). Detailed profile data is owned by the User Service.
+opaque `memberId` owned and issued by the Member Service. The Member Service resolves the mapping between the Keycloak
+identity (OIDC `sub` claim) and the `memberId` internally, decoupling the rest of the platform from the identity
+provider. Detailed profile data is owned by the Member Service.
 
 ### Pallas Community
 

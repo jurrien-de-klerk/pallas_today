@@ -13,7 +13,7 @@ part 'story.g.dart';
 ///
 /// Properties:
 /// * [id] - Unique identifier of the story
-/// * [authorId] - The userId of the member who published the story
+/// * [authorId] - The memberId of the member who published the story
 /// * [content] - The story body as a JSON-serialised Quill Delta array of insert operations. Image references within the Delta are URLs pointing to file storage; raw image data is never embedded.
 /// * [sharedWith]
 /// * [publishedAt] - The date and time at which the story was published (ISO 8601, UTC). Used to order stories in the Stories near you feed.
@@ -23,7 +23,7 @@ abstract class Story implements Built<Story, StoryBuilder> {
   @BuiltValueField(wireName: r'id')
   String get id;
 
-  /// The userId of the member who published the story
+  /// The memberId of the member who published the story
   @BuiltValueField(wireName: r'authorId')
   String get authorId;
 

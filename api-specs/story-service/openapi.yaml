@@ -311,7 +311,7 @@ components:
         authorId:
           type: string
           format: uuid
-          description: The userId of the member who published the story
+          description: The memberId of the member who published the story
           example: 987fcdeb-51a2-43d7-b012-345678901234
         content:
           type: string

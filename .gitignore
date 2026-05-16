@@ -3,3 +3,5 @@
 *.code-workspace
 # Maven build artifacts
 target/
+# Generated OpenAPI client dummy tests
+pallas_app/packages/openapi_*/test/

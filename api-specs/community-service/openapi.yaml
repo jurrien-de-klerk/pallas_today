@@ -289,12 +289,12 @@ components:
     MemberReference:
       type: object
       required:
-        - userId
+        - memberId
       properties:
-        userId:
+        memberId:
           type: string
-          maxLength: 255
-          description: Opaque OIDC sub claim identifying the member (up to 255 ASCII characters)
+          format: uuid
+          description: Opaque member identifier owned and issued by the Member Service
     Circles:
       type: object
       required:

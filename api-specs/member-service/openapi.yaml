@@ -1,0 +1,214 @@
+---
+openapi: 3.0.3
+info:
+  title: MemberService API
+  description: >-
+    API for retrieving member profile data. The Member Service acts as an
+    anti-corruption layer on top of Keycloak, exposing only the domain-relevant
+    subset of identity data.
+  version: 0.0.1-SNAPSHOT
+  contact:
+    name: Pallas Team
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+security:
+  - oauth2: []
+paths:
+  /members/me:
+    get:
+      summary: Get the authenticated member's own profile
+      description: >-
+        Retrieve the profile of the currently authenticated member. The member
+        is identified from the access token's `sub` claim. Returns first and
+        last name only.
+      operationId: getAuthenticatedMember
+      tags:
+        - members
+      responses:
+        '200':
+          description: Profile of the authenticated member
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /members/member/{memberId}:
+    get:
+      summary: Get a member
+      description: >-
+        Retrieve a single member by their member ID. Returns first and last name
+        only. Returns 404 when no member with the given ID exists.
+      operationId: getMember
+      tags:
+        - members
+      parameters:
+        - $ref: '#/components/parameters/memberId'
+      responses:
+        '200':
+          description: Member found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /members/batch:
+    get:
+      summary: Get a batch of members
+      description: >-
+        Retrieve multiple members by their member IDs in a single request. IDs are
+        supplied as repeated `memberId` query parameters. Members not found for a
+        given ID are silently omitted from the response; no error is returned for
+        unknown IDs.
+      operationId: getMembers
+      tags:
+        - members
+      parameters:
+        - name: memberId
+          in: query
+          required: true
+          description: >-
+            One or more member IDs to look up. Repeat this parameter for each
+            requested member ID.
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 100
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+          example:
+            - 987fcdeb-51a2-43d7-b012-345678901234
+            - 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '200':
+          description: Batch of members returned. Unknown IDs are omitted silently.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberBatch'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:9090/realms/pallas/protocol/openid-connect/auth
+          tokenUrl: http://localhost:9090/realms/pallas/protocol/openid-connect/token
+          scopes: {}
+  parameters:
+    memberId:
+      name: memberId
+      in: path
+      required: true
+      description: The unique identifier of the member, owned and issued by the Member Service.
+      schema:
+        type: string
+        format: uuid
+      example: 987fcdeb-51a2-43d7-b012-345678901234
+  schemas:
+    Member:
+      type: object
+      required:
+        - memberId
+        - firstName
+        - lastName
+      properties:
+        memberId:
+          type: string
+          format: uuid
+          description: >-
+            The unique identifier of the member. Owned and issued by the Member
+            Service. Opaque to all other services; the mapping to the Keycloak
+            identity is an internal implementation detail of the Member Service.
+          example: 987fcdeb-51a2-43d7-b012-345678901234
+        firstName:
+          type: string
+          description: The member's given name.
+          minLength: 1
+          maxLength: 100
+          example: Alice
+        lastName:
+          type: string
+          description: The member's family name.
+          minLength: 1
+          maxLength: 100
+          example: Smith
+    MemberBatch:
+      type: object
+      required:
+        - members
+      properties:
+        members:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Member'
+          description: >-
+            The members found for the requested user IDs. Members not found for
+            a given ID are omitted.
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          maxLength: 256
+        code:
+          type: string
+          description: Error code
+          maxLength: 64
+        details:
+          type: string
+          description: Additional error details
+          maxLength: 1024
