@@ -28,7 +28,36 @@ Use the developer's prompt to understand the description and scope of the change
 
 Do not proceed to the next step until the description and scope are clear.
 
-## Step 2 — Estimate size and adjust scope
+## Step 2 — Usability analysis (frontend issues only)
+
+If the scope includes `pallas_app` (Flutter frontend), perform a usability analysis **before** estimating size or
+finalising scope. Use `doc/architecture/ux-design.md` as the sole input for this analysis.
+
+Check the proposed change against each of the following areas and note any findings:
+
+1. **Design vision** — Does the change respect the transparency and feedback principles (idle / loading / success /
+   error states)? If the change involves user input, does it explain clearly why input is rejected and help the member
+   do the right thing?
+1. **Action frequency** — Which frequency category does the feature's primary action fall into (most frequent /
+   regularly frequent / rarely performed)? Is the proposed interaction cost appropriate for that category?
+1. **Personas** — Does the change work for all three personas (dedicated family member, activist, older member)? Note
+   any persona that would struggle with the proposed interaction.
+1. **Navigation** — Does the change fit within the defined information hierarchy? If it introduces a new screen or entry
+   point, does it belong under an existing top-level destination?
+1. **Loading experience** — If the change fetches data, does it support the progressive loading strategy (show data as
+   it arrives, indicate loading state, parallelise service calls where possible)?
+1. **Visual style** — Does the change use the established colour roles, typography (Work Sans for display, Inter for
+   body), and Material Icons? Does it avoid introducing custom colours or fonts outside the defined theme?
+
+After completing the analysis:
+
+- Summarise any findings that affect the description, in-scope, or out-of-scope items and discuss them with the
+  developer.
+- If a finding reveals work that goes beyond the original prompt, suggest it as a separate out-of-scope item or a
+  follow-up issue rather than expanding the current scope silently.
+- If all areas are satisfied and no concerns arise, note "Usability analysis: no issues found" and continue.
+
+## Step 3 — Estimate size and adjust scope
 
 Estimate the number of lines of code that the in-scope changes are likely to require. If the estimate exceeds 200 lines:
 
@@ -37,7 +66,7 @@ Estimate the number of lines of code that the in-scope changes are likely to req
    something meaningful.
 1. Adjust the scope based on the developer's response before continuing.
 
-## Step 3 — Ensure out-of-scope work is tracked
+## Step 4 — Ensure out-of-scope work is tracked
 
 For each item listed as out of scope, check whether an existing open issue already covers it. Ask the developer if
 unsure. If no issue exists for an out-of-scope item:
@@ -46,7 +75,7 @@ unsure. If no issue exists for an out-of-scope item:
 - Do not create the placeholder automatically; let the developer decide.
 - Once the developer confirms, note any placeholder issue numbers so they can be referenced in the feature issue.
 
-## Step 4 — Security risk analysis
+## Step 5 — Security risk analysis
 
 Assess whether the in-scope changes carry a security risk. Consider at minimum:
 
@@ -63,7 +92,7 @@ If no risk is identified, add a **Security risk** section with the text: "No sec
 
 Issues created from the `placeholder` template are exempt from this step.
 
-## Step 5 — Determine labels
+## Step 6 — Determine labels
 
 Assign one or more of the following labels based on what is in scope. **Only use labels from this table — do not suggest
 any label not listed here:**
@@ -75,18 +104,18 @@ any label not listed here:**
 | Installing or configuring a third-party service             | `third-party-service` |
 | Documentation                                               | `documentation`       |
 | CI/CD                                                       | `ci-cd`               |
-| Issue carries an identified security risk (see step 4)      | `security-risk`       |
+| Issue carries an identified security risk (see step 5)      | `security-risk`       |
 
 If you are unsure whether a label exists in the repository, check the repository's label list before suggesting it.
 
-## Step 6 — Draft and create the issue
+## Step 7 — Draft and create the issue
 
 Fill in `.github/ISSUE_TEMPLATE/feature.md`:
 
 - **Description**: short description of what the feature or bug fix is about.
 - **In scope**: bullet list of what is included, using the areas confirmed in step 1.
 - **Out of scope**: bullet list of what is explicitly not included; link to tracking issues where they exist.
-- **Security risk**: outcome of step 4 — either the identified risk with impact and mitigation, or "No security risk
+- **Security risk**: outcome of step 5 — either the identified risk with impact and mitigation, or “No security risk
   identified."
 
 Present the draft to the developer for review using a YAML code block with `type="draft-issue"` — **never use raw
