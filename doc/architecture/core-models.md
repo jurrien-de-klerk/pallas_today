@@ -3,6 +3,23 @@
 This chapter describes the core domain models of Pallas Today. These models are central to the platform and are
 referenced across all services.
 
+## Member
+
+A **member** is the representation of a registered person on the platform. The canonical source of user data is
+**Keycloak**, the platform's identity provider. The **Member Service** acts as an anti-corruption layer on top of
+Keycloak: it exposes a stable domain model without leaking the internal structure or full data set of the identity
+provider.
+
+The Member model exposes only the information required by the domain:
+
+| Field         | Description               |
+| ------------- | ------------------------- |
+| **firstName** | The member's given name.  |
+| **lastName**  | The member's family name. |
+
+Although Keycloak holds additional profile attributes, the Member Service deliberately limits its exposure to first and
+last name. All other personal data remains within the identity provider and is never propagated to other services.
+
 ______________________________________________________________________
 
 ## Member Network
