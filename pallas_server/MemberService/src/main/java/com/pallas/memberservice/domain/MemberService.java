@@ -1,6 +1,7 @@
 package com.pallas.memberservice.domain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,11 +26,15 @@ public class MemberService {
    */
   @Transactional
   public Member getCurrentMember(String keycloakSub) {
-    MemberMapping mapping =
-        memberMappingPort
-            .findBySub(keycloakSub)
-            .orElseGet(() -> memberMappingPort.save(MemberMapping.newMapping(keycloakSub)));
-
+    Optional<MemberMapping> existing = memberMappingPort.findBySub(keycloakSub);
+    MemberMapping mapping;
+    if (existing.isPresent()) {
+      mapping = existing.get();
+      log.debug("getCurrentMember: mapping found");
+    } else {
+      mapping = memberMappingPort.save(MemberMapping.newMapping(keycloakSub));
+      log.debug("getCurrentMember: mapping created");
+    }
     return buildMember(mapping);
   }
 
@@ -42,6 +47,7 @@ public class MemberService {
    */
   @Transactional(readOnly = true)
   public Member getMember(UUID memberId) {
+    log.debug("getMember: looking up mapping");
     MemberMapping mapping =
         memberMappingPort
             .findByMemberId(memberId)
@@ -58,15 +64,21 @@ public class MemberService {
    */
   @Transactional(readOnly = true)
   public List<Member> getMembers(List<UUID> memberIds) {
-    return memberMappingPort.findByMemberIds(memberIds).stream().map(this::buildMember).toList();
+    log.debug("getMembers: {} ids requested", memberIds.size());
+    List<Member> result =
+        memberMappingPort.findByMemberIds(memberIds).stream().map(this::buildMember).toList();
+    log.debug("getMembers: {} members resolved", result.size());
+    return result;
   }
 
   private Member buildMember(MemberMapping mapping) {
+    log.debug("buildMember: fetching identity profile");
     IdentityProfile profile =
         identityProfilePort
             .findBySub(mapping.keycloakSub())
             .orElseThrow(() -> new MemberNotFoundException(mapping.memberId()));
 
+    log.debug("buildMember: profile fetched");
     return new Member(mapping.memberId(), profile.firstName(), profile.lastName());
   }
 }
