@@ -1,6 +1,7 @@
 package com.pallas.memberservice.exception;
 
 import com.pallas.logger.PallasBacktrace;
+import com.pallas.memberservice.domain.MemberNotFoundException;
 import com.pallas.memberservice.model.Error;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
     error.setMessage(message);
     error.setCode(HttpStatus.BAD_REQUEST.toString());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(MemberNotFoundException.class)
+  public ResponseEntity<Error> handleMemberNotFoundException(MemberNotFoundException ex) {
+    log.warn("Member not found: {}", ex.getMessage());
+    Error error = new Error();
+    error.setMessage(ex.getMessage());
+    error.setCode(HttpStatus.NOT_FOUND.toString());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
   @ExceptionHandler(Exception.class)
