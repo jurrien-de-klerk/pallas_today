@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 analysis_options.yaml
 doc/Error.md
@@ -22,7 +21,3 @@ lib/src/model/member.dart
 lib/src/model/member_batch.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/error_test.dart
-test/member_batch_test.dart
-test/member_test.dart
-test/members_api_test.dart

@@ -9,9 +9,51 @@ All URIs are relative to *http://localhost:8081*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getAuthenticatedMember**](MembersApi.md#getauthenticatedmember) | **GET** /members/me | Get the authenticated member&#39;s own profile
 [**getMember**](MembersApi.md#getmember) | **GET** /members/{userId} | Get a member
 [**getMembers**](MembersApi.md#getmembers) | **GET** /members/batch | Get a batch of members
 
+
+# **getAuthenticatedMember**
+> Member getAuthenticatedMember()
+
+Get the authenticated member's own profile
+
+Retrieve the profile of the currently authenticated member. The member is identified from the access token's `sub` claim. Returns first and last name only.
+
+### Example
+```dart
+import 'package:openapi_member/api.dart';
+// TODO Configure OAuth2 access token for authorization: oauth2
+//defaultApiClient.getAuthentication<OAuth>('oauth2').accessToken = 'YOUR_ACCESS_TOKEN';
+
+final api = OpenapiMember().getMembersApi();
+
+try {
+    final response = api.getAuthenticatedMember();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling MembersApi->getAuthenticatedMember: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Member**](Member.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getMember**
 > Member getMember(userId)

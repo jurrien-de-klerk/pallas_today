@@ -48,13 +48,12 @@ import 'package:openapi_member/openapi_member.dart';
 
 
 final api = OpenapiMember().getMembersApi();
-final String userId = 987fcdeb-51a2-43d7-b012-345678901234; // String | The unique identifier of the member (OIDC sub claim).
 
 try {
-    final response = await api.getMember(userId);
+    final response = await api.getAuthenticatedMember();
     print(response);
 } catch on DioException (e) {
-    print("Exception when calling MembersApi->getMember: $e\n");
+    print("Exception when calling MembersApi->getAuthenticatedMember: $e\n");
 }
 
 ```
@@ -65,6 +64,7 @@ All URIs are relative to *http://localhost:8081*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*MembersApi*](doc/MembersApi.md) | [**getAuthenticatedMember**](doc/MembersApi.md#getauthenticatedmember) | **GET** /members/me | Get the authenticated member&#39;s own profile
 [*MembersApi*](doc/MembersApi.md) | [**getMember**](doc/MembersApi.md#getmember) | **GET** /members/{userId} | Get a member
 [*MembersApi*](doc/MembersApi.md) | [**getMembers**](doc/MembersApi.md#getmembers) | **GET** /members/batch | Get a batch of members
 

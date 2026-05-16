@@ -15,6 +15,35 @@ servers:
 security:
   - oauth2: []
 paths:
+  /members/me:
+    get:
+      summary: Get the authenticated member's own profile
+      description: >-
+        Retrieve the profile of the currently authenticated member. The member
+        is identified from the access token's `sub` claim. Returns first and
+        last name only.
+      operationId: getAuthenticatedMember
+      tags:
+        - members
+      responses:
+        '200':
+          description: Profile of the authenticated member
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /members/{userId}:
     get:
       summary: Get a member
