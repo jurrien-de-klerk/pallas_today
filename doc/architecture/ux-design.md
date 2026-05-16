@@ -109,3 +109,51 @@ To make the app feel fast, a progressive loading strategy is used (see
 - Service calls are made in parallel where possible to minimise total loading time.
 - Whenever data is still loading, a visible loading indicator is shown, consistent with the transparency principle
   described above.
+
+______________________________________________________________________
+
+## Visual Style
+
+### Design system
+
+The app is built on **Material 3** (`useMaterial3: true`). This provides a consistent component library, accessible
+colour roles, and adaptive behaviour across platforms out of the box. The theme is generated from a custom seed palette
+using the Material Theme Builder.
+
+### Colour palette
+
+The palette centres on deep forest teal as the primary brand colour, paired with warm earth tones for secondary and
+tertiary roles. This reinforces the platform's values of trust and calm intellectual engagement, while remaining
+distinct from the saturated palettes common on commercial social media platforms.
+
+Both a light and a dark scheme are defined; the app follows the device's system preference automatically.
+
+| Role      | Light (`#`) | Dark (`#`) | Description                                      |
+| --------- | ----------- | ---------- | ------------------------------------------------ |
+| Primary   | `144740`    | `9fd0c6`   | Deep forest teal — primary actions and branding. |
+| Secondary | `665e49`    | `fff9f1`   | Warm tan — supporting actions and surfaces.      |
+| Tertiary  | `516143`    | `bbcca8`   | Olive green — complementary accents.             |
+| Error     | `994436`    | `ffb4a6`   | Muted terracotta — errors and warnings.          |
+| Surface   | `fcf8f7`    | `141313`   | Warm off-white / near-black page background.     |
+
+The full colour token set is defined in
+[`pallas_app/lib/config/theme/lib/theme.dart`](../../pallas_app/lib/config/theme/lib/theme.dart). Each role includes
+standard, medium-contrast, and high-contrast variants to meet accessibility requirements for members with varying visual
+needs.
+
+### Typography
+
+Two typefaces are used, loaded via the Google Fonts package:
+
+| Role    | Typeface      | Applied to                                         |
+| ------- | ------------- | -------------------------------------------------- |
+| Display | **Work Sans** | Headings, titles, and large display text.          |
+| Body    | **Inter**     | Body copy, labels, buttons, and all other UI text. |
+
+Work Sans provides a friendly, geometric quality suited to headlines. Inter is highly legible at small sizes and across
+varied screen densities, making it a sound choice for dense UI text.
+
+### Iconography
+
+The app launcher icon is `pallas_icon.png`, located in [`pallas_app/assets/`](../../pallas_app/assets/). In-app icons
+use the Material Icons set provided by the Flutter `material` library.
