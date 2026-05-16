@@ -556,6 +556,17 @@
       "groups": [
         "/Member"
       ]
+    },
+    {
+      "id": "a7de9752-3122-4881-be5c-1c32a6916649",
+      "username": "service-account-member-service",
+      "enabled": true,
+      "serviceAccountClientId": "member-service",
+      "clientRoles": {
+        "realm-management": [
+          "view-users"
+        ]
+      }
     }
   ],
   "scopeMappings": [
@@ -971,6 +982,20 @@
         "offline_access",
         "microprofile-jwt"
       ]
+    },
+    {
+      "id": "fc5f9969-1696-4e82-ab65-7711ce79c0f2",
+      "clientId": "member-service",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "secret": "changeme",
+      "protocol": "openid-connect",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "fullScopeAllowed": true
     }
   ],
   "clientScopes": [
