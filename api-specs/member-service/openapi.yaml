@@ -44,7 +44,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /members/{memberId}:
+  /members/member/{memberId}:
     get:
       summary: Get a member
       description: >-

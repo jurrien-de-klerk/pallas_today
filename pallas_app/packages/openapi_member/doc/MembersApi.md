@@ -10,7 +10,7 @@ All URIs are relative to *http://localhost:8081*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getAuthenticatedMember**](MembersApi.md#getauthenticatedmember) | **GET** /members/me | Get the authenticated member&#39;s own profile
-[**getMember**](MembersApi.md#getmember) | **GET** /members/{memberId} | Get a member
+[**getMember**](MembersApi.md#getmember) | **GET** /members/member/{memberId} | Get a member
 [**getMembers**](MembersApi.md#getmembers) | **GET** /members/batch | Get a batch of members
 
 
