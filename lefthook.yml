@@ -110,7 +110,8 @@ pre-commit:
       glob:
         - "api-specs/*.yaml"
         - "api-specs/**/*.yaml"
-        - "pallas_app/packages/openapi_*/**"
+        - "pallas_app/lib/proxy/client/**/*.dart"
+      stage_fixed: true
       name: Dart client codegen
     - run: >-
         if ! git diff --quiet -- $(ls -d pallas_app/packages/openapi_*/); then
