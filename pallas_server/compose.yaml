@@ -69,13 +69,35 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
       KEYCLOAK_REALM: pallas
       SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://member-db:5432/memberservice
+      SPRING_DATASOURCE_USERNAME: memberservice
+      SPRING_DATASOURCE_PASSWORD: memberservice
     networks:
       - services
+      - member-internal
     depends_on:
       keycloak:
         condition: service_healthy
+      member-db:
+        condition: service_healthy
+  member-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: memberservice
+      POSTGRES_USER: memberservice
+      POSTGRES_PASSWORD: memberservice
+    networks:
+      - member-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U memberservice -d memberservice"]
+      interval: 2s
+      timeout: 5s
+      retries: 25
 networks:
   keycloak-internal:
+    driver: bridge
+    internal: true
+  member-internal:
     driver: bridge
     internal: true
   services:
