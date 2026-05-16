@@ -58,6 +58,22 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+  member-service:
+    build:
+      context: ./MemberService
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
+      KEYCLOAK_AUTH_SERVER_URL: http://localhost:8180
+      KEYCLOAK_REALM: pallas
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - services
+    depends_on:
+      keycloak:
+        condition: service_healthy
 networks:
   keycloak-internal:
     driver: bridge
