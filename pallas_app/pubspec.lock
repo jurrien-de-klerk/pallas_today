@@ -780,6 +780,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  openapi_member:
+    dependency: "direct main"
+    description:
+      path: "packages/openapi_member"
+      relative: true
+    source: path
+    version: "1.0.0"
   openapi_story:
     dependency: "direct main"
     description:

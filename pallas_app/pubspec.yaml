@@ -39,6 +39,8 @@ dependencies:
   dio: ^5.2.0
   openapi_image:
     path: packages/openapi_image
+  openapi_member:
+    path: packages/openapi_member
   openapi_story:
     path: packages/openapi_story
   pallas_logger:
