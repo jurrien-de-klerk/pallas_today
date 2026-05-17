@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,6 +36,16 @@ public class GlobalExceptionHandler {
             .findFirst()
             .orElse("Validation failed");
     error.setMessage(message);
+    error.setCode(HttpStatus.BAD_REQUEST.toString());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<Error> handleMissingServletRequestParameterException(
+      MissingServletRequestParameterException ex) {
+    log.warn("Missing required request parameter: {}", ex.getParameterName());
+    Error error = new Error();
+    error.setMessage("Missing required parameter: " + ex.getParameterName());
     error.setCode(HttpStatus.BAD_REQUEST.toString());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }

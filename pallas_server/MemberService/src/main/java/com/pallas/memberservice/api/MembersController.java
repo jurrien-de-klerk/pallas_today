@@ -3,6 +3,7 @@ package com.pallas.memberservice.api;
 import com.pallas.memberservice.domain.MemberService;
 import com.pallas.memberservice.model.MemberBatch;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,6 +35,9 @@ public class MembersController implements MembersApi {
 
   @Override
   public ResponseEntity<MemberBatch> getMembers(List<UUID> memberId) {
+    if (Objects.isNull(memberId) || memberId.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
     log.info("GET /members/batch ({} ids requested)", memberId.size());
     List<com.pallas.memberservice.model.Member> members =
         memberService.getMembers(memberId).stream().map(this::toModel).toList();

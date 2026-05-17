@@ -117,6 +117,11 @@ class MembersControllerTest {
   }
 
   @Test
+  void getMembers_returns400_whenMemberIdIsEmpty() throws Exception {
+    mockMvc.perform(get("/members/batch").with(jwt())).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void getMembers_returns401_whenNoToken() throws Exception {
     mockMvc
         .perform(get("/members/batch").param("memberId", MEMBER.getMemberId().toString()))
