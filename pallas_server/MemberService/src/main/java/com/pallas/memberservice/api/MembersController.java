@@ -3,11 +3,12 @@ package com.pallas.memberservice.api;
 import com.pallas.memberservice.domain.MemberService;
 import com.pallas.memberservice.model.MemberBatch;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,8 @@ public class MembersController implements MembersApi {
 
   @Override
   public ResponseEntity<MemberBatch> getMembers(List<UUID> memberId) {
-    if (Objects.isNull(memberId) || memberId.isEmpty()) {
-      return ResponseEntity.badRequest().build();
+    if (memberId == null || memberId.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "memberId must not be empty");
     }
     log.info("GET /members/batch ({} ids requested)", memberId.size());
     List<com.pallas.memberservice.model.Member> members =

@@ -52,7 +52,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MemberNotFoundException.class)
   public ResponseEntity<Error> handleMemberNotFoundException(MemberNotFoundException ex) {
-    log.warn("Member not found: {}", ex.getMessage());
+    // Log only the exception type — not the message — to avoid recording member identifiers
+    // or identity-provider path info in log output (ADR-0007). The member ID is still
+    // returned to the caller in the HTTP response body below.
+    log.warn("Handling {}", ex.getClass().getSimpleName());
     Error error = new Error();
     error.setMessage(ex.getMessage());
     error.setCode(HttpStatus.NOT_FOUND.toString());

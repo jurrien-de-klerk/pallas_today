@@ -35,7 +35,9 @@ public class SecurityConfig {
   @Bean
   public AuthenticationEntryPoint unauthorizedEntryPoint() {
     return (request, response, ex) -> {
-      log.warn("Unauthenticated request to {}", request.getRequestURI());
+      // Log only a static message — not the URI — to avoid recording member identifiers
+      // or other application data that may appear in path segments (ADR-0007).
+      log.warn("Unauthenticated request to members API");
       response.sendError(401);
     };
   }

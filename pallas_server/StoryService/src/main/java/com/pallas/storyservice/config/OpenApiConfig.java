@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 @Profile("dev")
 public class OpenApiConfig {
 
-  @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
+  @Value("${keycloak.public-url}/realms/${keycloak.realm}")
   private String issuerUri;
 
   @Bean
