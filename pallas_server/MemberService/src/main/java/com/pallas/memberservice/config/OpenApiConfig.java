@@ -1,4 +1,4 @@
-package com.pallas.storyservice.config;
+package com.pallas.memberservice.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -50,8 +50,6 @@ public class OpenApiConfig {
                     pathItem
                         .readOperations()
                         .forEach(
-                            operation ->
-                                operation.addSecurityItem(
-                                    new SecurityRequirement().addList("oauth2"))));
+                            op -> op.addSecurityItem(new SecurityRequirement().addList("oauth2"))));
   }
 }

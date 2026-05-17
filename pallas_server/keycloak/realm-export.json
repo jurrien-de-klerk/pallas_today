@@ -556,6 +556,17 @@
       "groups": [
         "/Member"
       ]
+    },
+    {
+      "id": "a7de9752-3122-4881-be5c-1c32a6916649",
+      "username": "service-account-member-service",
+      "enabled": true,
+      "serviceAccountClientId": "member-service",
+      "clientRoles": {
+        "realm-management": [
+          "view-users"
+        ]
+      }
     }
   ],
   "scopeMappings": [
@@ -890,10 +901,12 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:8080/swagger-ui/oauth2-redirect.html"
+        "http://localhost:8080/swagger-ui/oauth2-redirect.html",
+        "http://localhost:8081/swagger-ui/oauth2-redirect.html"
       ],
       "webOrigins": [
-        "http://localhost:8080"
+        "http://localhost:8080",
+        "http://localhost:8081"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -969,6 +982,20 @@
         "offline_access",
         "microprofile-jwt"
       ]
+    },
+    {
+      "id": "fc5f9969-1696-4e82-ab65-7711ce79c0f2",
+      "clientId": "member-service",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "secret": "changeme",
+      "protocol": "openid-connect",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "fullScopeAllowed": true
     }
   ],
   "clientScopes": [

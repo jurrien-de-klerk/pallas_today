@@ -1,12 +1,12 @@
-package com.pallas.storyservice;
+package com.pallas.memberservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @SuppressWarnings("PMD.UseUtilityClass")
-public class StoryServiceApplication {
+public class MemberServiceApplication {
   public static void main(String[] args) {
-    SpringApplication.run(StoryServiceApplication.class, args);
+    SpringApplication.run(MemberServiceApplication.class, args);
   }
 }

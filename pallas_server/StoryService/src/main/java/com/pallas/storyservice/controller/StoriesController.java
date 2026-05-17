@@ -8,6 +8,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 public class StoriesController implements StoriesApi {
 
-  private final ConcurrentHashMap<UUID, Story> storiesDb = new ConcurrentHashMap<>();
+  private final ConcurrentMap<UUID, Story> storiesDb = new ConcurrentHashMap<>();
 
   @Override
   public ResponseEntity<Story> createStory(StoryInput storyInput) {

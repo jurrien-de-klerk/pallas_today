@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.13</version>
+    <version>3.5.14</version>
     <relativePath/>
   </parent>
   <groupId>com.pallas</groupId>
@@ -16,6 +16,7 @@
   <modules>
     <module>pallas-logger</module>
     <module>StoryService</module>
+    <module>MemberService</module>
   </modules>
   <properties>
     <!-- Set to true in CI to skip auto-formatting (fmt:check still runs). -->
@@ -65,7 +66,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.21.2</version>
+        <version>3.24.0</version>
         <executions>
           <execution>
             <id>pmd-check</id>
@@ -77,7 +78,7 @@
         </executions>
         <configuration>
           <rulesets>
-            <ruleset>rulesets/java/quickstart.xml</ruleset>
+            <ruleset>${project.basedir}/../../tool/maven/pmd-ruleset.xml</ruleset>
           </rulesets>
           <failOnViolation>true</failOnViolation>
         </configuration>
