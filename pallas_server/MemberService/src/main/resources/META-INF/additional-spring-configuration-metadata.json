@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "keycloak.auth-server-url",
+      "type": "java.lang.String",
+      "description": "Internal base URL of the Keycloak server (used for server-side JWT validation and admin-client calls). In Docker Compose this is the service-network address, e.g. http://keycloak:8080."
+    },
+    {
+      "name": "keycloak.public-url",
+      "type": "java.lang.String",
+      "description": "Browser-accessible base URL of the Keycloak server (used to build Swagger UI OAuth2 authorize/token URLs). Defaults to the auth-server-url value when running locally without Docker."
+    },
+    {
+      "name": "keycloak.realm",
+      "type": "java.lang.String",
+      "description": "Keycloak realm name, e.g. pallas."
+    },
+    {
+      "name": "keycloak.admin-client-id",
+      "type": "java.lang.String",
+      "description": "Client ID used by the MemberService admin client to authenticate against Keycloak."
+    },
+    {
+      "name": "keycloak.admin-client-secret",
+      "type": "java.lang.String",
+      "description": "Client secret for the MemberService admin client. Must be overridden in production via the KEYCLOAK_ADMIN_CLIENT_SECRET environment variable."
+    }
+  ]
+}
