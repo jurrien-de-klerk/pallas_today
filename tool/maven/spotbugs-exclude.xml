@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-  <!-- Exclude auto-generated OpenAPI code from all microservices -->
+  <!-- Exclude auto-generated OpenAPI model classes (all classes under *.model are generated) -->
   <Match>
-    <Package name="~com\.pallas\.[^.]+\.api.*"/>
+    <Package name="~com\.pallas\.[^.]+\.model"/>
+  </Match>
+  <!-- Exclude auto-generated OpenAPI API interfaces and ApiUtil (handwritten controllers in the
+       same package must NOT be excluded) -->
+  <Match>
+    <Class name="~com\.pallas\.[^.]+\.api\..*Api"/>
   </Match>
   <Match>
-    <Package name="~com\.pallas\.[^.]+\.model.*"/>
+    <Class name="~com\.pallas\.[^.]+\.api\.ApiUtil"/>
   </Match>
 </FindBugsFilter>
