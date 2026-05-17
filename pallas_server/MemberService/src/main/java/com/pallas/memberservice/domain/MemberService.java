@@ -1,7 +1,6 @@
 package com.pallas.memberservice.domain;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,27 +19,16 @@ public class MemberService {
    * Returns the member for the currently authenticated principal. If this is the first request for
    * the given subject, a new domain MemberId is minted and persisted.
    *
-   * <p>Known limitation: if two requests race on the very first call for a subject, the second
-   * concurrent save will be rejected by the unique constraint and surface as a {@code
-   * DataIntegrityViolationException}. The {@code GlobalExceptionHandler} maps that to HTTP 409 so
-   * the caller can retry. A proper fix (upsert or REQUIRES_NEW auxiliary component) is tracked as a
-   * follow-up.
-   *
    * @param keycloakSub the {@code sub} claim from the validated access token
    * @return the member's profile
    * @throws MemberNotFoundException if the subject is not found in the identity provider
    */
   @Transactional
   public Member getCurrentMember(String keycloakSub) {
-    Optional<MemberMapping> existing = memberMappingPort.findBySub(keycloakSub);
-    MemberMapping mapping;
-    if (existing.isPresent()) {
-      mapping = existing.get();
-      log.debug("getCurrentMember: mapping found");
-    } else {
-      mapping = memberMappingPort.save(MemberMapping.newMapping(keycloakSub));
-      log.debug("getCurrentMember: mapping created");
-    }
+    MemberMapping mapping =
+        memberMappingPort.findOrCreateBySub(
+            keycloakSub, () -> MemberMapping.newMapping(keycloakSub));
+    log.debug("getCurrentMember: mapping resolved");
     return buildMember(mapping);
   }
 

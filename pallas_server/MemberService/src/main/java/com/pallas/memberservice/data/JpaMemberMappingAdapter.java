@@ -5,6 +5,7 @@ import com.pallas.memberservice.domain.MemberMappingPort;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +37,14 @@ public class JpaMemberMappingAdapter implements MemberMappingPort {
   }
 
   @Override
-  public MemberMapping save(MemberMapping mapping) {
+  public MemberMapping findOrCreateBySub(String keycloakSub, Supplier<MemberMapping> creator) {
+    return repository
+        .findByKeycloakSub(keycloakSub)
+        .map(this::toDomain)
+        .orElseGet(() -> save(creator.get()));
+  }
+
+  private MemberMapping save(MemberMapping mapping) {
     MemberIdentityMapping entity =
         new MemberIdentityMapping(mapping.memberId(), mapping.keycloakSub(), mapping.createdAt());
     return toDomain(repository.save(entity));

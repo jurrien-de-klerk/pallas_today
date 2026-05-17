@@ -3,7 +3,7 @@ package com.pallas.memberservice.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +35,7 @@ class MemberServiceTest {
 
   @Test
   void getCurrentMember_existingMapping_returnsMemberWithoutCreatingNewMapping() {
-    when(memberMappingPort.findBySub(SUB)).thenReturn(Optional.of(MAPPING));
+    when(memberMappingPort.findOrCreateBySub(eq(SUB), any())).thenReturn(MAPPING);
     when(identityProfilePort.findBySub(SUB)).thenReturn(Optional.of(PROFILE));
 
     Member result = memberService.getCurrentMember(SUB);
@@ -43,26 +43,25 @@ class MemberServiceTest {
     assertThat(result.getMemberId()).isEqualTo(MEMBER_ID);
     assertThat(result.getFirstName()).isEqualTo(PROFILE.firstName());
     assertThat(result.getLastName()).isEqualTo(PROFILE.lastName());
-    verify(memberMappingPort, never()).save(any());
+    verify(memberMappingPort).findOrCreateBySub(eq(SUB), any());
   }
 
   @Test
   void getCurrentMember_noExistingMapping_createsAndPersistsNewMapping() {
     MemberMapping newMapping = MemberMapping.newMapping(SUB);
-    when(memberMappingPort.findBySub(SUB)).thenReturn(Optional.empty());
-    when(memberMappingPort.save(any())).thenReturn(newMapping);
+    when(memberMappingPort.findOrCreateBySub(eq(SUB), any())).thenReturn(newMapping);
     when(identityProfilePort.findBySub(SUB)).thenReturn(Optional.of(PROFILE));
 
     Member result = memberService.getCurrentMember(SUB);
 
-    verify(memberMappingPort).save(any());
+    verify(memberMappingPort).findOrCreateBySub(eq(SUB), any());
     assertThat(result.getFirstName()).isEqualTo(PROFILE.firstName());
     assertThat(result.getLastName()).isEqualTo(PROFILE.lastName());
   }
 
   @Test
   void getCurrentMember_subNotFoundInIdentityProvider_throwsMemberNotFoundException() {
-    when(memberMappingPort.findBySub(SUB)).thenReturn(Optional.of(MAPPING));
+    when(memberMappingPort.findOrCreateBySub(eq(SUB), any())).thenReturn(MAPPING);
     when(identityProfilePort.findBySub(SUB)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> memberService.getCurrentMember(SUB))

@@ -3,6 +3,7 @@ package com.pallas.memberservice.domain;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /** Port for persisting and querying the sub → MemberId identity mapping. */
 public interface MemberMappingPort {
@@ -32,10 +33,20 @@ public interface MemberMappingPort {
   List<MemberMapping> findByMemberIds(List<UUID> memberIds);
 
   /**
-   * Persist a new mapping. Must only be called when no mapping exists for the given sub.
+   * Return the existing mapping for {@code keycloakSub}, or create and persist one using {@code
+   * creator} if none exists yet.
    *
-   * @param mapping the new mapping to save
-   * @return the saved mapping
+   * <p>Creation is not atomic with respect to the surrounding transaction: a concurrent caller that
+   * wins the INSERT will cause this call to throw {@link
+   * org.springframework.dao.DataIntegrityViolationException} (unique-constraint violation on {@code
+   * keycloak_sub}). The {@code GlobalExceptionHandler} maps that to HTTP 409 so the client can
+   * retry; on retry the mapping will already exist and be returned immediately.
+   *
+   * @param keycloakSub the {@code sub} claim from the validated access token
+   * @param creator supplier that produces the new {@link MemberMapping} when none exists yet;
+   *     invoked at most once per call
+   * @return the persisted mapping — either the pre-existing one or the newly created one
+   * @throws org.springframework.dao.DataIntegrityViolationException on concurrent first-creation
    */
-  MemberMapping save(MemberMapping mapping);
+  MemberMapping findOrCreateBySub(String keycloakSub, Supplier<MemberMapping> creator);
 }
