@@ -20,6 +20,12 @@ public class MemberService {
    * Returns the member for the currently authenticated principal. If this is the first request for
    * the given subject, a new domain MemberId is minted and persisted.
    *
+   * <p>Known limitation: if two requests race on the very first call for a subject, the second
+   * concurrent save will be rejected by the unique constraint and surface as a {@code
+   * DataIntegrityViolationException}. The {@code GlobalExceptionHandler} maps that to HTTP 409 so
+   * the caller can retry. A proper fix (upsert or REQUIRES_NEW auxiliary component) is tracked as a
+   * follow-up.
+   *
    * @param keycloakSub the {@code sub} claim from the validated access token
    * @return the member's profile
    * @throws MemberNotFoundException if the subject is not found in the identity provider
@@ -76,7 +82,10 @@ public class MemberService {
     IdentityProfile profile =
         identityProfilePort
             .findBySub(mapping.keycloakSub())
-            .orElseThrow(() -> new MemberNotFoundException(mapping.memberId()));
+            .orElseThrow(
+                () ->
+                    new MemberNotFoundException(
+                        "Identity profile not found for member: " + mapping.memberId()));
 
     log.debug("buildMember: profile fetched");
     return new Member(mapping.memberId(), profile.firstName(), profile.lastName());

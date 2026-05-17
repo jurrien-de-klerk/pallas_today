@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MembersController.class)
@@ -120,5 +121,17 @@ class MembersControllerTest {
     mockMvc
         .perform(get("/members/batch").param("memberId", MEMBER.getMemberId().toString()))
         .andExpect(status().isUnauthorized());
+  }
+
+  // --- DataIntegrityViolation → 409 ---
+
+  @Test
+  void getAuthenticatedMember_returns409_onConcurrentFirstRegistration() throws Exception {
+    when(memberService.getCurrentMember(KEYCLOAK_SUB))
+        .thenThrow(new DataIntegrityViolationException("duplicate key"));
+
+    mockMvc
+        .perform(get("/members/me").with(jwt().jwt(j -> j.subject(KEYCLOAK_SUB))))
+        .andExpect(status().isConflict());
   }
 }
