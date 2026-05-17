@@ -99,7 +99,8 @@ class PallasBacktraceTest {
     PallasBacktrace.setBacktraceLevel(Level.ALL);
     PallasBacktrace.backtrace(LOG);
 
-    // Buffer must not have grown: replay events must be suppressed by BacktraceFilter.
+    // Buffer must not have grown: replayed events are emitted via raw Log4j2 and bypass
+    // PallasLogger.
     assertThat(BacktraceBuffer.getInstance().size()).isEqualTo(sizeBeforeReplay);
   }
 

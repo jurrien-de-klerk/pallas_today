@@ -1,6 +1,5 @@
 package com.pallas.logger;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -8,10 +7,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Thread-safe singleton FIFO ring buffer that captures every {@link BacktraceRecord} logged by any
- * logger instrumented with {@link BacktraceFilter}.
+ * Thread-safe shared FIFO ring buffer that captures every {@link BacktraceRecord} written by any
+ * {@link PallasLogger} instance.
  *
- * <p>Configure the capacity once at application start — before any logging occurs:
+ * <p>All {@link PallasLogger} instances share one static buffer. Configure the capacity once at
+ * application start -- before any logging occurs:
  *
  * <pre>{@code
  * BacktraceBuffer.configure(200);
@@ -25,8 +25,8 @@ public final class BacktraceBuffer {
   /** Default number of records held when capacity is not explicitly configured. */
   public static final int DEFAULT_CAPACITY = 100;
 
-  @SuppressWarnings("PMD.AvoidUsingVolatile") // double-checked locking requires volatile
-  private static volatile BacktraceBuffer instance;
+  // Shared static buffer - all PallasLogger instances write here.
+  private static BacktraceBuffer instance = new BacktraceBuffer(DEFAULT_CAPACITY);
 
   private final int capacity;
   private final Deque<BacktraceRecord> queue;
@@ -36,28 +36,13 @@ public final class BacktraceBuffer {
     this.queue = new ArrayDeque<>(capacity);
   }
 
-  /**
-   * Returns the singleton buffer instance, creating it with {@link #DEFAULT_CAPACITY} on first
-   * access.
-   */
-  @SuppressFBWarnings(
-      value = "MS_EXPOSE_REP",
-      justification = "Intentional singleton exposure; callers need the shared mutable instance")
-  @SuppressWarnings(
-      "PMD.NonThreadSafeSingleton") // double-checked locking with volatile is thread-safe
+  /** Returns the shared buffer instance. */
   public static BacktraceBuffer getInstance() {
-    if (instance == null) {
-      synchronized (BacktraceBuffer.class) {
-        if (instance == null) {
-          instance = new BacktraceBuffer(DEFAULT_CAPACITY);
-        }
-      }
-    }
     return instance;
   }
 
   /**
-   * Configures (or re-creates) the singleton buffer with the given {@code capacity}.
+   * Configures (or re-creates) the buffer with the given {@code capacity}.
    *
    * <p>Any existing records are discarded. Must be called before any logger emits records to take
    * effect.
