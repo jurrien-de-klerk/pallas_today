@@ -250,23 +250,23 @@ Never run `install` or `verify` when `compile` or `test` is sufficient.
 Always redirect Maven output to a log file inside the module's `target/` directory so the terminal stays clean and the
 output can be inspected afterwards without re-running the build.
 
-Use a command in this form:
+On a fresh checkout `target/` does not exist yet. Always create it first with `mkdir -p`, then run Maven:
 
 ```bash
-mvn <phase-or-goal> [options] > <module>/target/mvn-<phase>.log 2>&1
+mkdir -p <module>/target && mvn <phase-or-goal> [options] > <module>/target/mvn-<phase>.log 2>&1
 ```
 
 Examples:
 
 ```bash
 # Compile only — MemberService
-mvn compile -pl MemberService > pallas_server/MemberService/target/mvn-compile.log 2>&1
+mkdir -p pallas_server/MemberService/target && mvn compile -pl MemberService > pallas_server/MemberService/target/mvn-compile.log 2>&1
 
 # Run tests — StoryService
-mvn test -pl StoryService > pallas_server/StoryService/target/mvn-test.log 2>&1
+mkdir -p pallas_server/StoryService/target && mvn test -pl StoryService > pallas_server/StoryService/target/mvn-test.log 2>&1
 
 # Package without tests — all modules
-mvn package -DskipTests > pallas_server/target/mvn-package.log 2>&1
+mkdir -p pallas_server/target && mvn package -DskipTests > pallas_server/target/mvn-package.log 2>&1
 ```
 
 When running from inside `pallas_server/`, use `target/mvn-<phase>.log` as the path.
