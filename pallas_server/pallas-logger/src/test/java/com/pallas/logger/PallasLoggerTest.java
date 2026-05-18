@@ -119,11 +119,11 @@ class PallasLoggerTest {
 
   @Test
   void parameterizedArgsAreFormattedInBuffer() {
-    LOG.info("user {} logged in from {}", "alice", "192.168.1.1");
+    LOG.info("processing batch {} of {}", 3, 10);
 
     assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
-        .contains("user alice logged in from 192.168.1.1");
+        .contains("processing batch 3 of 10");
   }
 
   @Test
