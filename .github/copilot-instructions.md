@@ -250,26 +250,29 @@ Never run `install` or `verify` when `compile` or `test` is sufficient.
 Always redirect Maven output to a log file inside the module's `target/` directory so the terminal stays clean and the
 output can be inspected afterwards without re-running the build.
 
-On a fresh checkout `target/` does not exist yet. Always create it first with `mkdir -p`, then run Maven:
+On a fresh checkout `target/` does not exist yet. Always create it first with `mkdir -p`, then run Maven.
+
+Maven must run from inside `pallas_server/` (the directory that contains the root `pom.xml`). There is no `pom.xml` at
+the repository root, so running `mvn` from there will fail. Use this form:
 
 ```bash
-mkdir -p <module>/target && mvn <phase-or-goal> -pl <module> -am [options] > <module>/target/mvn-<phase>.log 2>&1
+cd pallas_server && mkdir -p <module>/target && mvn <phase-or-goal> -pl <module> -am [options] > <module>/target/mvn-<phase>.log 2>&1
 ```
 
 Examples:
 
 ```bash
 # Compile only — MemberService
-mkdir -p pallas_server/MemberService/target && mvn compile -pl MemberService -am > pallas_server/MemberService/target/mvn-compile.log 2>&1
+cd pallas_server && mkdir -p MemberService/target && mvn compile -pl MemberService -am > MemberService/target/mvn-compile.log 2>&1
 
 # Run tests — StoryService
-mkdir -p pallas_server/StoryService/target && mvn test -pl StoryService -am > pallas_server/StoryService/target/mvn-test.log 2>&1
+cd pallas_server && mkdir -p StoryService/target && mvn test -pl StoryService -am > StoryService/target/mvn-test.log 2>&1
 
 # Package without tests — all modules
-mkdir -p pallas_server/target && mvn package -DskipTests > pallas_server/target/mvn-package.log 2>&1
+cd pallas_server && mkdir -p target && mvn package -DskipTests > target/mvn-package.log 2>&1
 ```
 
-When running from inside `pallas_server/`, use `target/mvn-<phase>.log` as the path.
+When already inside `pallas_server/`, omit the `cd pallas_server &&` prefix.
 
 ### Step 3 — Read the log file to interpret results
 
@@ -277,8 +280,8 @@ After the command completes, read the log file to understand build results. Do *
 information that is already present in the log.
 
 ```bash
-# Check for errors or test failures
-grep -E "BUILD|ERROR|Tests run|FAILURE" pallas_server/MemberService/target/mvn-compile.log
+# Check for errors or test failures (run from inside pallas_server/)
+grep -E "BUILD|ERROR|Tests run|FAILURE" MemberService/target/mvn-compile.log
 ```
 
 The full log is available for deeper inspection when needed.
