@@ -25,8 +25,9 @@ import org.apache.logging.log4j.core.config.Configurator;
  * BacktraceBuffer.configure(200);
  * }</pre>
  *
- * <p>When a crash is detected, call {@link #backtrace(Logger, BacktraceBuffer)} to replay all buffered records.
- * Prefer using {@link PallasLogger#backtrace()} which calls this method automatically:
+ * <p>When a crash is detected, call {@link #backtrace(Logger, BacktraceBuffer)} to replay all
+ * buffered records. Prefer using {@link PallasLogger#backtrace()} which calls this method
+ * automatically:
  *
  * <pre>{@code
  * private static final PallasLogger log = PallasLogger.getLogger(MyService.class);
@@ -63,7 +64,8 @@ public final class PallasBacktrace {
   }
 
   /**
-   * Sets the level used as a temporary root floor during {@link #backtrace(Logger, BacktraceBuffer)}.
+   * Sets the level used as a temporary root floor during {@link #backtrace(Logger,
+   * BacktraceBuffer)}.
    *
    * <p>Defaults to {@link Level#DEBUG} when not explicitly configured. During a backtrace call the
    * root level is lowered to this value so that all buffered records — regardless of the normal log
