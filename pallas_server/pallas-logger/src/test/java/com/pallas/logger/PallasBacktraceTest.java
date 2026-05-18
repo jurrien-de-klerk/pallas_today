@@ -30,7 +30,7 @@ class PallasBacktraceTest {
     levelBeforeTest = LogManager.getRootLogger().getLevel();
 
     // Reset buffer and backtrace level state.
-    BacktraceBuffer.configure(BacktraceBuffer.DEFAULT_CAPACITY);
+    PallasLogger.configure(BacktraceBuffer.DEFAULT_CAPACITY);
     PallasBacktrace.setBacktraceLevel(Level.FATAL);
     PallasBacktrace.setLevel(Level.ALL);
 
@@ -58,12 +58,12 @@ class PallasBacktraceTest {
 
   @Test
   void backtraceReplaysBufferedRecords() {
-    BacktraceBuffer.getInstance().add(record("first", Level.DEBUG));
-    BacktraceBuffer.getInstance().add(record("second", Level.INFO));
-    BacktraceBuffer.getInstance().add(record("third", Level.WARN));
+    PallasLogger.BUFFER.add(record("first", Level.DEBUG));
+    PallasLogger.BUFFER.add(record("second", Level.INFO));
+    PallasLogger.BUFFER.add(record("third", Level.WARN));
 
     PallasBacktrace.setBacktraceLevel(Level.ALL);
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
     List<String> messages = capturingAppender.messages();
     assertThat(messages).anyMatch(m -> m.contains("first"));
@@ -74,7 +74,7 @@ class PallasBacktraceTest {
   @Test
   void backtraceEmitsHeaderAndFooter() {
     PallasBacktrace.setBacktraceLevel(Level.ALL);
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
     List<String> messages = capturingAppender.messages();
     assertThat(messages).anyMatch(m -> m.contains("Backtrace start"));
@@ -83,25 +83,25 @@ class PallasBacktraceTest {
 
   @Test
   void backtraceDoesNotModifyBuffer() {
-    BacktraceBuffer.getInstance().add(record("keep me", Level.INFO));
+    PallasLogger.BUFFER.add(record("keep me", Level.INFO));
 
     PallasBacktrace.setBacktraceLevel(Level.ALL);
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
-    assertThat(BacktraceBuffer.getInstance().size()).isEqualTo(1);
+    assertThat(PallasLogger.BUFFER.size()).isEqualTo(1);
   }
 
   @Test
   void backtraceReplayDoesNotReBufferReplayedRecords() {
-    BacktraceBuffer.getInstance().add(record("original", Level.INFO));
-    int sizeBeforeReplay = BacktraceBuffer.getInstance().size();
+    PallasLogger.BUFFER.add(record("original", Level.INFO));
+    int sizeBeforeReplay = PallasLogger.BUFFER.size();
 
     PallasBacktrace.setBacktraceLevel(Level.ALL);
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
     // Buffer must not have grown: replayed events are emitted via raw Log4j2 and bypass
     // PallasLogger.
-    assertThat(BacktraceBuffer.getInstance().size()).isEqualTo(sizeBeforeReplay);
+    assertThat(PallasLogger.BUFFER.size()).isEqualTo(sizeBeforeReplay);
   }
 
   @Test
@@ -109,7 +109,7 @@ class PallasBacktraceTest {
     Configurator.setRootLevel(Level.WARN);
     PallasBacktrace.setBacktraceLevel(Level.ALL);
 
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
     assertThat(LogManager.getRootLogger().getLevel()).isEqualTo(Level.WARN);
   }
@@ -117,7 +117,7 @@ class PallasBacktraceTest {
   @Test
   void backtraceOnEmptyBufferEmitsHeaderAndFooterOnly() {
     PallasBacktrace.setBacktraceLevel(Level.ALL);
-    PallasBacktrace.backtrace(LOG);
+    PallasBacktrace.backtrace(LOG, PallasLogger.BUFFER);
 
     List<String> messages = capturingAppender.messages();
     assertThat(messages).hasSize(2); // header + footer

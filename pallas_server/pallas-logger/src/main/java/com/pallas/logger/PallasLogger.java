@@ -9,7 +9,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
 /**
  * Drop-in logger that combines a standard Log4j2 logger with an automatic backtrace buffer.
  *
- * <p>Every log call is captured in the shared {@link BacktraceBuffer} <em>and</em> forwarded to the
+ * <p>Every log call is captured in the shared {@link #BUFFER} <em>and</em> forwarded to the
  * underlying Log4j2 logger. Because the capture happens unconditionally in this wrapper — before
  * Log4j2's own level gate — the buffer always contains the full record history regardless of the
  * active log level, identical to the previous {@code BacktraceFilter} behaviour.
@@ -27,14 +27,36 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
  * log.backtrace();
  * }</pre>
  *
- * <p>The shared buffer is configurable via {@link BacktraceBuffer#configure(int)}.
+ * <p>The shared buffer capacity is configurable via {@link #configure(int)}.
  */
 public final class PallasLogger {
+
+  /**
+   * Shared backtrace buffer written by every {@code PallasLogger} instance.
+   *
+   * <p>Package-private so tests can inspect and reset it directly. Production code outside this
+   * class must not write to the buffer.
+   */
+  @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
+  static BacktraceBuffer BUFFER = new BacktraceBuffer(BacktraceBuffer.DEFAULT_CAPACITY);
 
   private final Logger delegate;
 
   private PallasLogger(Logger delegate) {
     this.delegate = delegate;
+  }
+
+  /**
+   * Replaces the shared buffer with a fresh one of the given {@code capacity}.
+   *
+   * <p>Any existing records are discarded. Call once at application start before any logging
+   * occurs.
+   *
+   * @param capacity maximum number of records to retain; must be positive
+   * @throws IllegalArgumentException when {@code capacity} is not a positive integer
+   */
+  public static synchronized void configure(int capacity) {
+    BUFFER = new BacktraceBuffer(capacity);
   }
 
   /** Returns a {@code PallasLogger} for the given class. */
@@ -133,7 +155,7 @@ public final class PallasLogger {
    * <p>Delegates to {@link PallasBacktrace#backtrace(Logger)}.
    */
   public void backtrace() {
-    PallasBacktrace.backtrace(delegate);
+    PallasBacktrace.backtrace(delegate, BUFFER);
   }
 
   // -------------------------------------------------------------------------
@@ -141,8 +163,7 @@ public final class PallasLogger {
   // -------------------------------------------------------------------------
 
   private void capture(Level level, String message, Throwable thrown) {
-    BacktraceBuffer.getInstance()
-        .add(new BacktraceRecord(delegate.getName(), level, message, Instant.now(), thrown));
+    BUFFER.add(new BacktraceRecord(delegate.getName(), level, message, Instant.now(), thrown));
   }
 
   /**
@@ -151,13 +172,8 @@ public final class PallasLogger {
    */
   private void captureParameterized(Level level, String message, Object[] args) {
     ParameterizedMessage pm = new ParameterizedMessage(message, args);
-    BacktraceBuffer.getInstance()
-        .add(
-            new BacktraceRecord(
-                delegate.getName(),
-                level,
-                pm.getFormattedMessage(),
-                Instant.now(),
-                pm.getThrowable()));
+    BUFFER.add(
+        new BacktraceRecord(
+            delegate.getName(), level, pm.getFormattedMessage(), Instant.now(), pm.getThrowable()));
   }
 }

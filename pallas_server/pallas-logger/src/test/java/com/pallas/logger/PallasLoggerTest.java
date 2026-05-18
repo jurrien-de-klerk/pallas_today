@@ -24,7 +24,7 @@ class PallasLoggerTest {
   @BeforeEach
   void setUp() {
     levelBeforeTest = LogManager.getRootLogger().getLevel();
-    BacktraceBuffer.configure(BacktraceBuffer.DEFAULT_CAPACITY);
+    PallasLogger.configure(BacktraceBuffer.DEFAULT_CAPACITY);
     Configurator.setRootLevel(Level.ALL);
 
     capturingAppender = CapturingAppender.create();
@@ -45,7 +45,7 @@ class PallasLoggerTest {
   void debugCapturesRecordInBuffer() {
     LOG.debug("debug message");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("debug message");
   }
@@ -54,7 +54,7 @@ class PallasLoggerTest {
   void infoCapturesRecordInBuffer() {
     LOG.info("info message");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("info message");
   }
@@ -63,7 +63,7 @@ class PallasLoggerTest {
   void warnCapturesRecordInBuffer() {
     LOG.warn("warn message");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("warn message");
   }
@@ -72,7 +72,7 @@ class PallasLoggerTest {
   void errorCapturesRecordInBuffer() {
     LOG.error("error message");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("error message");
   }
@@ -84,7 +84,7 @@ class PallasLoggerTest {
     LOG.error("something went wrong", boom);
 
     BacktraceRecord record =
-        BacktraceBuffer.getInstance().getRecords().stream()
+        PallasLogger.BUFFER.getRecords().stream()
             .filter(r -> r.message().equals("something went wrong"))
             .findFirst()
             .orElseThrow();
@@ -96,7 +96,7 @@ class PallasLoggerTest {
   void fatalCapturesRecordInBuffer() {
     LOG.fatal("fatal message");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("fatal message");
   }
@@ -108,7 +108,7 @@ class PallasLoggerTest {
     LOG.fatal("system failure", boom);
 
     BacktraceRecord record =
-        BacktraceBuffer.getInstance().getRecords().stream()
+        PallasLogger.BUFFER.getRecords().stream()
             .filter(r -> r.message().equals("system failure"))
             .findFirst()
             .orElseThrow();
@@ -120,7 +120,7 @@ class PallasLoggerTest {
   void parameterizedArgsAreFormattedInBuffer() {
     LOG.info("user {} logged in from {}", "alice", "192.168.1.1");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("user alice logged in from 192.168.1.1");
   }
@@ -132,7 +132,7 @@ class PallasLoggerTest {
     LOG.warn("oops {}", "value", ex);
 
     BacktraceRecord record =
-        BacktraceBuffer.getInstance().getRecords().stream()
+        PallasLogger.BUFFER.getRecords().stream()
             .filter(r -> r.message().contains("oops value"))
             .findFirst()
             .orElseThrow();
@@ -147,7 +147,7 @@ class PallasLoggerTest {
 
     LOG.debug("suppressed by log4j");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::message)
         .contains("suppressed by log4j");
     assertThat(capturingAppender.messages()).doesNotContain("suppressed by log4j");
@@ -162,10 +162,9 @@ class PallasLoggerTest {
 
   @Test
   void backtraceReplaysBufferViaLog4j() {
-    BacktraceBuffer.getInstance()
-        .add(
-            new BacktraceRecord(
-                "TestLogger", Level.WARN, "buffered event", java.time.Instant.now(), null));
+    PallasLogger.BUFFER.add(
+        new BacktraceRecord(
+            "TestLogger", Level.WARN, "buffered event", java.time.Instant.now(), null));
 
     PallasBacktrace.setBacktraceLevel(Level.ALL);
     LOG.backtrace();
@@ -178,7 +177,7 @@ class PallasLoggerTest {
     PallasLogger named = PallasLogger.getLogger("com.pallas.MyService");
     named.info("named logger");
 
-    assertThat(BacktraceBuffer.getInstance().getRecords())
+    assertThat(PallasLogger.BUFFER.getRecords())
         .extracting(BacktraceRecord::loggerName)
         .contains("com.pallas.MyService");
   }

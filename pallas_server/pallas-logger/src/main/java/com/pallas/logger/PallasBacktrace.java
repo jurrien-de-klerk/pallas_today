@@ -95,8 +95,8 @@ public final class PallasBacktrace {
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
 
   @SuppressWarnings("PMD.GuardLogStatement") // root level is explicitly lowered before these calls
-  public static synchronized void backtrace(Logger logger) {
-    List<BacktraceRecord> records = BacktraceBuffer.getInstance().getRecords();
+  public static synchronized void backtrace(Logger logger, BacktraceBuffer buffer) {
+    List<BacktraceRecord> records = buffer.getRecords();
 
     Level currentLevel = LogManager.getRootLogger().getLevel();
     Configurator.setRootLevel(backtraceLevel);
