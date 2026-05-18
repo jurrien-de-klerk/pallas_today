@@ -1,8 +1,7 @@
 package com.pallas.storyservice.exception;
 
-import com.pallas.logger.PallasBacktrace;
 import com.pallas.storyservice.model.Error;
-import lombok.extern.log4j.Log4j2;
+import lombok.CustomLog;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-@Log4j2
+@CustomLog
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -40,7 +39,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleGenericException(Exception ex) {
     log.error("Unhandled exception of type {}", ex.getClass().getName());
-    PallasBacktrace.backtrace(log);
+    log.backtrace();
     Error error = new Error();
     error.setMessage("Internal server error");
     error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());

@@ -1,5 +1,7 @@
 package com.pallas.logger;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -89,6 +91,9 @@ public final class PallasBacktrace {
    *
    * @param logger the Log4j2 logger instance used to emit the replayed records
    */
+  private static final DateTimeFormatter BACKTRACE_TS =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
+
   @SuppressWarnings("PMD.GuardLogStatement") // root level is explicitly lowered before these calls
   public static synchronized void backtrace(Logger logger) {
     List<BacktraceRecord> records = BacktraceBuffer.getInstance().getRecords();
@@ -98,13 +103,13 @@ public final class PallasBacktrace {
     try {
       logger.info("--- Backtrace start (replaying {} records) ---", records.size());
       for (BacktraceRecord record : records) {
-        logger.log(
-            record.level(),
-            "[backtrace] {} {}: {}",
-            record.time(),
-            record.loggerName(),
-            record.message(),
-            record.thrown());
+        Logger recordLogger = LogManager.getLogger(record.loggerName());
+        String msg = "[backtrace " + BACKTRACE_TS.format(record.time()) + "] " + record.message();
+        if (record.thrown() != null) {
+          recordLogger.log(record.level(), msg, record.thrown());
+        } else {
+          recordLogger.log(record.level(), msg);
+        }
       }
       logger.info("--- Backtrace end ---");
     } finally {

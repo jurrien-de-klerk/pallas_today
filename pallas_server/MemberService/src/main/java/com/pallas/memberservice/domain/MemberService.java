@@ -2,12 +2,12 @@ package com.pallas.memberservice.domain;
 
 import java.util.List;
 import java.util.UUID;
+import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Log4j2
+@CustomLog
 @Service
 @RequiredArgsConstructor
 public class MemberService {

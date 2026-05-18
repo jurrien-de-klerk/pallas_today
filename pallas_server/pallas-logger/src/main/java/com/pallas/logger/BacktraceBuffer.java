@@ -1,5 +1,6 @@
 package com.pallas.logger;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -26,6 +27,7 @@ public final class BacktraceBuffer {
   public static final int DEFAULT_CAPACITY = 100;
 
   // Shared static buffer - all PallasLogger instances write here.
+  @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
   private static BacktraceBuffer instance = new BacktraceBuffer(DEFAULT_CAPACITY);
 
   private final int capacity;
@@ -36,7 +38,16 @@ public final class BacktraceBuffer {
     this.queue = new ArrayDeque<>(capacity);
   }
 
-  /** Returns the shared buffer instance. */
+  /**
+   * Returns the shared buffer instance.
+   *
+   * <p>The returned reference is intentionally the live shared instance; callers need direct access
+   * to add and read records.
+   */
+  @SuppressFBWarnings(
+      value = "MS_EXPOSE_REP",
+      justification =
+          "Intentional shared mutable instance; callers need direct access to add records")
   public static BacktraceBuffer getInstance() {
     return instance;
   }
