@@ -220,3 +220,73 @@ Perform this review after a pull request is created or when explicitly asked.
   `pallas_app/linux/`, `pallas_app/macos/`, `pallas_app/web/`, `pallas_app/windows/`.
 - Do not review generated Dart client code in `pallas_app/packages/openapi/`. This code is auto-generated from OpenAPI
   specs in `api-specs/` and must not be manually edited or reviewed.
+
+## Workflow: Running Maven (`mvn`) commands
+
+Maven builds are expensive in time. Follow these rules every time before executing a `mvn` command.
+
+### Step 1 — Assess purpose and required phase
+
+Before running any `mvn` command, explicitly determine:
+
+1. **What is the goal?** (e.g. compile only, run tests, package a JAR, verify dependencies)
+1. **What is the minimum lifecycle phase that satisfies that goal?**
+
+Use the least-expensive phase that is sufficient:
+
+| Goal                                           | Use phase / goal      |
+| ---------------------------------------------- | --------------------- |
+| Check whether the code compiles                | `compile`             |
+| Run unit tests                                 | `test`                |
+| Produce a JAR/WAR without running tests        | `package -DskipTests` |
+| Run integration tests or the full verify cycle | `verify`              |
+| Install artifact to local repo                 | `install`             |
+| Resolve and download dependencies only         | `dependency:resolve`  |
+
+Never run `install` or `verify` when `compile` or `test` is sufficient.
+
+### Step 2 — Write build output to a log file
+
+Always redirect Maven output to a log file inside the module's `target/` directory so the terminal stays clean and the
+output can be inspected afterwards without re-running the build.
+
+On a fresh checkout `target/` does not exist yet. Always create it first with `mkdir -p`, then run Maven.
+
+Maven must run from inside `pallas_server/` (the directory that contains the root `pom.xml`). There is no `pom.xml` at
+the repository root, so running `mvn` from there will fail. Use this form:
+
+```bash
+cd pallas_server && mkdir -p <module>/target && mvn <phase-or-goal> -pl <module> -am [options] > <module>/target/mvn-<phase>.log 2>&1
+```
+
+Examples:
+
+```bash
+# Compile only — MemberService
+cd pallas_server && mkdir -p MemberService/target && mvn compile -pl MemberService -am > MemberService/target/mvn-compile.log 2>&1
+
+# Run tests — StoryService
+cd pallas_server && mkdir -p StoryService/target && mvn test -pl StoryService -am > StoryService/target/mvn-test.log 2>&1
+
+# Package without tests — all modules
+cd pallas_server && mkdir -p target && mvn package -DskipTests > target/mvn-package.log 2>&1
+```
+
+When already inside `pallas_server/`, omit the `cd pallas_server &&` prefix.
+
+### Step 3 — Read the log file to interpret results
+
+After the command completes, read the log file to understand build results. Do **not** re-run Maven to gather
+information that is already present in the log.
+
+```bash
+# Check for errors or test failures (run from inside pallas_server/)
+grep -E "BUILD|ERROR|Tests run|FAILURE" MemberService/target/mvn-compile.log
+```
+
+The full log is available for deeper inspection when needed.
+
+### Step 4 — Fix and iterate without re-running unnecessary phases
+
+When fixing compilation or test errors, re-run only the phase that failed. Do not escalate to a heavier phase unless the
+fix specifically requires it.
