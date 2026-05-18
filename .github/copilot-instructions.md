@@ -220,3 +220,70 @@ Perform this review after a pull request is created or when explicitly asked.
   `pallas_app/linux/`, `pallas_app/macos/`, `pallas_app/web/`, `pallas_app/windows/`.
 - Do not review generated Dart client code in `pallas_app/packages/openapi/`. This code is auto-generated from OpenAPI
   specs in `api-specs/` and must not be manually edited or reviewed.
+
+## Workflow: Running Maven (`mvn`) commands
+
+Maven builds are expensive in time. Follow these rules every time before executing a `mvn` command.
+
+### Step 1 — Assess purpose and required phase
+
+Before running any `mvn` command, explicitly determine:
+
+1. **What is the goal?** (e.g. compile only, run tests, package a JAR, verify dependencies)
+1. **What is the minimum lifecycle phase that satisfies that goal?**
+
+Use the least-expensive phase that is sufficient:
+
+| Goal                                           | Use phase / goal      |
+| ---------------------------------------------- | --------------------- |
+| Check whether the code compiles                | `compile`             |
+| Run unit tests                                 | `test`                |
+| Produce a JAR/WAR without running tests        | `package -DskipTests` |
+| Run integration tests or the full verify cycle | `verify`              |
+| Install artifact to local repo                 | `install`             |
+| Resolve and download dependencies only         | `dependency:resolve`  |
+
+Never run `install` or `verify` when `compile` or `test` is sufficient.
+
+### Step 2 — Write build output to a log file
+
+Always redirect Maven output to a log file inside the module's `target/` directory so the terminal stays clean and the
+output can be inspected afterwards without re-running the build.
+
+Use a command in this form:
+
+```bash
+mvn <phase-or-goal> [options] | tee <module>/target/mvn-<phase>.log
+```
+
+Examples:
+
+```bash
+# Compile only — MemberService
+mvn compile -pl MemberService | tee pallas_server/MemberService/target/mvn-compile.log
+
+# Run tests — StoryService
+mvn test -pl StoryService | tee pallas_server/StoryService/target/mvn-test.log
+
+# Package without tests — all modules
+mvn package -DskipTests | tee pallas_server/target/mvn-package.log
+```
+
+When running from inside `pallas_server/`, use `target/mvn-<phase>.log` as the path.
+
+### Step 3 — Read the log file to interpret results
+
+After the command completes, read the log file to understand build results. Do **not** re-run Maven to gather
+information that is already present in the log.
+
+```bash
+# Check for errors or test failures
+grep -E "BUILD|ERROR|Tests run|FAILURE" pallas_server/MemberService/target/mvn-compile.log
+```
+
+The full log is available for deeper inspection when needed.
+
+### Step 4 — Fix and iterate without re-running unnecessary phases
+
+When fixing compilation or test errors, re-run only the phase that failed. Do not escalate to a heavier phase unless the
+fix specifically requires it.
