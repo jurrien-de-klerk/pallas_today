@@ -38,6 +38,7 @@ class PallasLoggerTest {
     org.apache.logging.log4j.core.Logger rootLogger =
         (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
     rootLogger.removeAppender(capturingAppender);
+    capturingAppender.stop();
     Configurator.setRootLevel(levelBeforeTest);
   }
 
