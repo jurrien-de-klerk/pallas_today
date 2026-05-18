@@ -1,6 +1,6 @@
 package com.pallas.memberservice.config;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.CustomLog;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Log4j2
+@CustomLog
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

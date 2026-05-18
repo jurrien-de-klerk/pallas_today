@@ -1,5 +1,7 @@
 package com.pallas.logger;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -9,11 +11,10 @@ import org.apache.logging.log4j.core.config.Configurator;
 /**
  * Static utility that mirrors the {@code PallasLogger} contract for Java services.
  *
- * <p>Use Lombok's {@code @Log4j2} on any class to obtain a logger, then call these methods once at
- * application start to configure the logging behaviour:
+ * <p>Call these methods once at application start to configure the logging behaviour:
  *
  * <pre>{@code
- * // Suppress DEBUG in production — only INFO and above pass through.
+ * // Suppress DEBUG in production — only INFO and above pass through to appenders.
  * PallasBacktrace.setLevel(Level.INFO);
  *
  * // During backtrace replay, temporarily lower the root level to DEBUG so
@@ -24,18 +25,19 @@ import org.apache.logging.log4j.core.config.Configurator;
  * BacktraceBuffer.configure(200);
  * }</pre>
  *
- * <p>When a crash is detected, call {@link #backtrace(Logger)} to replay all buffered records:
+ * <p>When a crash is detected, call {@link #backtrace(Logger, BacktraceBuffer)} to replay all
+ * buffered records. Prefer using {@link PallasLogger#backtrace()} which calls this method
+ * automatically:
  *
  * <pre>{@code
- * @Log4j2
- * public class MyService {
- *   public void process() {
- *     try {
- *       ...
- *     } catch (Exception e) {
- *       log.error("Unhandled exception", e);
- *       PallasBacktrace.backtrace(log);
- *     }
+ * private static final PallasLogger log = PallasLogger.getLogger(MyService.class);
+ *
+ * public void process() {
+ *   try {
+ *     ...
+ *   } catch (Exception e) {
+ *     log.error("Unhandled exception", e);
+ *     log.backtrace();
  *   }
  * }
  * }</pre>
@@ -62,7 +64,8 @@ public final class PallasBacktrace {
   }
 
   /**
-   * Sets the level used as a temporary root floor during {@link #backtrace(Logger)}.
+   * Sets the level used as a temporary root floor during {@link #backtrace(Logger,
+   * BacktraceBuffer)}.
    *
    * <p>Defaults to {@link Level#DEBUG} when not explicitly configured. During a backtrace call the
    * root level is lowered to this value so that all buffered records — regardless of the normal log
@@ -82,32 +85,36 @@ public final class PallasBacktrace {
    * #setBacktraceLevel(Level)}, default {@link Level#DEBUG}) so that every buffered record is
    * visible to all appenders. The original root level is restored after replay completes.
    *
+   * <p>Replayed records are emitted via a raw Log4j2 logger and therefore bypass {@link
+   * PallasLogger}, so they are never re-added to the buffer.
+   *
    * <p>Header and footer lines are logged at {@link Level#INFO} to delimit the backtrace output in
    * the log stream.
    *
-   * @param logger the logger instance used to emit the replayed records
+   * @param logger the Log4j2 logger instance used to emit the replayed records
    */
+  private static final DateTimeFormatter BACKTRACE_TS =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
+
   @SuppressWarnings("PMD.GuardLogStatement") // root level is explicitly lowered before these calls
-  public static synchronized void backtrace(Logger logger) {
-    List<BacktraceRecord> records = BacktraceBuffer.getInstance().getRecords();
+  public static synchronized void backtrace(Logger logger, BacktraceBuffer buffer) {
+    List<BacktraceRecord> records = buffer.getRecords();
 
     Level currentLevel = LogManager.getRootLogger().getLevel();
     Configurator.setRootLevel(backtraceLevel);
-    BacktraceFilter.suppressForReplay();
     try {
       logger.info("--- Backtrace start (replaying {} records) ---", records.size());
       for (BacktraceRecord record : records) {
-        logger.log(
-            record.level(),
-            "[backtrace] {} {}: {}",
-            record.time(),
-            record.loggerName(),
-            record.message(),
-            record.thrown());
+        Logger recordLogger = LogManager.getLogger(record.loggerName());
+        String msg = "[backtrace " + BACKTRACE_TS.format(record.time()) + "] " + record.message();
+        if (record.thrown() != null) {
+          recordLogger.log(record.level(), msg, record.thrown());
+        } else {
+          recordLogger.log(record.level(), msg);
+        }
       }
       logger.info("--- Backtrace end ---");
     } finally {
-      BacktraceFilter.restoreAfterReplay();
       Configurator.setRootLevel(currentLevel);
     }
   }

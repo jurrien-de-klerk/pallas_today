@@ -1,9 +1,8 @@
 package com.pallas.memberservice.exception;
 
-import com.pallas.logger.PallasBacktrace;
 import com.pallas.memberservice.domain.MemberNotFoundException;
 import com.pallas.memberservice.model.Error;
-import lombok.extern.log4j.Log4j2;
+import lombok.CustomLog;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-@Log4j2
+@CustomLog
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -82,7 +81,7 @@ public class GlobalExceptionHandler {
     // Log only the exception type — not the message or cause message — to avoid
     // recording identity data in log output (ADR-0007).
     log.error("Unhandled exception of type {}", ex.getClass().getName());
-    PallasBacktrace.backtrace(log);
+    log.backtrace();
     Error error = new Error();
     error.setMessage("Internal server error");
     error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());

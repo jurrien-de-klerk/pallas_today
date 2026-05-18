@@ -6,26 +6,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Instant;
 import java.util.List;
 import org.apache.logging.log4j.Level;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class BacktraceBufferTest {
 
-  @BeforeEach
-  void resetSingleton() {
-    // Reset to default capacity before each test so tests are independent.
-    BacktraceBuffer.configure(BacktraceBuffer.DEFAULT_CAPACITY);
-  }
-
   @Test
   void newBufferIsEmpty() {
-    assertThat(BacktraceBuffer.getInstance().isEmpty()).isTrue();
-    assertThat(BacktraceBuffer.getInstance().size()).isZero();
+    BacktraceBuffer buffer = new BacktraceBuffer(BacktraceBuffer.DEFAULT_CAPACITY);
+    assertThat(buffer.isEmpty()).isTrue();
+    assertThat(buffer.size()).isZero();
   }
 
   @Test
   void addIncreasesSize() {
-    BacktraceBuffer buffer = BacktraceBuffer.getInstance();
+    BacktraceBuffer buffer = new BacktraceBuffer(BacktraceBuffer.DEFAULT_CAPACITY);
 
     buffer.add(record("first"));
     buffer.add(record("second"));
@@ -35,8 +29,7 @@ class BacktraceBufferTest {
 
   @Test
   void getRecordsReturnsOldestFirst() {
-    BacktraceBuffer.configure(10);
-    BacktraceBuffer buffer = BacktraceBuffer.getInstance();
+    BacktraceBuffer buffer = new BacktraceBuffer(10);
 
     buffer.add(record("alpha"));
     buffer.add(record("beta"));
@@ -50,8 +43,7 @@ class BacktraceBufferTest {
 
   @Test
   void getRecordsDoesNotModifyBuffer() {
-    BacktraceBuffer.configure(10);
-    BacktraceBuffer buffer = BacktraceBuffer.getInstance();
+    BacktraceBuffer buffer = new BacktraceBuffer(10);
     buffer.add(record("x"));
 
     buffer.getRecords();
@@ -61,8 +53,7 @@ class BacktraceBufferTest {
 
   @Test
   void oldestRecordEvictedWhenFull() {
-    BacktraceBuffer.configure(3);
-    BacktraceBuffer buffer = BacktraceBuffer.getInstance();
+    BacktraceBuffer buffer = new BacktraceBuffer(3);
 
     buffer.add(record("one"));
     buffer.add(record("two"));
@@ -77,29 +68,17 @@ class BacktraceBufferTest {
 
   @Test
   void capacityIsRespected() {
-    BacktraceBuffer.configure(5);
-    assertThat(BacktraceBuffer.getInstance().getCapacity()).isEqualTo(5);
+    assertThat(new BacktraceBuffer(5).getCapacity()).isEqualTo(5);
   }
 
   @Test
-  void configureWithZeroCapacityThrows() {
-    assertThatThrownBy(() -> BacktraceBuffer.configure(0))
-        .isInstanceOf(IllegalArgumentException.class);
+  void constructorWithZeroCapacityThrows() {
+    assertThatThrownBy(() -> new BacktraceBuffer(0)).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
-  void configureWithNegativeCapacityThrows() {
-    assertThatThrownBy(() -> BacktraceBuffer.configure(-1))
-        .isInstanceOf(IllegalArgumentException.class);
-  }
-
-  @Test
-  void configureDiscardsExistingRecords() {
-    BacktraceBuffer.getInstance().add(record("old"));
-
-    BacktraceBuffer.configure(10);
-
-    assertThat(BacktraceBuffer.getInstance().isEmpty()).isTrue();
+  void constructorWithNegativeCapacityThrows() {
+    assertThatThrownBy(() -> new BacktraceBuffer(-1)).isInstanceOf(IllegalArgumentException.class);
   }
 
   // --- helpers ---

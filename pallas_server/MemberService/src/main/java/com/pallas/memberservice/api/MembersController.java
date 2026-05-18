@@ -4,8 +4,8 @@ import com.pallas.memberservice.domain.MemberService;
 import com.pallas.memberservice.model.MemberBatch;
 import java.util.List;
 import java.util.UUID;
+import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /** REST controller implementing the generated {@link MembersApi} interface. */
-@Log4j2
+@CustomLog
 @RestController
 @RequiredArgsConstructor
 public class MembersController implements MembersApi {
