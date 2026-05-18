@@ -253,20 +253,20 @@ output can be inspected afterwards without re-running the build.
 Use a command in this form:
 
 ```bash
-mvn <phase-or-goal> [options] | tee <module>/target/mvn-<phase>.log
+mvn <phase-or-goal> [options] > <module>/target/mvn-<phase>.log 2>&1
 ```
 
 Examples:
 
 ```bash
 # Compile only — MemberService
-mvn compile -pl MemberService | tee pallas_server/MemberService/target/mvn-compile.log
+mvn compile -pl MemberService > pallas_server/MemberService/target/mvn-compile.log 2>&1
 
 # Run tests — StoryService
-mvn test -pl StoryService | tee pallas_server/StoryService/target/mvn-test.log
+mvn test -pl StoryService > pallas_server/StoryService/target/mvn-test.log 2>&1
 
 # Package without tests — all modules
-mvn package -DskipTests | tee pallas_server/target/mvn-package.log
+mvn package -DskipTests > pallas_server/target/mvn-package.log 2>&1
 ```
 
 When running from inside `pallas_server/`, use `target/mvn-<phase>.log` as the path.
