@@ -152,7 +152,7 @@ public final class PallasLogger {
   /**
    * Replays all records currently held in {@link BacktraceBuffer} via the underlying Log4j2 logger.
    *
-   * <p>Delegates to {@link PallasBacktrace#backtrace(Logger)}.
+   * <p>Delegates to {@link PallasBacktrace#backtrace(Logger, BacktraceBuffer)}.
    */
   public void backtrace() {
     PallasBacktrace.backtrace(delegate, BUFFER);
