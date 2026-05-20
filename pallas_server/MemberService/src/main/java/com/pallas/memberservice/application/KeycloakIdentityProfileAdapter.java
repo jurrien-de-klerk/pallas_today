@@ -36,7 +36,7 @@ public class KeycloakIdentityProfileAdapter implements IdentityProfilePort {
       // Throw a dedicated exception so the handler can log at error level with a backtrace
       // (ADR-0014). Do not return Optional.empty() — that would trigger a misleading warn.
       throw new IdentityProviderException(
-          "Keycloak user not found for subject present in member mapping");
+          "Keycloak user not found for subject present in member mapping", e);
     }
   }
 }
