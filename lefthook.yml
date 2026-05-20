@@ -62,6 +62,17 @@ pre-commit:
       glob: "**/*.json"
       name: JSON lint
     - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project sqlfluff/sqlfluff:latest
+        fix --config /project/tool/lefthook/sqlfluff.cfg {staged_files}
+      glob: "**/*.sql"
+      stage_fixed: true
+      name: SQL formatter
+    - run: >-
+        docker run --rm --user $(id -u):$(id -g) --volume $(pwd):/project --workdir /project sqlfluff/sqlfluff:latest
+        lint --config /project/tool/lefthook/sqlfluff.cfg {staged_files}
+      glob: "**/*.sql"
+      name: SQL lint
+    - run: >-
         cd pallas_app && dart format $(echo {staged_files} | sed 's|pallas_app/||g')
       glob: "pallas_app/**/*.dart"
       stage_fixed: true
