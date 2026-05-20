@@ -95,11 +95,49 @@ services:
       interval: 2s
       timeout: 5s
       retries: 25
+  community-service:
+    build:
+      context: ./CommunityService
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
+      KEYCLOAK_PUBLIC_URL: http://localhost:8180
+      KEYCLOAK_REALM: pallas
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://community-db:5432/communityservice
+      SPRING_DATASOURCE_USERNAME: communityservice
+      SPRING_DATASOURCE_PASSWORD: communityservice
+    networks:
+      - services
+      - community-internal
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      community-db:
+        condition: service_healthy
+  community-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: communityservice
+      POSTGRES_USER: communityservice
+      POSTGRES_PASSWORD: communityservice
+    networks:
+      - community-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U communityservice -d communityservice"]
+      interval: 2s
+      timeout: 5s
+      retries: 25
 networks:
   keycloak-internal:
     driver: bridge
     internal: true
   member-internal:
+    driver: bridge
+    internal: true
+  community-internal:
     driver: bridge
     internal: true
   services:

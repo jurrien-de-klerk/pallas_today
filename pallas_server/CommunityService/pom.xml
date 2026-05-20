@@ -8,10 +8,10 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>com.pallas</groupId>
-  <artifactId>memberservice</artifactId>
+  <artifactId>communityservice</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>memberservice</name>
-  <description>MemberService Spring Boot microservice</description>
+  <name>communityservice</name>
+  <description>CommunityService Spring Boot microservice</description>
   <properties>
     <java.version>21</java.version>
     <openapi-generator.version>7.8.0</openapi-generator.version>
@@ -101,11 +101,6 @@
       <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.keycloak</groupId>
-      <artifactId>keycloak-admin-client</artifactId>
-      <version>26.0.5</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -128,10 +123,10 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/../../api-specs/member-service/openapi.yaml</inputSpec>
+              <inputSpec>${project.basedir}/../../api-specs/community-service/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>com.pallas.memberservice.api</apiPackage>
-              <modelPackage>com.pallas.memberservice.model</modelPackage>
+              <apiPackage>com.pallas.communityservice.api</apiPackage>
+              <modelPackage>com.pallas.communityservice.model</modelPackage>
               <configOptions>
                 <useSpringBoot3>true</useSpringBoot3>
                 <interfaceOnly>true</interfaceOnly>
