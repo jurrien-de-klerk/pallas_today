@@ -16,13 +16,17 @@ void main() {
       expect(PallasLevel.warn.loggingLevel, equals(Level.WARNING));
     });
 
-    test('fatal maps to Level.SEVERE', () {
-      expect(PallasLevel.fatal.loggingLevel, equals(Level.SEVERE));
+    test('error maps to Level.SEVERE', () {
+      expect(PallasLevel.error.loggingLevel, equals(Level.SEVERE));
     });
 
-    test('all four levels are distinct', () {
+    test('fatal maps to Level.SHOUT', () {
+      expect(PallasLevel.fatal.loggingLevel, equals(Level.SHOUT));
+    });
+
+    test('all five levels are distinct', () {
       final levels = PallasLevel.values.map((l) => l.loggingLevel).toSet();
-      expect(levels, hasLength(4));
+      expect(levels, hasLength(5));
     });
   });
 }

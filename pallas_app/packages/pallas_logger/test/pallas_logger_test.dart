@@ -39,9 +39,14 @@ void main() {
       expect(emitted.first.level, equals(Level.WARNING));
     });
 
-    test('fatal emits Level.SEVERE', () {
-      log.fatal('f message');
+    test('error emits Level.SEVERE', () {
+      log.error('e message');
       expect(emitted.first.level, equals(Level.SEVERE));
+    });
+
+    test('fatal emits Level.SHOUT', () {
+      log.fatal('f message');
+      expect(emitted.first.level, equals(Level.SHOUT));
     });
 
     test('error and stackTrace are forwarded', () {
@@ -58,9 +63,10 @@ void main() {
       log.debug('a');
       log.info('b');
       log.warn('c');
-      log.fatal('d');
+      log.error('d');
+      log.fatal('e');
 
-      expect(PallasLogBuffer.instance.length, equals(4));
+      expect(PallasLogBuffer.instance.length, equals(5));
     });
 
     test('buffer record preserves logger name', () {
