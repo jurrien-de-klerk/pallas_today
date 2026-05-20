@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleUnexpectedException(Exception ex) {
-    log.error("Unexpected error: {}", ex.getMessage());
+    log.error("Unhandled exception of type {}", ex.getClass().getName());
     log.backtrace();
     Error error = new Error();
     error.setMessage("Internal server error");
