@@ -55,7 +55,7 @@ class StoryService {
       );
       return false;
     } catch (e, st) {
-      _log.fatal('publishStory unexpected error', e, st);
+      _log.error('publishStory unexpected error', e, st);
       _log.backtrace();
       return false;
     }

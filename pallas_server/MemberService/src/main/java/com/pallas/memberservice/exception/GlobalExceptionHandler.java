@@ -1,5 +1,6 @@
 package com.pallas.memberservice.exception;
 
+import com.pallas.memberservice.domain.IdentityProviderException;
 import com.pallas.memberservice.domain.MemberNotFoundException;
 import com.pallas.memberservice.model.Error;
 import lombok.CustomLog;
@@ -47,6 +48,18 @@ public class GlobalExceptionHandler {
     error.setMessage("Missing required parameter: " + ex.getParameterName());
     error.setCode(HttpStatus.BAD_REQUEST.toString());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(IdentityProviderException.class)
+  public ResponseEntity<Error> handleIdentityProviderException(IdentityProviderException ex) {
+    // The identity provider returned an unexpected response indicating a data consistency failure.
+    // Log at error with a backtrace to aid diagnosis (ADR-0014).
+    log.error("Identity provider failure: {}", ex.getMessage());
+    log.backtrace();
+    Error error = new Error();
+    error.setMessage("Internal server error");
+    error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
   }
 
   @ExceptionHandler(MemberNotFoundException.class)

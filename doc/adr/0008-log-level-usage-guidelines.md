@@ -4,7 +4,7 @@ Date: 2026-04-28
 
 ## Status
 
-Accepted
+Superseded by [14. Log level usage guidelines v2](0014-log-level-usage-guidelines-v2.md)
 
 ## Context
 

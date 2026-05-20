@@ -2,6 +2,7 @@ package com.pallas.memberservice.application;
 
 import com.pallas.memberservice.domain.IdentityProfile;
 import com.pallas.memberservice.domain.IdentityProfilePort;
+import com.pallas.memberservice.domain.IdentityProviderException;
 import jakarta.ws.rs.NotFoundException;
 import java.util.Optional;
 import org.keycloak.admin.client.Keycloak;
@@ -31,7 +32,11 @@ public class KeycloakIdentityProfileAdapter implements IdentityProfilePort {
       UserRepresentation user = keycloak.realm(realm).users().get(keycloakSub).toRepresentation();
       return Optional.of(new IdentityProfile(user.getFirstName(), user.getLastName()));
     } catch (NotFoundException e) {
-      return Optional.empty();
+      // A subject that exists in our mapping table has no corresponding user in Keycloak.
+      // Throw a dedicated exception so the handler can log at error level with a backtrace
+      // (ADR-0014). Do not return Optional.empty() — that would trigger a misleading warn.
+      throw new IdentityProviderException(
+          "Keycloak user not found for subject present in member mapping", e);
     }
   }
 }

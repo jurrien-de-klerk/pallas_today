@@ -13,7 +13,10 @@ enum PallasLevel {
   /// Unexpected but recoverable events — maps to [Level.WARNING].
   warn,
 
-  /// Critical, unrecoverable failures — maps to [Level.SEVERE].
+  /// Non-fatal malfunction that must be investigated — maps to [Level.SEVERE].
+  error,
+
+  /// Critical, unrecoverable failure that crashes the application — maps to [Level.SHOUT].
   fatal;
 
   /// The corresponding [Level] from the `logging` package.
@@ -21,6 +24,7 @@ enum PallasLevel {
     PallasLevel.debug => Level.FINE,
     PallasLevel.info => Level.INFO,
     PallasLevel.warn => Level.WARNING,
-    PallasLevel.fatal => Level.SEVERE,
+    PallasLevel.error => Level.SEVERE,
+    PallasLevel.fatal => Level.SHOUT,
   };
 }

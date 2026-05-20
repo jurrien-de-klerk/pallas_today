@@ -132,11 +132,17 @@ class PallasLogger {
   void warn(Object? message, [Object? error, StackTrace? stackTrace]) =>
       _log(Level.WARNING, message, error, stackTrace);
 
-  /// Logs a fatal error (maps to [Level.SEVERE]).
+  /// Logs an error (maps to [Level.SEVERE]).
+  ///
+  /// Use for critical failures from which the application cannot recover.
+  void error(Object? message, [Object? error, StackTrace? stackTrace]) =>
+      _log(Level.SEVERE, message, error, stackTrace);
+
+  /// Logs a fatal error (maps to [Level.SHOUT]).
   ///
   /// Use for critical failures from which the application cannot recover.
   void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      _log(Level.SEVERE, message, error, stackTrace);
+      _log(Level.SHOUT, message, error, stackTrace);
 
   /// Replays all records currently in [PallasLogBuffer] at their original
   /// levels without modifying the buffer.
