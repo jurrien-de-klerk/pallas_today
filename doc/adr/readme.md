@@ -13,3 +13,4 @@
 - [11. Secure by Design](0011-secure-by-design.md)
 - [12. Security Risk Analysis in Issues and Pull Requests](0012-security-risk-analysis-in-issues-and-pull-requests.md)
 - [13. App Domain Layer for Data Aggregation](0013-app-domain-layer-for-data-aggregation.md)
+- [14. Log level usage guidelines v2](0014-log-level-usage-guidelines-v2.md)
