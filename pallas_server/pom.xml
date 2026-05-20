@@ -17,6 +17,7 @@
     <module>pallas-logger</module>
     <module>StoryService</module>
     <module>MemberService</module>
+    <module>CommunityService</module>
   </modules>
   <properties>
     <!-- Set to true in CI to skip auto-formatting (fmt:check still runs). -->

@@ -1,0 +1,2 @@
+-- Initial schema for CommunityService
+-- TODO: add DDL for connection_suggestions and circle membership tables
