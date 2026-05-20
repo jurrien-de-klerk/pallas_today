@@ -16,12 +16,15 @@ CREATE TABLE connection_suggestions (
     created_at timestamptz NOT NULL DEFAULT now(),
     responded_at timestamptz,
 
-    PRIMARY KEY (id),
-
-    -- Only one pending suggestion may exist between a given pair for the same circle.
-    CONSTRAINT uq_pending_suggestion
-    UNIQUE (initiator_id, target_id, target_circle)
+    PRIMARY KEY (id)
 );
+
+-- Only one pending suggestion may exist between a given pair for the same circle.
+-- A partial index (rather than a table constraint) allows new suggestions after
+-- a prior one has been accepted or rejected.
+CREATE UNIQUE INDEX uq_pending_suggestion_pending
+ON connection_suggestions (initiator_id, target_id, target_circle)
+WHERE status = 'pending';
 
 -- Stores accepted circle memberships.
 -- The canonical-pair constraint (a < b) guarantees exactly one row per pair and
