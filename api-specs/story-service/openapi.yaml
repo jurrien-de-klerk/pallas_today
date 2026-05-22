@@ -58,7 +58,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /stories/{storyId}:
+  /stories/story/{storyId}:
     get:
       summary: Get a story
       description: >-

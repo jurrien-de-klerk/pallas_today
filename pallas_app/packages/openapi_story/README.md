@@ -66,9 +66,9 @@ All URIs are relative to *http://localhost:8080*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*StoriesApi*](doc/StoriesApi.md) | [**createStory**](doc/StoriesApi.md#createstory) | **POST** /stories | Publish a story
-[*StoriesApi*](doc/StoriesApi.md) | [**deleteStory**](doc/StoriesApi.md#deletestory) | **DELETE** /stories/{storyId} | Delete a story
-[*StoriesApi*](doc/StoriesApi.md) | [**getStory**](doc/StoriesApi.md#getstory) | **GET** /stories/{storyId} | Get a story
-[*StoriesApi*](doc/StoriesApi.md) | [**updateStory**](doc/StoriesApi.md#updatestory) | **PUT** /stories/{storyId} | Update a story
+[*StoriesApi*](doc/StoriesApi.md) | [**deleteStory**](doc/StoriesApi.md#deletestory) | **DELETE** /stories/story/{storyId} | Delete a story
+[*StoriesApi*](doc/StoriesApi.md) | [**getStory**](doc/StoriesApi.md#getstory) | **GET** /stories/story/{storyId} | Get a story
+[*StoriesApi*](doc/StoriesApi.md) | [**updateStory**](doc/StoriesApi.md#updatestory) | **PUT** /stories/story/{storyId} | Update a story
 [*StoriesNearYouApi*](doc/StoriesNearYouApi.md) | [**getStoriesNearYou**](doc/StoriesNearYouApi.md#getstoriesnearyou) | **GET** /stories/near/{memberId} | Get Stories near you for a member
 
 

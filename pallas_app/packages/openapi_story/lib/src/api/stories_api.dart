@@ -143,7 +143,7 @@ class StoriesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/stories/{storyId}'.replaceAll(
+    final _path = r'/stories/story/{storyId}'.replaceAll(
         '{' r'storyId' '}',
         encodeQueryParameter(_serializers, storyId, const FullType(String))
             .toString());
@@ -198,7 +198,7 @@ class StoriesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/stories/{storyId}'.replaceAll(
+    final _path = r'/stories/story/{storyId}'.replaceAll(
         '{' r'storyId' '}',
         encodeQueryParameter(_serializers, storyId, const FullType(String))
             .toString());
@@ -284,7 +284,7 @@ class StoriesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/stories/{storyId}'.replaceAll(
+    final _path = r'/stories/story/{storyId}'.replaceAll(
         '{' r'storyId' '}',
         encodeQueryParameter(_serializers, storyId, const FullType(String))
             .toString());

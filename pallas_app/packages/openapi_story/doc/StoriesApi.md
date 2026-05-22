@@ -10,9 +10,9 @@ All URIs are relative to *http://localhost:8080*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createStory**](StoriesApi.md#createstory) | **POST** /stories | Publish a story
-[**deleteStory**](StoriesApi.md#deletestory) | **DELETE** /stories/{storyId} | Delete a story
-[**getStory**](StoriesApi.md#getstory) | **GET** /stories/{storyId} | Get a story
-[**updateStory**](StoriesApi.md#updatestory) | **PUT** /stories/{storyId} | Update a story
+[**deleteStory**](StoriesApi.md#deletestory) | **DELETE** /stories/story/{storyId} | Delete a story
+[**getStory**](StoriesApi.md#getstory) | **GET** /stories/story/{storyId} | Get a story
+[**updateStory**](StoriesApi.md#updatestory) | **PUT** /stories/story/{storyId} | Update a story
 
 
 # **createStory**

@@ -12,7 +12,7 @@ servers:
 security:
   - oauth2: []
 paths:
-  /connection-suggestions:
+  /communities/connection-suggestions:
     post:
       summary: Create a connection suggestion
       description: >-
@@ -81,7 +81,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /connection-suggestions/{id}/response:
+  /communities/connection-suggestions/{id}/response:
     put:
       summary: Respond to a connection suggestion
       description: >-
@@ -140,7 +140,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /me/circles:
+  /communities/me/circles:
     get:
       summary: Retrieve my circles
       description: >-
@@ -161,7 +161,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /members/{memberId}/relationship:
+  /communities/members/{memberId}/relationship:
     get:
       summary: Get the relationship with a member
       description: Returns the relationship type between the authenticated member and the specified member.
