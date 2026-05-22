@@ -123,7 +123,7 @@ class MembersApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/members/{memberId}'.replaceAll(
+    final _path = r'/members/member/{memberId}'.replaceAll(
         '{' r'memberId' '}',
         encodeQueryParameter(_serializers, memberId, const FullType(String))
             .toString());

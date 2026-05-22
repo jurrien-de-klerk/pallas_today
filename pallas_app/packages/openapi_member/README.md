@@ -65,7 +65,7 @@ All URIs are relative to *http://localhost:8081*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*MembersApi*](doc/MembersApi.md) | [**getAuthenticatedMember**](doc/MembersApi.md#getauthenticatedmember) | **GET** /members/me | Get the authenticated member&#39;s own profile
-[*MembersApi*](doc/MembersApi.md) | [**getMember**](doc/MembersApi.md#getmember) | **GET** /members/{memberId} | Get a member
+[*MembersApi*](doc/MembersApi.md) | [**getMember**](doc/MembersApi.md#getmember) | **GET** /members/member/{memberId} | Get a member
 [*MembersApi*](doc/MembersApi.md) | [**getMembers**](doc/MembersApi.md#getmembers) | **GET** /members/batch | Get a batch of members
 
 
