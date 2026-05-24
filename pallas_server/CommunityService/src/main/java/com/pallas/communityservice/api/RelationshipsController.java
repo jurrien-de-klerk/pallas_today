@@ -3,6 +3,7 @@ package com.pallas.communityservice.api;
 import com.pallas.communityservice.application.CommunityApplicationService;
 import com.pallas.communityservice.domain.RelationshipType;
 import com.pallas.communityservice.model.Relationship;
+import java.util.UUID;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class RelationshipsController implements RelationshipsApi {
   private final CommunityApplicationService applicationService;
 
   @Override
-  public ResponseEntity<Relationship> getRelationship(String memberId) {
+  public ResponseEntity<Relationship> getRelationship(UUID memberId) {
     log.info("GET /communities/members/{memberId}/relationship");
     RelationshipType type = applicationService.getRelationship(memberId);
     Relationship response = new Relationship();

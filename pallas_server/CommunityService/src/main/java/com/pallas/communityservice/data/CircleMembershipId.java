@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class CircleMembershipId implements Serializable {
+  private static final long serialVersionUID = 1L;
 
   @Column(name = "member_id_a", nullable = false)
   private UUID memberIdA;

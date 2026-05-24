@@ -64,8 +64,8 @@ public class ConnectionSuggestionsController implements ConnectionSuggestionsApi
     com.pallas.communityservice.model.ConnectionSuggestion model =
         new com.pallas.communityservice.model.ConnectionSuggestion();
     model.setId(domain.getId());
-    model.setInitiatorId(domain.getInitiatorId().toString());
-    model.setTargetMemberId(domain.getTargetId().toString());
+    model.setInitiatorId(domain.getInitiatorId());
+    model.setTargetMemberId(domain.getTargetId());
     model.setTargetCircle(toModelCircleType(domain.getTargetCircle()));
     model.setStatus(toModelStatus(domain.getStatus()));
     model.setCreatedAt(domain.getCreatedAt());

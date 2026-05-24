@@ -171,11 +171,11 @@ paths:
       parameters:
         - name: memberId
           in: path
-          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
+          description: Member ID of the other member
           required: true
           schema:
             type: string
-            maxLength: 255
+            format: uuid
       responses:
         '200':
           description: Successful response
@@ -235,8 +235,8 @@ components:
       properties:
         targetMemberId:
           type: string
-          maxLength: 255
-          description: Opaque OIDC sub claim of the member to whom the suggestion is sent
+          format: uuid
+          description: Member ID of the member to whom the suggestion is sent
         targetCircle:
           $ref: '#/components/schemas/CircleType'
     ConnectionSuggestion:
@@ -256,12 +256,12 @@ components:
           example: 123e4567-e89b-12d3-a456-426614174000
         initiatorId:
           type: string
-          maxLength: 255
-          description: Opaque OIDC sub claim of the member who initiated the suggestion
+          format: uuid
+          description: Member ID of the member who initiated the suggestion
         targetMemberId:
           type: string
-          maxLength: 255
-          description: Opaque OIDC sub claim of the member who received the suggestion
+          format: uuid
+          description: Member ID of the member who received the suggestion
         targetCircle:
           $ref: '#/components/schemas/CircleType'
         status:
@@ -321,8 +321,8 @@ components:
       properties:
         memberId:
           type: string
-          maxLength: 255
-          description: Opaque OIDC sub claim identifying the other member (up to 255 ASCII characters)
+          format: uuid
+          description: Member ID of the other member
         relationshipType:
           $ref: '#/components/schemas/RelationshipType'
     Error:

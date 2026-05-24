@@ -38,10 +38,6 @@ public class MemberServiceHttpAdapter implements MemberServicePort {
 
       MembersApi api = new MembersApi(apiClient);
       var member = api.getAuthenticatedMember();
-
-      if (member == null || member.getMemberId() == null) {
-        throw new MemberServiceUnavailableException("Member Service returned empty response");
-      }
       log.debug("resolveCurrentMemberId: resolved");
       return member.getMemberId();
     } catch (ApiException e) {

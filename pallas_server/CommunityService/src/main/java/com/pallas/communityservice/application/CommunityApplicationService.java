@@ -7,6 +7,7 @@ import com.pallas.communityservice.domain.ConnectionSuggestion;
 import com.pallas.communityservice.domain.MemberServicePort;
 import com.pallas.communityservice.domain.RelationshipType;
 import com.pallas.communityservice.domain.SuggestionDecision;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.CustomLog;
@@ -14,12 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-
-
-- do the todos
-- add unit tests
-- add service tests
-
 
 /**
  * Application service for the community context.
@@ -47,19 +42,16 @@ public class CommunityApplicationService {
   /**
    * Create a connection suggestion from the authenticated member to the specified target.
    *
-   * @param targetMemberId the target (as Keycloak sub from request body - to be translated to UUID)
+   * @param targetMemberId the member ID of the target member (as issued by Member Service)
    * @param targetCircle the circle to which the target should be added
    * @return the created suggestion
-   * @throws UnsupportedOperationException if Member Service cannot resolve the target member sub to
-   *     UUID (requires Member Service enhancement to support `GET /members/by-sub/{sub}`)
    */
   public ConnectionSuggestion createConnectionSuggestion(
-      String targetMemberId, CircleType targetCircle) {
+      UUID targetMemberId, CircleType targetCircle) {
     log.info("createConnectionSuggestion: target={} circle={}", targetMemberId, targetCircle);
     UUID initiatorUuid = getCurrentUserUuid();
-    // TODO: Resolve targetMemberId (Keycloak sub) to UUID via Member Service
-    // Blocked: Member Service only provides GET /members/me; need endpoint for arbitrary sub lookup
-    throw new UnsupportedOperationException("Target member resolution not yet implemented");
+    return communityDomainService.createConnectionSuggestion(
+        initiatorUuid, targetMemberId, targetCircle);
   }
 
   /**
@@ -110,17 +102,13 @@ public class CommunityApplicationService {
   /**
    * Return the relationship type between the authenticated member and the given member.
    *
-   * @param targetMemberId the other member (as Keycloak sub from path - needs UUID translation)
+   * @param targetMemberId the member ID of the other member (as issued by Member Service)
    * @return the relationship type
-   * @throws UnsupportedOperationException if Member Service cannot resolve the target member sub to
-   *     UUID (requires Member Service enhancement to support `GET /members/by-sub/{sub}`)
    */
-  public RelationshipType getRelationship(String targetMemberId) {
+  public RelationshipType getRelationship(UUID targetMemberId) {
     UUID currentUuid = getCurrentUserUuid();
     log.info("getRelationship: querying relationship");
-    // TODO: Resolve targetMemberId (Keycloak sub) to UUID via Member Service
-    // Blocked: Member Service only provides GET /members/me; need endpoint for arbitrary sub lookup
-    throw new UnsupportedOperationException("Target member resolution not yet implemented");
+    return communityDomainService.getRelationship(currentUuid, targetMemberId);
   }
 
   // -------------------------------------------------------------------------
@@ -145,10 +133,27 @@ public class CommunityApplicationService {
   }
 
   /**
-   * Value carrier for the two circle lists returned by {@link #getMyCircles()}.
+   * Value carrier for the two circle lists returned by {@link #getMyCircles()}. Returns
+   * unmodifiable views to prevent callers from modifying the lists.
    *
    * @param trusted memberships in the trusted circle
    * @param connected memberships in the connected circle
    */
-  public record Circles(List<CircleMembership> trusted, List<CircleMembership> connected) {}
+  public record Circles(List<CircleMembership> trusted, List<CircleMembership> connected) {
+    // Compact constructor makes defensive copies of mutable input lists
+    public Circles {
+      trusted = Collections.unmodifiableList(new java.util.ArrayList<>(trusted));
+      connected = Collections.unmodifiableList(new java.util.ArrayList<>(connected));
+    }
+
+    @Override
+    public List<CircleMembership> trusted() {
+      return trusted;
+    }
+
+    @Override
+    public List<CircleMembership> connected() {
+      return connected;
+    }
+  }
 }
