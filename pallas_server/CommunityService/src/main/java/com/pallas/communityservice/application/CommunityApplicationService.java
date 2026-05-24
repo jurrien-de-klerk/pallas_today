@@ -125,7 +125,8 @@ public class CommunityApplicationService {
   }
 
   private Jwt currentJwt() {
-    return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    var auth = SecurityContextHolder.getContext().getAuthentication();
+    return (Jwt) auth.getPrincipal();
   }
 
   private String bearerToken(Jwt jwt) {

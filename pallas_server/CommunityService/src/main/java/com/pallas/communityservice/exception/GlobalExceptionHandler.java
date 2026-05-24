@@ -52,7 +52,9 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ResponseStatusException.class)
   public ResponseEntity<Error> handleResponseStatusException(ResponseStatusException ex) {
-    log.warn("Request failed with status {}", ex.getStatusCode());
+    if (log.isWarnEnabled()) {
+      log.warn("Request failed with status {}", ex.getStatusCode());
+    }
     Error error = new Error();
     error.setMessage(ex.getReason() != null ? ex.getReason() : ex.getMessage());
     error.setCode(ex.getStatusCode().toString());
@@ -61,7 +63,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Error> handleValidationException(MethodArgumentNotValidException ex) {
-    log.warn("Request validation failed: {} field error(s)", ex.getBindingResult().getErrorCount());
+    if (log.isWarnEnabled()) {
+      log.warn(
+          "Request validation failed: {} field error(s)", ex.getBindingResult().getErrorCount());
+    }
     String message =
         ex.getBindingResult().getFieldErrors().stream()
             .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
@@ -72,8 +77,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleUnexpectedException(Exception ex) {
-    log.error("Unhandled exception of type {}", ex.getClass().getName());
-    log.backtrace();
+    if (log.isErrorEnabled()) {
+      log.error("Unhandled exception of type {}", ex.getClass().getName());
+      log.backtrace();
+    }
     return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
   }
 

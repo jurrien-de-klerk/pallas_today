@@ -146,6 +146,35 @@ public final class PallasLogger {
   }
 
   // -------------------------------------------------------------------------
+  // Level checks (for PMD GuardLogStatement compliance)
+  // -------------------------------------------------------------------------
+
+  /** Returns {@code true} if DEBUG level is enabled for this logger. */
+  public boolean isDebugEnabled() {
+    return delegate.isEnabled(Level.DEBUG);
+  }
+
+  /** Returns {@code true} if INFO level is enabled for this logger. */
+  public boolean isInfoEnabled() {
+    return delegate.isEnabled(Level.INFO);
+  }
+
+  /** Returns {@code true} if WARN level is enabled for this logger. */
+  public boolean isWarnEnabled() {
+    return delegate.isEnabled(Level.WARN);
+  }
+
+  /** Returns {@code true} if ERROR level is enabled for this logger. */
+  public boolean isErrorEnabled() {
+    return delegate.isEnabled(Level.ERROR);
+  }
+
+  /** Returns {@code true} if FATAL level is enabled for this logger. */
+  public boolean isFatalEnabled() {
+    return delegate.isEnabled(Level.FATAL);
+  }
+
+  // -------------------------------------------------------------------------
   // Backtrace
   // -------------------------------------------------------------------------
 

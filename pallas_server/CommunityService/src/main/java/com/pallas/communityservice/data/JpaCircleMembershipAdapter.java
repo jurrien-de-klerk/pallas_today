@@ -59,9 +59,10 @@ public class JpaCircleMembershipAdapter implements CircleMembershipPort {
   // -------------------------------------------------------------------------
 
   private CircleMembership toDomain(CircleMembershipEntity entity) {
+    var id = entity.getId();
     return CircleMembership.builder()
-        .memberIdA(entity.getId().getMemberIdA())
-        .memberIdB(entity.getId().getMemberIdB())
+        .memberIdA(id.getMemberIdA())
+        .memberIdB(id.getMemberIdB())
         .circleType(toDomainCircleType(entity.getCircleType()))
         .memberSince(entity.getMemberSince())
         .build();
