@@ -110,6 +110,41 @@
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>4.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.gsonfire</groupId>
+      <artifactId>gson-fire</artifactId>
+      <version>1.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.oltu.oauth2</groupId>
+      <artifactId>org.apache.oltu.oauth2.client</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.3.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -119,6 +154,7 @@
         <version>${openapi-generator.version}</version>
         <executions>
           <execution>
+            <id>generate-community-server</id>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -135,6 +171,22 @@
                 <delegatePattern>false</delegatePattern>
                 <useBeanValidation>true</useBeanValidation>
                 <performBeanValidation>true</performBeanValidation>
+              </configOptions>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-member-client</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/../../api-specs/member-service/openapi.yaml</inputSpec>
+              <generatorName>java</generatorName>
+              <apiPackage>com.pallas.communityservice.client.memberservice</apiPackage>
+              <modelPackage>com.pallas.communityservice.client.memberservice.model</modelPackage>
+              <configOptions>
+                <library>okhttp-gson</library>
+                <dateLibrary>java8</dateLibrary>
               </configOptions>
             </configuration>
           </execution>

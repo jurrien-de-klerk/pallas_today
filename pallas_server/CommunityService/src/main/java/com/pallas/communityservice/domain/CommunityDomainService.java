@@ -1,0 +1,203 @@
+package com.pallas.communityservice.domain;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.CustomLog;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Domain service for the community bounded context.
+ *
+ * <p>All business rules live here. Persistence and external integrations are accessed through
+ * ports, keeping the domain layer free of infrastructure concerns (ADR-0010).
+ */
+@CustomLog
+@Service
+@RequiredArgsConstructor
+public class CommunityDomainService {
+
+  private final ConnectionSuggestionPort connectionSuggestionPort;
+  private final CircleMembershipPort circleMembershipPort;
+
+  // -------------------------------------------------------------------------
+  // Connection suggestions
+  // -------------------------------------------------------------------------
+
+  /**
+   * Create a new connection suggestion.
+   *
+   * @param initiatorId Member Service UUID of the authenticated initiator
+   * @param targetId Member Service UUID of the intended target
+   * @param targetCircle the circle into which the initiator wishes to add the target
+   * @return the persisted suggestion
+   */
+  @Transactional
+  public ConnectionSuggestion createConnectionSuggestion(
+      UUID initiatorId, UUID targetId, CircleType targetCircle) {
+    log.debug("createConnectionSuggestion: creating suggestion");
+    ConnectionSuggestion suggestion =
+        ConnectionSuggestion.builder()
+            .id(UUID.randomUUID())
+            .initiatorId(initiatorId)
+            .targetId(targetId)
+            .targetCircle(targetCircle)
+            .status(SuggestionStatus.PENDING)
+            .createdAt(OffsetDateTime.now())
+            .respondedAt(null)
+            .build();
+    ConnectionSuggestion saved = connectionSuggestionPort.save(suggestion);
+    log.debug("createConnectionSuggestion: suggestion saved");
+    return saved;
+  }
+
+  /**
+   * List all pending incoming connection suggestions for the given member.
+   *
+   * @param currentId Member Service UUID of the authenticated member
+   * @return pending suggestions received by this member
+   */
+  @Transactional(readOnly = true)
+  public List<ConnectionSuggestion> listIncomingSuggestions(UUID currentId) {
+    log.debug("listIncomingSuggestions: fetching for member");
+    return connectionSuggestionPort.findPendingByTargetId(currentId);
+  }
+
+  /**
+   * Respond to a connection suggestion.
+   *
+   * <p>If the decision is {@link SuggestionDecision#ACCEPTED} the circle membership between the two
+   * members is created or upgraded to the suggested circle type.
+   *
+   * @param suggestionId the ID of the suggestion to respond to
+   * @param currentId Member Service UUID of the authenticated member (must be the recipient)
+   * @param decision whether the suggestion is accepted or rejected
+   * @return the updated suggestion
+   * @throws ConnectionSuggestionNotFoundException when no suggestion with the given ID exists
+   * @throws NotSuggestionRecipientException when the authenticated member is not the recipient
+   * @throws SuggestionAlreadyRespondedException when the suggestion is no longer pending
+   */
+  @Transactional
+  public ConnectionSuggestion respondToSuggestion(
+      UUID suggestionId, UUID currentId, SuggestionDecision decision) {
+
+    ConnectionSuggestion suggestion =
+        connectionSuggestionPort
+            .findById(suggestionId)
+            .orElseThrow(() -> new ConnectionSuggestionNotFoundException(suggestionId));
+
+    if (!suggestion.getTargetId().equals(currentId)) {
+      throw new NotSuggestionRecipientException(suggestionId);
+    }
+    if (!suggestion.isPending()) {
+      throw new SuggestionAlreadyRespondedException(suggestionId);
+    }
+
+    SuggestionStatus newStatus =
+        decision == SuggestionDecision.ACCEPTED
+            ? SuggestionStatus.ACCEPTED
+            : SuggestionStatus.REJECTED;
+
+    ConnectionSuggestion updated =
+        ConnectionSuggestion.builder()
+            .id(suggestion.getId())
+            .initiatorId(suggestion.getInitiatorId())
+            .targetId(suggestion.getTargetId())
+            .targetCircle(suggestion.getTargetCircle())
+            .status(newStatus)
+            .createdAt(suggestion.getCreatedAt())
+            .respondedAt(OffsetDateTime.now())
+            .build();
+
+    ConnectionSuggestion saved = connectionSuggestionPort.update(updated);
+
+    if (decision == SuggestionDecision.ACCEPTED) {
+      log.debug("respondToSuggestion: accepted — creating circle membership");
+      acceptSuggestion(suggestion, currentId);
+    }
+
+    log.debug("respondToSuggestion: done");
+    return saved;
+  }
+
+  // -------------------------------------------------------------------------
+  // Circles
+  // -------------------------------------------------------------------------
+
+  /**
+   * Return all trusted circle members for the given member.
+   *
+   * @param currentId Member Service UUID of the authenticated member
+   * @return circle memberships where the type is {@link CircleType#TRUSTED}
+   */
+  @Transactional(readOnly = true)
+  public List<CircleMembership> getTrustedCircle(UUID currentId) {
+    return circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.TRUSTED);
+  }
+
+  /**
+   * Return all connected circle members for the given member.
+   *
+   * @param currentId Member Service UUID of the authenticated member
+   * @return circle memberships where the type is {@link CircleType#CONNECTED}
+   */
+  @Transactional(readOnly = true)
+  public List<CircleMembership> getConnectedCircle(UUID currentId) {
+    return circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.CONNECTED);
+  }
+
+  // -------------------------------------------------------------------------
+  // Relationships
+  // -------------------------------------------------------------------------
+
+  /**
+   * Determine the relationship type between the authenticated member and another member.
+   *
+   * @param currentId Member Service UUID of the authenticated member
+   * @param targetId Member Service UUID of the other member
+   * @return the relationship type; {@link RelationshipType#COMMUNITY} if no circle membership
+   *     exists
+   */
+  @Transactional(readOnly = true)
+  public RelationshipType getRelationship(UUID currentId, UUID targetId) {
+    Optional<CircleMembership> membership = circleMembershipPort.findByPair(currentId, targetId);
+    return membership
+        .map(
+            m ->
+                m.getCircleType() == CircleType.TRUSTED
+                    ? RelationshipType.TRUSTED
+                    : RelationshipType.CONNECTED)
+        .orElse(RelationshipType.COMMUNITY);
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
+
+  private void acceptSuggestion(ConnectionSuggestion suggestion, UUID acceptorId) {
+    UUID initiatorId = suggestion.getInitiatorId();
+
+    // Canonical ordering: member with the smaller UUID is A.
+    UUID memberIdA;
+    UUID memberIdB;
+    if (initiatorId.compareTo(acceptorId) < 0) {
+      memberIdA = initiatorId;
+      memberIdB = acceptorId;
+    } else {
+      memberIdA = acceptorId;
+      memberIdB = initiatorId;
+    }
+
+    CircleMembership membership =
+        CircleMembership.builder()
+            .memberIdA(memberIdA)
+            .memberIdB(memberIdB)
+            .circleType(suggestion.getTargetCircle())
+            .memberSince(OffsetDateTime.now())
+            .build();
+    circleMembershipPort.save(membership);
+  }
+}

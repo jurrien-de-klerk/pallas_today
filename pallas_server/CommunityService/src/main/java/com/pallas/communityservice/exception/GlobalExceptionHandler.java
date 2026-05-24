@@ -1,7 +1,12 @@
 package com.pallas.communityservice.exception;
 
+import com.pallas.communityservice.data.MemberServiceUnavailableException;
+import com.pallas.communityservice.domain.ConnectionSuggestionNotFoundException;
+import com.pallas.communityservice.domain.NotSuggestionRecipientException;
+import com.pallas.communityservice.domain.SuggestionAlreadyRespondedException;
 import com.pallas.communityservice.model.Error;
 import lombok.CustomLog;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +17,38 @@ import org.springframework.web.server.ResponseStatusException;
 @CustomLog
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(ConnectionSuggestionNotFoundException.class)
+  public ResponseEntity<Error> handleNotFound(ConnectionSuggestionNotFoundException ex) {
+    log.warn("Connection suggestion not found");
+    return errorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(NotSuggestionRecipientException.class)
+  public ResponseEntity<Error> handleForbidden(NotSuggestionRecipientException ex) {
+    log.warn("Forbidden: not suggestion recipient");
+    return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+  }
+
+  @ExceptionHandler(SuggestionAlreadyRespondedException.class)
+  public ResponseEntity<Error> handleConflict(SuggestionAlreadyRespondedException ex) {
+    log.warn("Conflict: suggestion already responded to");
+    return errorResponse(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<Error> handleDuplicateSuggestion(DataIntegrityViolationException ex) {
+    log.warn("DataIntegrityViolation — likely duplicate pending suggestion");
+    return errorResponse(
+        HttpStatus.CONFLICT, "A pending suggestion between these members already exists");
+  }
+
+  @ExceptionHandler(MemberServiceUnavailableException.class)
+  public ResponseEntity<Error> handleMemberServiceError(MemberServiceUnavailableException ex) {
+    log.error("Member Service unavailable");
+    log.backtrace();
+    return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Could not reach the Member Service");
+  }
 
   @ExceptionHandler(ResponseStatusException.class)
   public ResponseEntity<Error> handleResponseStatusException(ResponseStatusException ex) {
@@ -25,24 +62,25 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Error> handleValidationException(MethodArgumentNotValidException ex) {
     log.warn("Request validation failed: {} field error(s)", ex.getBindingResult().getErrorCount());
-    Error error = new Error();
     String message =
         ex.getBindingResult().getFieldErrors().stream()
             .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
             .findFirst()
             .orElse("Validation failed");
-    error.setMessage(message);
-    error.setCode(HttpStatus.BAD_REQUEST.toString());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    return errorResponse(HttpStatus.BAD_REQUEST, message);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Error> handleUnexpectedException(Exception ex) {
     log.error("Unhandled exception of type {}", ex.getClass().getName());
     log.backtrace();
+    return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+  }
+
+  private ResponseEntity<Error> errorResponse(HttpStatus status, String message) {
     Error error = new Error();
-    error.setMessage("Internal server error");
-    error.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    error.setMessage(message);
+    error.setCode(status.toString());
+    return ResponseEntity.status(status).body(error);
   }
 }
