@@ -1,47 +1,20 @@
 package com.pallas.communityservice.exception;
 
 import com.pallas.communityservice.data.MemberServiceUnavailableException;
-import com.pallas.communityservice.domain.ConnectionSuggestionNotFoundException;
-import com.pallas.communityservice.domain.NotSuggestionRecipientException;
-import com.pallas.communityservice.domain.SuggestionAlreadyRespondedException;
 import com.pallas.communityservice.model.Error;
 import lombok.CustomLog;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
+/** Handles generic web and infrastructure exceptions. */
 @CustomLog
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-
-  @ExceptionHandler(ConnectionSuggestionNotFoundException.class)
-  public ResponseEntity<Error> handleNotFound(ConnectionSuggestionNotFoundException ex) {
-    log.warn("Connection suggestion not found");
-    return errorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-  }
-
-  @ExceptionHandler(NotSuggestionRecipientException.class)
-  public ResponseEntity<Error> handleForbidden(NotSuggestionRecipientException ex) {
-    log.warn("Forbidden: not suggestion recipient");
-    return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
-  }
-
-  @ExceptionHandler(SuggestionAlreadyRespondedException.class)
-  public ResponseEntity<Error> handleConflict(SuggestionAlreadyRespondedException ex) {
-    log.warn("Conflict: suggestion already responded to");
-    return errorResponse(HttpStatus.CONFLICT, ex.getMessage());
-  }
-
-  @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Error> handleDuplicateSuggestion(DataIntegrityViolationException ex) {
-    log.warn("DataIntegrityViolation — likely duplicate pending suggestion");
-    return errorResponse(
-        HttpStatus.CONFLICT, "A pending suggestion between these members already exists");
-  }
+public final class GlobalExceptionHandler {
 
   @ExceptionHandler(MemberServiceUnavailableException.class)
   public ResponseEntity<Error> handleMemberServiceError(MemberServiceUnavailableException ex) {
@@ -73,6 +46,23 @@ public class GlobalExceptionHandler {
             .findFirst()
             .orElse("Validation failed");
     return errorResponse(HttpStatus.BAD_REQUEST, message);
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<Error> handleIllegalArgument(IllegalArgumentException ex) {
+    if (log.isWarnEnabled()) {
+      log.warn("Illegal argument: {}", ex.getMessage());
+    }
+    return errorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<Error> handleMethodArgumentTypeMismatch(
+      MethodArgumentTypeMismatchException ex) {
+    if (log.isWarnEnabled()) {
+      log.warn("Invalid path parameter: {}", ex.getValue());
+    }
+    return errorResponse(HttpStatus.BAD_REQUEST, "Invalid UUID format: " + ex.getValue());
   }
 
   @ExceptionHandler(Exception.class)
