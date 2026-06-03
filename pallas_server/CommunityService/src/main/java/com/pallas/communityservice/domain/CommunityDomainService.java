@@ -39,6 +39,9 @@ public class CommunityDomainService {
   public ConnectionSuggestion createConnectionSuggestion(
       UUID initiatorId, UUID targetId, CircleType targetCircle) {
     log.debug("createConnectionSuggestion: creating suggestion");
+    if (initiatorId.equals(targetId)) {
+      throw new IllegalArgumentException("A member cannot suggest a connection with themselves");
+    }
     ConnectionSuggestion suggestion =
         ConnectionSuggestion.builder()
             .id(UUID.randomUUID())

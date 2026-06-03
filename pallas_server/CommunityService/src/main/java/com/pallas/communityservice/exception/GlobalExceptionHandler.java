@@ -53,7 +53,7 @@ public final class GlobalExceptionHandler {
     if (log.isWarnEnabled()) {
       log.warn("Illegal argument: {}", ex.getMessage());
     }
-    return errorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    return errorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
