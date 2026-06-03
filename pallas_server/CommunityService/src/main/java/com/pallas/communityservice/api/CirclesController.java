@@ -22,17 +22,18 @@ public class CirclesController implements CirclesApi {
   @Override
   public ResponseEntity<Circles> getMyCircles() {
     log.info("GET /communities/me/circles");
+    UUID currentUuid = applicationService.getCurrentUserUuid();
     CommunityApplicationService.Circles circles = applicationService.getMyCircles();
     Circles response = new Circles();
-    response.setTrustedCircle(toMemberReferences(circles.trusted()));
-    response.setConnectedCircle(toMemberReferences(circles.connected()));
+    response.setTrustedCircle(toMemberReferences(circles.trusted(), currentUuid));
+    response.setConnectedCircle(toMemberReferences(circles.connected(), currentUuid));
     return ResponseEntity.ok(response);
   }
 
-  private List<MemberReference> toMemberReferences(List<CircleMembership> memberships) {
+  private List<MemberReference> toMemberReferences(
+      List<CircleMembership> memberships, UUID currentUuid) {
     // The circles are already filtered per member by the application service.
     // We simply extract the partner ID from each membership.
-    UUID currentUuid = applicationService.getCurrentUserUuid();
     return memberships.stream()
         .map(
             m -> {
