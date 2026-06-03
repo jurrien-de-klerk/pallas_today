@@ -4,7 +4,6 @@ import com.pallas.communityservice.client.ApiClient;
 import com.pallas.communityservice.client.ApiException;
 import com.pallas.communityservice.client.memberservice.MembersApi;
 import com.pallas.communityservice.domain.MemberServicePort;
-import com.pallas.communityservice.exception.MemberServiceUnavailableException;
 import java.util.UUID;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,23 +20,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberServiceHttpAdapter implements MemberServicePort {
 
-  private final String baseUrl;
+  private final ApiClient apiClient;
+  private final MembersApi membersApi;
 
   public MemberServiceHttpAdapter(
       @Value("${member-service.base-url:http://localhost:8081}") String baseUrl) {
-    this.baseUrl = baseUrl;
+    this.apiClient = new ApiClient();
+    this.apiClient.setBasePath(baseUrl);
+    this.membersApi = new MembersApi(apiClient);
   }
 
   @Override
   public UUID resolveCurrentMemberId(String bearerToken) {
     log.debug("resolveCurrentMemberId: calling member service");
     try {
-      ApiClient apiClient = new ApiClient();
-      apiClient.setBasePath(baseUrl);
       apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
-
-      MembersApi api = new MembersApi(apiClient);
-      var member = api.getAuthenticatedMember();
+      var member = membersApi.getAuthenticatedMember();
       log.debug("resolveCurrentMemberId: resolved");
       return member.getMemberId();
     } catch (ApiException e) {

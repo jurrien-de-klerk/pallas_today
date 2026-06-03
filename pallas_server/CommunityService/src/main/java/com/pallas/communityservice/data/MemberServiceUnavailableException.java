@@ -7,4 +7,8 @@ public class MemberServiceUnavailableException extends RuntimeException {
   public MemberServiceUnavailableException(String message) {
     super(message);
   }
+
+  public MemberServiceUnavailableException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
