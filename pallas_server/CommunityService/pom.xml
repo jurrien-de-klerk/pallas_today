@@ -135,6 +135,15 @@
       <artifactId>gson-fire</artifactId>
       <version>1.9.0</version>
     </dependency>
+    <!-- Required by generated OpenAPI client (ApiClient, OAuthOkHttpClient, RetryingOAuth).
+         The generator emits OAuth helper code that imports org.apache.oltu.oauth2 packages,
+         so this dependency must remain even though application code does not reference it
+         directly. -->
+    <dependency>
+      <groupId>org.apache.oltu.oauth2</groupId>
+      <artifactId>org.apache.oltu.oauth2.client</artifactId>
+      <version>1.0.2</version>
+    </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
