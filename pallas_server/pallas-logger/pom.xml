@@ -9,6 +9,7 @@
   </parent>
   <artifactId>pallas-logger</artifactId>
   <name>pallas-logger</name>
+  <version>0.0.2-SNAPSHOT</version>
   <description>Reusable backtrace logging library for Pallas server-side services</description>
   <dependencies>
     <dependency>
