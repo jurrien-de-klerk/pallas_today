@@ -88,13 +88,7 @@ class CircleMembershipTest {
             .build();
 
     // When
-    CircleMembership modified =
-        CircleMembership.builder()
-            .memberIdA(original.getMemberIdA())
-            .memberIdB(original.getMemberIdB())
-            .circleType(CircleType.CONNECTED)
-            .memberSince(original.getMemberSince())
-            .build();
+    CircleMembership modified = original.toBuilder().circleType(CircleType.CONNECTED).build();
 
     // Then
     assertThat(modified.getMemberIdA()).isEqualTo(original.getMemberIdA());

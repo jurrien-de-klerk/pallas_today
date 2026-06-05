@@ -7,7 +7,7 @@ info:
   contact:
     name: Pallas Team
 servers:
-  - url: http://localhost:8081
+  - url: http://localhost:8082
     description: Local development server
 security:
   - oauth2: []

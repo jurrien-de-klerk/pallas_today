@@ -11,7 +11,7 @@ import lombok.Value;
  * <p>The pair is stored in canonical order (idA &lt; idB as UUIDs).
  */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class CircleMembership {
 
   /** Member Service UUID of the member with the lexicographically smaller UUID. */
