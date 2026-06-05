@@ -183,6 +183,66 @@ class PallasLoggerTest {
         .contains("com.pallas.MyService");
   }
 
+  @Test
+  void isDebugEnabledReturnsTrueWhenRootLevelIsDebug() {
+    Configurator.setRootLevel(Level.DEBUG);
+    assertThat(LOG.isDebugEnabled()).isTrue();
+  }
+
+  @Test
+  void isDebugEnabledReturnsFalseWhenRootLevelIsInfo() {
+    Configurator.setRootLevel(Level.INFO);
+    assertThat(LOG.isDebugEnabled()).isFalse();
+  }
+
+  @Test
+  void isInfoEnabledReturnsTrueWhenRootLevelIsInfo() {
+    Configurator.setRootLevel(Level.INFO);
+    assertThat(LOG.isInfoEnabled()).isTrue();
+  }
+
+  @Test
+  void isInfoEnabledReturnsFalseWhenRootLevelIsWarn() {
+    Configurator.setRootLevel(Level.WARN);
+    assertThat(LOG.isInfoEnabled()).isFalse();
+  }
+
+  @Test
+  void isWarnEnabledReturnsTrueWhenRootLevelIsWarn() {
+    Configurator.setRootLevel(Level.WARN);
+    assertThat(LOG.isWarnEnabled()).isTrue();
+  }
+
+  @Test
+  void isWarnEnabledReturnsFalseWhenRootLevelIsError() {
+    Configurator.setRootLevel(Level.ERROR);
+    assertThat(LOG.isWarnEnabled()).isFalse();
+  }
+
+  @Test
+  void isErrorEnabledReturnsTrueWhenRootLevelIsError() {
+    Configurator.setRootLevel(Level.ERROR);
+    assertThat(LOG.isErrorEnabled()).isTrue();
+  }
+
+  @Test
+  void isErrorEnabledReturnsFalseWhenRootLevelIsFatal() {
+    Configurator.setRootLevel(Level.FATAL);
+    assertThat(LOG.isErrorEnabled()).isFalse();
+  }
+
+  @Test
+  void isFatalEnabledReturnsTrueWhenRootLevelIsFatal() {
+    Configurator.setRootLevel(Level.FATAL);
+    assertThat(LOG.isFatalEnabled()).isTrue();
+  }
+
+  @Test
+  void isFatalEnabledReturnsFalseWhenRootLevelIsOff() {
+    Configurator.setRootLevel(Level.OFF);
+    assertThat(LOG.isFatalEnabled()).isFalse();
+  }
+
   // --- helpers ---
 
   private static final class CapturingAppender extends AbstractAppender {

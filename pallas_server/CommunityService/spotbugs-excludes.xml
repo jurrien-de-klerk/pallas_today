@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Exclude generated API classes -->
+  <Match>
+    <Class name="~com\.pallas\.communityservice\.api\..*"/>
+  </Match>
+  <!-- Exclude generated model classes -->
+  <Match>
+    <Class name="~com\.pallas\.communityservice\.model\..*"/>
+  </Match>
+  <!-- Exclude all generated client code -->
+  <Match>
+    <Class name="~com\.pallas\.communityservice\.client\..*"/>
+  </Match>
+</FindBugsFilter>

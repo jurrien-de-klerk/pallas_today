@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Custom ruleset for Community Service" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+  <description>Community Service PMD rules with generated code exclusions.</description>
+  <!-- Use default rule sets but exclude generated code -->
+  <rule ref="category/java/bestpractices.xml"/>
+  <rule ref="category/java/design.xml">
+    <!-- Exclude SignatureDeclareThrowsException: Spring Security filter chains require Exception declaration -->
+    <exclude name="SignatureDeclareThrowsException"/>
+    <!-- Exclude LawOfDemeter: too strict for domain layer object traversal -->
+    <exclude name="LawOfDemeter"/>
+  </rule>
+  <rule ref="category/java/errorprone.xml"/>
+  <rule ref="category/java/performance.xml"/>
+  <rule ref="category/java/security.xml"/>
+  <!-- Exclude generated packages -->
+  <exclude-pattern>.*/target/generated-sources/.*</exclude-pattern>
+</ruleset>

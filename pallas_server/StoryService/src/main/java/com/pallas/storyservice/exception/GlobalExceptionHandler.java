@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @CustomLog
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public final class GlobalExceptionHandler {
 
   @ExceptionHandler(ResponseStatusException.class)
   public ResponseEntity<Error> handleResponseStatusException(ResponseStatusException ex) {

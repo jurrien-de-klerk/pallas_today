@@ -1,0 +1,84 @@
+package com.pallas.communityservice.data;
+
+import com.pallas.communityservice.domain.CircleMembership;
+import com.pallas.communityservice.domain.CircleMembershipPort;
+import com.pallas.communityservice.domain.CircleType;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.stereotype.Component;
+
+/** JPA adapter implementing {@link CircleMembershipPort}. */
+@Component
+public class JpaCircleMembershipAdapter implements CircleMembershipPort {
+
+  private final CircleMembershipRepository repository;
+
+  public JpaCircleMembershipAdapter(CircleMembershipRepository repository) {
+    this.repository = repository;
+  }
+
+  @Override
+  public CircleMembership save(CircleMembership membership) {
+    CircleMembershipId id =
+        new CircleMembershipId(membership.getMemberIdA(), membership.getMemberIdB());
+
+    CircleMembershipEntity entity =
+        repository
+            .findById(id)
+            .orElseGet(
+                () -> {
+                  CircleMembershipEntity e = new CircleMembershipEntity();
+                  e.setId(id);
+                  e.setMemberSince(OffsetDateTime.now());
+                  return e;
+                });
+
+    entity.setCircleType(toEntityCircleType(membership.getCircleType()));
+    return toDomain(repository.save(entity));
+  }
+
+  @Override
+  public List<CircleMembership> findAllByMemberIdAndCircleType(
+      UUID memberId, CircleType circleType) {
+    return repository
+        .findAllByMemberIdAndCircleType(memberId, toEntityCircleType(circleType))
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public Optional<CircleMembership> findByPair(UUID memberIdA, UUID memberIdB) {
+    return repository.findByEitherPair(memberIdA, memberIdB).map(this::toDomain);
+  }
+
+  // -------------------------------------------------------------------------
+  // Mapping helpers
+  // -------------------------------------------------------------------------
+
+  private CircleMembership toDomain(CircleMembershipEntity entity) {
+    var id = entity.getId();
+    return CircleMembership.builder()
+        .memberIdA(id.getMemberIdA())
+        .memberIdB(id.getMemberIdB())
+        .circleType(toDomainCircleType(entity.getCircleType()))
+        .memberSince(entity.getMemberSince())
+        .build();
+  }
+
+  private CircleTypeEntity toEntityCircleType(CircleType domain) {
+    return switch (domain) {
+      case TRUSTED -> CircleTypeEntity.TRUSTED;
+      case CONNECTED -> CircleTypeEntity.CONNECTED;
+    };
+  }
+
+  private CircleType toDomainCircleType(CircleTypeEntity entity) {
+    return switch (entity) {
+      case TRUSTED -> CircleType.TRUSTED;
+      case CONNECTED -> CircleType.CONNECTED;
+    };
+  }
+}

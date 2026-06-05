@@ -9,6 +9,11 @@
       "name": "keycloak.realm",
       "type": "java.lang.String",
       "description": "Keycloak realm name, e.g. pallas."
+    },
+    {
+      "name": "member-service.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the Member Service used to resolve the current member's domain UUID. Defaults to http://localhost:8081."
     }
   ]
 }
