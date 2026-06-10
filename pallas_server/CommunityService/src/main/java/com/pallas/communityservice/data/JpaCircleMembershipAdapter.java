@@ -7,9 +7,11 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 
 /** JPA adapter implementing {@link CircleMembershipPort}. */
+@CustomLog
 @Component
 public class JpaCircleMembershipAdapter implements CircleMembershipPort {
 
@@ -21,6 +23,7 @@ public class JpaCircleMembershipAdapter implements CircleMembershipPort {
 
   @Override
   public CircleMembership save(CircleMembership membership) {
+    log.debug("save: upserting circle membership with circle type {}", membership.getCircleType());
     CircleMembershipId id =
         new CircleMembershipId(membership.getMemberIdA(), membership.getMemberIdB());
 
@@ -29,6 +32,7 @@ public class JpaCircleMembershipAdapter implements CircleMembershipPort {
             .findById(id)
             .orElseGet(
                 () -> {
+                  log.debug("save: no existing membership found, creating new entity");
                   CircleMembershipEntity e = new CircleMembershipEntity();
                   e.setId(id);
                   e.setMemberSince(OffsetDateTime.now());
@@ -36,22 +40,30 @@ public class JpaCircleMembershipAdapter implements CircleMembershipPort {
                 });
 
     entity.setCircleType(toEntityCircleType(membership.getCircleType()));
-    return toDomain(repository.save(entity));
+    CircleMembership saved = toDomain(repository.save(entity));
+    log.debug("save: circle membership saved");
+    return saved;
   }
 
   @Override
   public List<CircleMembership> findAllByMemberIdAndCircleType(
       UUID memberId, CircleType circleType) {
-    return repository
-        .findAllByMemberIdAndCircleType(memberId, toEntityCircleType(circleType))
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    log.debug("findAllByMemberIdAndCircleType: querying for circle type {}", circleType);
+    List<CircleMembership> results =
+        repository.findAllByMemberIdAndCircleType(memberId, toEntityCircleType(circleType)).stream()
+            .map(this::toDomain)
+            .toList();
+    log.debug("findAllByMemberIdAndCircleType: found {} membership(s)", results.size());
+    return results;
   }
 
   @Override
   public Optional<CircleMembership> findByPair(UUID memberIdA, UUID memberIdB) {
-    return repository.findByEitherPair(memberIdA, memberIdB).map(this::toDomain);
+    log.debug("findByPair: querying membership");
+    Optional<CircleMembership> result =
+        repository.findByEitherPair(memberIdA, memberIdB).map(this::toDomain);
+    log.debug("findByPair: membership {}", result.isPresent() ? "found" : "not found");
+    return result;
   }
 
   // -------------------------------------------------------------------------

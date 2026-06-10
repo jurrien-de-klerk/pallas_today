@@ -117,11 +117,11 @@ class CommunityDomainServiceTest {
   }
 
   // =========================================================================
-  // listIncomingSuggestions tests
+  // listPendingSuggestions tests
   // =========================================================================
 
   @Test
-  void listIncomingSuggestions_WithPendingSuggestions_ReturnsList() {
+  void listPendingSuggestions_WithPendingSuggestions_ReturnsList() {
     // Given
     UUID receiverId = UUID.fromString("44444444-4444-4444-4444-444444444444");
     ConnectionSuggestion suggestion1 =
@@ -144,25 +144,25 @@ class CommunityDomainServiceTest {
             .createdAt(pendingSuggestion.getCreatedAt())
             .respondedAt(null)
             .build();
-    when(connectionSuggestionPort.findPendingByTargetId(receiverId))
+    when(connectionSuggestionPort.findPendingByParticipantId(receiverId))
         .thenReturn(List.of(suggestion1, suggestion2));
 
     // When
-    List<ConnectionSuggestion> result = service.listIncomingSuggestions(receiverId);
+    List<ConnectionSuggestion> result = service.listPendingSuggestions(receiverId);
 
     // Then
     assertThat(result).hasSize(2).contains(suggestion1, suggestion2);
-    verify(connectionSuggestionPort).findPendingByTargetId(receiverId);
+    verify(connectionSuggestionPort).findPendingByParticipantId(receiverId);
   }
 
   @Test
-  void listIncomingSuggestions_WithNoSuggestions_ReturnsEmptyList() {
+  void listPendingSuggestions_WithNoSuggestions_ReturnsEmptyList() {
     // Given
     UUID receiverId = UUID.fromString("44444444-4444-4444-4444-444444444444");
-    when(connectionSuggestionPort.findPendingByTargetId(receiverId)).thenReturn(List.of());
+    when(connectionSuggestionPort.findPendingByParticipantId(receiverId)).thenReturn(List.of());
 
     // When
-    List<ConnectionSuggestion> result = service.listIncomingSuggestions(receiverId);
+    List<ConnectionSuggestion> result = service.listPendingSuggestions(receiverId);
 
     // Then
     assertThat(result).isEmpty();
@@ -467,7 +467,7 @@ class CommunityDomainServiceTest {
     UUID partnerId = UUID.randomUUID();
     UUID memberIdA;
     UUID memberIdB;
-    if (currentId.compareTo(partnerId) < 0) {
+    if (currentId.toString().compareTo(partnerId.toString()) < 0) {
       memberIdA = currentId;
       memberIdB = partnerId;
     } else {

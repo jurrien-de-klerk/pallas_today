@@ -32,13 +32,15 @@ public class MemberServiceHttpAdapter implements MemberServicePort {
 
   @Override
   public UUID resolveCurrentMemberId(String bearerToken) {
-    log.debug("resolveCurrentMemberId: calling member service");
+    log.debug(
+        "resolveCurrentMemberId: calling member service at {}/members/me", apiClient.getBasePath());
     try {
       apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
       var member = membersApi.getAuthenticatedMember();
       log.debug("resolveCurrentMemberId: resolved");
       return member.getMemberId();
     } catch (ApiException e) {
+      log.debug("resolveCurrentMemberId: Member Service call failed with HTTP {}", e.getCode());
       throw new MemberServiceUnavailableException(
           "Member Service returned error: " + e.getCode(), e);
     }

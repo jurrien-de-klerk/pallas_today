@@ -40,11 +40,14 @@ public class CommunityDomainService {
       UUID initiatorId, UUID targetId, CircleType targetCircle) {
     log.debug("createConnectionSuggestion: creating suggestion");
     if (initiatorId.equals(targetId)) {
+      log.debug("createConnectionSuggestion: rejected — self-suggestion");
       throw new IllegalArgumentException("A member cannot suggest a connection with themselves");
     }
+    log.debug(
+        "createConnectionSuggestion: self-check passed, building suggestion for circle {}",
+        targetCircle);
     ConnectionSuggestion suggestion =
         ConnectionSuggestion.builder()
-            .id(UUID.randomUUID())
             .initiatorId(initiatorId)
             .targetId(targetId)
             .targetCircle(targetCircle)
@@ -52,21 +55,26 @@ public class CommunityDomainService {
             .createdAt(OffsetDateTime.now())
             .respondedAt(null)
             .build();
+    log.debug("createConnectionSuggestion: persisting");
     ConnectionSuggestion saved = connectionSuggestionPort.save(suggestion);
     log.debug("createConnectionSuggestion: suggestion saved");
     return saved;
   }
 
   /**
-   * List all pending incoming connection suggestions for the given member.
+   * List all pending connection suggestions that involve the given member, either as the initiator
+   * or as the target.
    *
    * @param currentId Member Service UUID of the authenticated member
-   * @return pending suggestions received by this member
+   * @return pending suggestions visible to this member
    */
   @Transactional(readOnly = true)
-  public List<ConnectionSuggestion> listIncomingSuggestions(UUID currentId) {
-    log.debug("listIncomingSuggestions: fetching for member");
-    return connectionSuggestionPort.findPendingByTargetId(currentId);
+  public List<ConnectionSuggestion> listPendingSuggestions(UUID currentId) {
+    log.debug("listPendingSuggestions: fetching for member");
+    List<ConnectionSuggestion> results =
+        connectionSuggestionPort.findPendingByParticipantId(currentId);
+    log.debug("listPendingSuggestions: found {} pending suggestion(s)", results.size());
+    return results;
   }
 
   /**
@@ -87,17 +95,26 @@ public class CommunityDomainService {
   public ConnectionSuggestion respondToSuggestion(
       UUID suggestionId, UUID currentId, SuggestionDecision decision) {
 
+    log.debug("respondToSuggestion: looking up suggestion");
     ConnectionSuggestion suggestion =
         connectionSuggestionPort
             .findById(suggestionId)
-            .orElseThrow(() -> new ConnectionSuggestionNotFoundException(suggestionId));
+            .orElseThrow(
+                () -> {
+                  log.debug("respondToSuggestion: suggestion not found");
+                  return new ConnectionSuggestionNotFoundException(suggestionId);
+                });
+    log.debug("respondToSuggestion: suggestion found with status {}", suggestion.getStatus());
 
     if (!suggestion.getTargetId().equals(currentId)) {
+      log.debug("respondToSuggestion: rejected — caller is not the recipient");
       throw new NotSuggestionRecipientException(suggestionId);
     }
     if (!suggestion.isPending()) {
+      log.debug("respondToSuggestion: rejected — suggestion already responded");
       throw new SuggestionAlreadyRespondedException(suggestionId);
     }
+    log.debug("respondToSuggestion: guards passed, applying decision {}", decision);
 
     SuggestionStatus newStatus =
         decision == SuggestionDecision.ACCEPTED
@@ -115,11 +132,15 @@ public class CommunityDomainService {
             .respondedAt(OffsetDateTime.now())
             .build();
 
+    log.debug("respondToSuggestion: persisting updated suggestion");
     ConnectionSuggestion saved = connectionSuggestionPort.update(updated);
+    log.debug("respondToSuggestion: suggestion updated");
 
     if (decision == SuggestionDecision.ACCEPTED) {
       log.debug("respondToSuggestion: accepted — creating circle membership");
       acceptSuggestion(suggestion, currentId);
+    } else {
+      log.debug("respondToSuggestion: rejected — no circle membership created");
     }
 
     log.debug("respondToSuggestion: done");
@@ -138,7 +159,11 @@ public class CommunityDomainService {
    */
   @Transactional(readOnly = true)
   public List<CircleMembership> getTrustedCircle(UUID currentId) {
-    return circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.TRUSTED);
+    log.debug("getTrustedCircle: fetching trusted circle members");
+    List<CircleMembership> results =
+        circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.TRUSTED);
+    log.debug("getTrustedCircle: found {} member(s)", results.size());
+    return results;
   }
 
   /**
@@ -149,7 +174,11 @@ public class CommunityDomainService {
    */
   @Transactional(readOnly = true)
   public List<CircleMembership> getConnectedCircle(UUID currentId) {
-    return circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.CONNECTED);
+    log.debug("getConnectedCircle: fetching connected circle members");
+    List<CircleMembership> results =
+        circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.CONNECTED);
+    log.debug("getConnectedCircle: found {} member(s)", results.size());
+    return results;
   }
 
   // -------------------------------------------------------------------------
@@ -166,14 +195,18 @@ public class CommunityDomainService {
    */
   @Transactional(readOnly = true)
   public RelationshipType getRelationship(UUID currentId, UUID targetId) {
+    log.debug("getRelationship: looking up circle membership between pair");
     Optional<CircleMembership> membership = circleMembershipPort.findByPair(currentId, targetId);
-    return membership
-        .map(
-            m ->
-                m.getCircleType() == CircleType.TRUSTED
-                    ? RelationshipType.TRUSTED
-                    : RelationshipType.CONNECTED)
-        .orElse(RelationshipType.COMMUNITY);
+    RelationshipType result =
+        membership
+            .map(
+                m ->
+                    m.getCircleType() == CircleType.TRUSTED
+                        ? RelationshipType.TRUSTED
+                        : RelationshipType.CONNECTED)
+            .orElse(RelationshipType.COMMUNITY);
+    log.debug("getRelationship: resolved to {}", result);
+    return result;
   }
 
   // -------------------------------------------------------------------------
@@ -181,12 +214,16 @@ public class CommunityDomainService {
   // -------------------------------------------------------------------------
 
   private void acceptSuggestion(ConnectionSuggestion suggestion, UUID acceptorId) {
+    log.debug(
+        "acceptSuggestion: building circle membership for circle {}", suggestion.getTargetCircle());
     UUID initiatorId = suggestion.getInitiatorId();
 
     // Canonical ordering: member with the smaller UUID is A.
+    // Use string comparison to match PostgreSQL's unsigned UUID ordering;
+    // UUID.compareTo() uses signed long arithmetic and can disagree with the DB.
     UUID memberIdA;
     UUID memberIdB;
-    if (initiatorId.compareTo(acceptorId) < 0) {
+    if (initiatorId.toString().compareTo(acceptorId.toString()) < 0) {
       memberIdA = initiatorId;
       memberIdB = acceptorId;
     } else {
@@ -201,6 +238,8 @@ public class CommunityDomainService {
             .circleType(suggestion.getTargetCircle())
             .memberSince(OffsetDateTime.now())
             .build();
+    log.debug("acceptSuggestion: persisting circle membership");
     circleMembershipPort.save(membership);
+    log.debug("acceptSuggestion: circle membership saved");
   }
 }

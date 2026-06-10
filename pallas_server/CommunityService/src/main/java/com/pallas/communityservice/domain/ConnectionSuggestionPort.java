@@ -24,12 +24,13 @@ public interface ConnectionSuggestionPort {
   Optional<ConnectionSuggestion> findById(UUID id);
 
   /**
-   * Returns all pending suggestions whose recipient is {@code targetId}.
+   * Returns all pending suggestions in which {@code memberId} participates, either as the initiator
+   * or as the target.
    *
-   * @param targetId the Member Service UUID of the intended recipient
-   * @return incoming pending suggestions
+   * @param memberId the Member Service UUID of the member
+   * @return pending suggestions visible to this member
    */
-  List<ConnectionSuggestion> findPendingByTargetId(UUID targetId);
+  List<ConnectionSuggestion> findPendingByParticipantId(UUID memberId);
 
   /**
    * Update the status and responded-at timestamp of a suggestion.

@@ -118,7 +118,8 @@ class ConnectionSuggestionsControllerTest {
             .respondedAt(null)
             .build();
 
-    when(suggestionPort.findPendingByTargetId(CURRENT_USER_ID)).thenReturn(List.of(suggestion1));
+    when(suggestionPort.findPendingByParticipantId(CURRENT_USER_ID))
+        .thenReturn(List.of(suggestion1));
 
     mockMvc
         .perform(
@@ -132,7 +133,7 @@ class ConnectionSuggestionsControllerTest {
   @Test
   void listConnectionSuggestions_WithNoSuggestions_Returns200WithEmptyList() throws Exception {
     when(memberServicePort.resolveCurrentMemberId(anyString())).thenReturn(CURRENT_USER_ID);
-    when(suggestionPort.findPendingByTargetId(CURRENT_USER_ID)).thenReturn(List.of());
+    when(suggestionPort.findPendingByParticipantId(CURRENT_USER_ID)).thenReturn(List.of());
 
     mockMvc
         .perform(

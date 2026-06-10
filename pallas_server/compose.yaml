@@ -105,6 +105,7 @@ services:
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
       KEYCLOAK_PUBLIC_URL: http://localhost:8180
       KEYCLOAK_REALM: pallas
+      MEMBER_SERVICE_BASE_URL: http://member-service:8081
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://community-db:5432/communityservice
       SPRING_DATASOURCE_USERNAME: communityservice

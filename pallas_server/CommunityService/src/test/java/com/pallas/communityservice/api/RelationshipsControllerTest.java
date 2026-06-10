@@ -47,10 +47,10 @@ class RelationshipsControllerTest {
     UUID currentMemberId = UUID.fromString("11111111-1111-1111-1111-111111111111");
     UUID targetMemberId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-    // Ensure canonical ordering: member with smaller UUID is A
+    // Ensure canonical ordering: member with smaller UUID is A (string/unsigned comparison).
     UUID memberIdA;
     UUID memberIdB;
-    if (currentMemberId.compareTo(targetMemberId) < 0) {
+    if (currentMemberId.toString().compareTo(targetMemberId.toString()) < 0) {
       memberIdA = currentMemberId;
       memberIdB = targetMemberId;
     } else {

@@ -55,14 +55,15 @@ public class CommunityApplicationService {
   }
 
   /**
-   * List all incoming pending connection suggestions for the authenticated member.
+   * List all pending connection suggestions involving the authenticated member (as initiator or
+   * target).
    *
-   * @return pending suggestions received by the current member
+   * @return pending suggestions visible to the current member
    */
-  public List<ConnectionSuggestion> listIncomingSuggestions() {
+  public List<ConnectionSuggestion> listPendingSuggestions() {
     UUID currentUuid = getCurrentUserUuid();
-    log.info("listIncomingSuggestions");
-    return communityDomainService.listIncomingSuggestions(currentUuid);
+    log.info("listPendingSuggestions");
+    return communityDomainService.listPendingSuggestions(currentUuid);
   }
 
   /**
