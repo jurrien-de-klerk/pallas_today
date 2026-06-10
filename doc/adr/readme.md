@@ -15,3 +15,4 @@
 - [13. App Domain Layer for Data Aggregation](0013-app-domain-layer-for-data-aggregation.md)
 - [14. Log level usage guidelines v2](0014-log-level-usage-guidelines-v2.md)
 - [15. Service-prefixed URL path segments](0015-service-prefixed-url-path-segments.md)
+- [16. Disable PMD GuardLogStatement rule](0016-disable-pmd-guardlogstatement-rule.md)

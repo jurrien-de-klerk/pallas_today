@@ -5,7 +5,7 @@
     <!--
       GuardLogStatement fires on every parameterised log call (e.g. log.warn("…", arg))
       even though Log4j2 / SLF4J already evaluates arguments lazily via {} placeholders.
-      Wrapping every log call in isXxxEnabled() guards would be unnecessary boilerplate.
+      Guards would also keep log records out of the log-backtrace buffer (see ADR 16).
     -->
     <exclude name="GuardLogStatement"/>
   </rule>
