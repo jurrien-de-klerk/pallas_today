@@ -117,11 +117,11 @@ class CommunityDomainServiceTest {
   }
 
   // =========================================================================
-  // listIncomingSuggestions tests
+  // listPendingSuggestions tests
   // =========================================================================
 
   @Test
-  void listIncomingSuggestions_WithPendingSuggestions_ReturnsList() {
+  void listPendingSuggestions_WithPendingSuggestions_ReturnsList() {
     // Given
     UUID receiverId = UUID.fromString("44444444-4444-4444-4444-444444444444");
     ConnectionSuggestion suggestion1 =
@@ -148,7 +148,7 @@ class CommunityDomainServiceTest {
         .thenReturn(List.of(suggestion1, suggestion2));
 
     // When
-    List<ConnectionSuggestion> result = service.listIncomingSuggestions(receiverId);
+    List<ConnectionSuggestion> result = service.listPendingSuggestions(receiverId);
 
     // Then
     assertThat(result).hasSize(2).contains(suggestion1, suggestion2);
@@ -156,13 +156,13 @@ class CommunityDomainServiceTest {
   }
 
   @Test
-  void listIncomingSuggestions_WithNoSuggestions_ReturnsEmptyList() {
+  void listPendingSuggestions_WithNoSuggestions_ReturnsEmptyList() {
     // Given
     UUID receiverId = UUID.fromString("44444444-4444-4444-4444-444444444444");
     when(connectionSuggestionPort.findPendingByParticipantId(receiverId)).thenReturn(List.of());
 
     // When
-    List<ConnectionSuggestion> result = service.listIncomingSuggestions(receiverId);
+    List<ConnectionSuggestion> result = service.listPendingSuggestions(receiverId);
 
     // Then
     assertThat(result).isEmpty();

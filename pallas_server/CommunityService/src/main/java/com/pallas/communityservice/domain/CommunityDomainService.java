@@ -69,11 +69,11 @@ public class CommunityDomainService {
    * @return pending suggestions visible to this member
    */
   @Transactional(readOnly = true)
-  public List<ConnectionSuggestion> listIncomingSuggestions(UUID currentId) {
-    log.debug("listIncomingSuggestions: fetching for member");
+  public List<ConnectionSuggestion> listPendingSuggestions(UUID currentId) {
+    log.debug("listPendingSuggestions: fetching for member");
     List<ConnectionSuggestion> results =
         connectionSuggestionPort.findPendingByParticipantId(currentId);
-    log.debug("listIncomingSuggestions: found {} pending suggestion(s)", results.size());
+    log.debug("listPendingSuggestions: found {} pending suggestion(s)", results.size());
     return results;
   }
 

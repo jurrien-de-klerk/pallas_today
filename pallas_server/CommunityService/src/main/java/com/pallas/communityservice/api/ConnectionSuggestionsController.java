@@ -39,7 +39,7 @@ public class ConnectionSuggestionsController implements ConnectionSuggestionsApi
   public ResponseEntity<ListConnectionSuggestions200Response> listConnectionSuggestions() {
     log.info("GET /communities/connection-suggestions");
     List<com.pallas.communityservice.model.ConnectionSuggestion> models =
-        applicationService.listIncomingSuggestions().stream().map(this::toModel).toList();
+        applicationService.listPendingSuggestions().stream().map(this::toModel).toList();
     ListConnectionSuggestions200Response response = new ListConnectionSuggestions200Response();
     response.setSuggestions(models);
     return ResponseEntity.ok(response);
