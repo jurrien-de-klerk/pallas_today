@@ -53,11 +53,30 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
       KEYCLOAK_REALM: pallas
       SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://story-db:5432/storyservice
+      SPRING_DATASOURCE_USERNAME: storyservice
+      SPRING_DATASOURCE_PASSWORD: storyservice
     networks:
       - services
+      - story-internal
     depends_on:
       keycloak:
         condition: service_healthy
+      story-db:
+        condition: service_healthy
+  story-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: storyservice
+      POSTGRES_USER: storyservice
+      POSTGRES_PASSWORD: storyservice
+    networks:
+      - story-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U storyservice -d storyservice"]
+      interval: 2s
+      timeout: 5s
+      retries: 25
   member-service:
     build:
       context: ./MemberService
@@ -133,6 +152,9 @@ services:
       retries: 25
 networks:
   keycloak-internal:
+    driver: bridge
+    internal: true
+  story-internal:
     driver: bridge
     internal: true
   member-internal:
