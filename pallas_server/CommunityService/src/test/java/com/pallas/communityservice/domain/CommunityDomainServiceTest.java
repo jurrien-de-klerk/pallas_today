@@ -467,7 +467,7 @@ class CommunityDomainServiceTest {
     UUID partnerId = UUID.randomUUID();
     UUID memberIdA;
     UUID memberIdB;
-    if (currentId.compareTo(partnerId) < 0) {
+    if (currentId.toString().compareTo(partnerId.toString()) < 0) {
       memberIdA = currentId;
       memberIdB = partnerId;
     } else {

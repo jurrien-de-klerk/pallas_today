@@ -210,6 +210,8 @@ public class CommunityDomainService {
             .circleType(suggestion.getTargetCircle())
             .memberSince(OffsetDateTime.now())
             .build();
+    log.debug("acceptSuggestion: persisting circle membership");
     circleMembershipPort.save(membership);
+    log.debug("acceptSuggestion: circle membership saved");
   }
 }

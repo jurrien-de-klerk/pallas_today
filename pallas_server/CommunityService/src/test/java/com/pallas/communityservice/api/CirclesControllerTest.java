@@ -127,7 +127,7 @@ class CirclesControllerTest {
       UUID memberId1, UUID memberId2, CircleType circleType) {
     UUID memberIdA;
     UUID memberIdB;
-    if (memberId1.compareTo(memberId2) < 0) {
+    if (memberId1.toString().compareTo(memberId2.toString()) < 0) {
       memberIdA = memberId1;
       memberIdB = memberId2;
     } else {
