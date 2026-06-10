@@ -47,7 +47,7 @@ public class JpaConnectionSuggestionAdapter implements ConnectionSuggestionPort 
         repository.findByParticipantAndStatus(memberId, SuggestionStatusEntity.PENDING).stream()
             .map(this::toDomain)
             .toList();
-    log.debug("findPendingByParticipantId");
+    log.debug("findPendingByParticipantId: found {} pending suggestion(s)", results.size());
     return results;
   }
 
