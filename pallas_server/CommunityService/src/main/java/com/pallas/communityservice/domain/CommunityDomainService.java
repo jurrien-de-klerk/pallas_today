@@ -52,21 +52,26 @@ public class CommunityDomainService {
             .createdAt(OffsetDateTime.now())
             .respondedAt(null)
             .build();
+    log.debug("createConnectionSuggestion: persisting");
     ConnectionSuggestion saved = connectionSuggestionPort.save(suggestion);
     log.debug("createConnectionSuggestion: suggestion saved");
     return saved;
   }
 
   /**
-   * List all pending incoming connection suggestions for the given member.
+   * List all pending connection suggestions that involve the given member, either as the initiator
+   * or as the target.
    *
    * @param currentId Member Service UUID of the authenticated member
-   * @return pending suggestions received by this member
+   * @return pending suggestions visible to this member
    */
   @Transactional(readOnly = true)
   public List<ConnectionSuggestion> listIncomingSuggestions(UUID currentId) {
     log.debug("listIncomingSuggestions: fetching for member");
-    return connectionSuggestionPort.findPendingByTargetId(currentId);
+    List<ConnectionSuggestion> results =
+        connectionSuggestionPort.findPendingByParticipantId(currentId);
+    log.debug("listIncomingSuggestions: found {} pending suggestion(s)", results.size());
+    return results;
   }
 
   /**
@@ -149,7 +154,11 @@ public class CommunityDomainService {
    */
   @Transactional(readOnly = true)
   public List<CircleMembership> getConnectedCircle(UUID currentId) {
-    return circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.CONNECTED);
+    log.debug("getConnectedCircle: fetching connected circle members");
+    List<CircleMembership> results =
+        circleMembershipPort.findAllByMemberIdAndCircleType(currentId, CircleType.CONNECTED);
+    log.debug("getConnectedCircle: found {} member(s)", results.size());
+    return results;
   }
 
   // -------------------------------------------------------------------------

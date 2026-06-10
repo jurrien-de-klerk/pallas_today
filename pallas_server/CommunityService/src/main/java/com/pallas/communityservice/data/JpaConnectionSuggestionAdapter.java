@@ -8,9 +8,11 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 
 /** JPA adapter implementing {@link ConnectionSuggestionPort}. */
+@CustomLog
 @Component
 public class JpaConnectionSuggestionAdapter implements ConnectionSuggestionPort {
 
@@ -22,35 +24,51 @@ public class JpaConnectionSuggestionAdapter implements ConnectionSuggestionPort 
 
   @Override
   public ConnectionSuggestion save(ConnectionSuggestion suggestion) {
+    log.debug("save: persisting new connection suggestion");
     ConnectionSuggestionEntity entity = toEntity(suggestion);
     entity.setCreatedAt(OffsetDateTime.now());
-    return toDomain(repository.save(entity));
+    ConnectionSuggestion saved = toDomain(repository.save(entity));
+    log.debug("save: connection suggestion persisted");
+    return saved;
   }
 
   @Override
   public Optional<ConnectionSuggestion> findById(UUID id) {
-    return repository.findById(id).map(this::toDomain);
+    log.debug("findById: querying connection suggestion");
+    Optional<ConnectionSuggestion> result = repository.findById(id).map(this::toDomain);
+    log.debug("findById: suggestion {}", result.isPresent() ? "found" : "not found");
+    return result;
   }
 
   @Override
-  public List<ConnectionSuggestion> findPendingByTargetId(UUID targetId) {
-    return repository.findByTargetIdAndStatus(targetId, SuggestionStatusEntity.PENDING).stream()
-        .map(this::toDomain)
-        .toList();
+  public List<ConnectionSuggestion> findPendingByParticipantId(UUID memberId) {
+    log.debug("findPendingByParticipantId: querying pending suggestions");
+    List<ConnectionSuggestion> results =
+        repository.findByParticipantAndStatus(memberId, SuggestionStatusEntity.PENDING).stream()
+            .map(this::toDomain)
+            .toList();
+    log.debug("findPendingByParticipantId");
+    return results;
   }
 
   @Override
   public ConnectionSuggestion update(ConnectionSuggestion suggestion) {
+    log.debug("update: loading suggestion for update");
     ConnectionSuggestionEntity entity =
         repository
             .findById(suggestion.getId())
             .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "Cannot update non-existent suggestion: " + suggestion.getId()));
+                () -> {
+                  log.debug("update: suggestion not found — illegal state");
+                  return new IllegalStateException(
+                      "Cannot update non-existent suggestion: " + suggestion.getId());
+                });
+    log.debug("update: applying new status {}", suggestion.getStatus());
     entity.setStatus(toEntityStatus(suggestion.getStatus()));
     entity.setRespondedAt(suggestion.getRespondedAt());
-    return toDomain(repository.save(entity));
+    ConnectionSuggestion updated = toDomain(repository.save(entity));
+    log.debug("update: suggestion updated");
+    return updated;
   }
 
   // -------------------------------------------------------------------------

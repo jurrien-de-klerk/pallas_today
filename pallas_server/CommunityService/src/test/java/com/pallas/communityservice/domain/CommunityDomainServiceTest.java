@@ -144,7 +144,7 @@ class CommunityDomainServiceTest {
             .createdAt(pendingSuggestion.getCreatedAt())
             .respondedAt(null)
             .build();
-    when(connectionSuggestionPort.findPendingByTargetId(receiverId))
+    when(connectionSuggestionPort.findPendingByParticipantId(receiverId))
         .thenReturn(List.of(suggestion1, suggestion2));
 
     // When
@@ -152,14 +152,14 @@ class CommunityDomainServiceTest {
 
     // Then
     assertThat(result).hasSize(2).contains(suggestion1, suggestion2);
-    verify(connectionSuggestionPort).findPendingByTargetId(receiverId);
+    verify(connectionSuggestionPort).findPendingByParticipantId(receiverId);
   }
 
   @Test
   void listIncomingSuggestions_WithNoSuggestions_ReturnsEmptyList() {
     // Given
     UUID receiverId = UUID.fromString("44444444-4444-4444-4444-444444444444");
-    when(connectionSuggestionPort.findPendingByTargetId(receiverId)).thenReturn(List.of());
+    when(connectionSuggestionPort.findPendingByParticipantId(receiverId)).thenReturn(List.of());
 
     // When
     List<ConnectionSuggestion> result = service.listIncomingSuggestions(receiverId);

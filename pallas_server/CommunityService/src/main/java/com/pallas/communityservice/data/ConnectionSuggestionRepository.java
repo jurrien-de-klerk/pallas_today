@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 interface ConnectionSuggestionRepository extends JpaRepository<ConnectionSuggestionEntity, UUID> {
 
-  List<ConnectionSuggestionEntity> findByTargetIdAndStatus(
-      UUID targetId, SuggestionStatusEntity status);
+  @org.springframework.data.jpa.repository.Query(
+      "SELECT e FROM ConnectionSuggestionEntity e"
+          + " WHERE (e.initiatorId = :memberId OR e.targetId = :memberId)"
+          + " AND e.status = :status")
+  List<ConnectionSuggestionEntity> findByParticipantAndStatus(
+      UUID memberId, SuggestionStatusEntity status);
 }
