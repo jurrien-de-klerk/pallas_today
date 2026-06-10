@@ -40,10 +40,7 @@ public class MemberServiceHttpAdapter implements MemberServicePort {
       log.debug("resolveCurrentMemberId: resolved");
       return member.getMemberId();
     } catch (ApiException e) {
-      log.debug(
-          "resolveCurrentMemberId: Member Service call failed with HTTP {}, body: {}",
-          e.getCode(),
-          e.getResponseBody());
+      log.debug("resolveCurrentMemberId: Member Service call failed with HTTP {}", e.getCode());
       throw new MemberServiceUnavailableException(
           "Member Service returned error: " + e.getCode(), e);
     }
