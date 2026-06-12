@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "keycloak.auth-server-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the Keycloak server used for OAuth2 token validation. Defaults to http://localhost:8180."
+    },
+    {
+      "name": "keycloak.public-url",
+      "type": "java.lang.String",
+      "description": "Browser-accessible base URL of the Keycloak server (used to build Swagger UI OAuth2 authorize/token URLs). Defaults to http://localhost:8180 when running locally without Docker."
+    },
+    {
+      "name": "keycloak.realm",
+      "type": "java.lang.String",
+      "description": "Keycloak realm name, e.g. pallas."
+    }
+  ]
+}
