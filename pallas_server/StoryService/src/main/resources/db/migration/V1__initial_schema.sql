@@ -1,5 +1,8 @@
 -- Initial schema for StoryService
 
+-- Enable pgcrypto extension for gen_random_uuid() function.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Stores published stories.
 -- All member identifiers are Member Service UUIDs; the StoryService resolves the
 -- Keycloak sub claim to a memberId via the Member Service before any write.
