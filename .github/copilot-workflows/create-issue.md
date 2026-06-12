@@ -113,7 +113,8 @@ If you are unsure whether a label exists in the repository, check the repository
 Fill in `.github/ISSUE_TEMPLATE/feature.md`:
 
 - **Description**: short description of what the feature or bug fix is about.
-- **In scope**: bullet list of what is included, using the areas confirmed in step 1.
+- **In scope**: bullet list of what is included, using the areas confirmed in step 1. The bullets should focus on
+  features, not on technical implementation.
 - **Out of scope**: bullet list of what is explicitly not included; link to tracking issues where they exist.
 - **Security risk**: outcome of step 5 — either the identified risk with impact and mitigation, or “No security risk
   identified."

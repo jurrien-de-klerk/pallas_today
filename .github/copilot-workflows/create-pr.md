@@ -70,7 +70,3 @@ Using `.github/PULL_REQUEST_TEMPLATE.md` as the structure:
 ## Step 6 — Create the pull request
 
 Only after the developer confirms the draft, create the pull request using the filled-in template.
-
-## Step 7 — Perform AI code review
-
-After the PR is created, follow the **Workflow: AI code review** steps in `.github/copilot-instructions.md`.
