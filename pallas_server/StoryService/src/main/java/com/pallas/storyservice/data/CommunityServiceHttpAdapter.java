@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 /**
  * HTTP adapter that calls the Community Service to retrieve relationship information.
  *
- * <p>Uses the generated OpenAPI client to call {@code GET /communities/members/{memberId}/relationship}
- * with the current user's bearer token forwarded as-is, so the Community Service can identify the
- * principal from the JWT.
+ * <p>Uses the generated OpenAPI client to call {@code GET
+ * /communities/members/{memberId}/relationship} with the current user's bearer token forwarded
+ * as-is, so the Community Service can identify the principal from the JWT.
  */
 @CustomLog
 @Component
@@ -43,7 +43,7 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
       return result;
     } catch (ApiException ex) {
       log.error("getRelationship: error communicating with community service", ex);
-      throw new RuntimeException("Failed to get relationship from community service", ex);
+      throw new CommunityServiceException("Failed to get relationship from community service", ex);
     }
   }
 

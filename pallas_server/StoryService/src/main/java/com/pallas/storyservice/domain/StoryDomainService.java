@@ -32,8 +32,7 @@ public class StoryDomainService {
   @Transactional
   public Story createStory(UUID authorId, String content, SharedWith sharedWith) {
     log.debug("createStory: creating story with shared with level {}", sharedWith);
-    Story story =
-        new Story(UUID.randomUUID(), authorId, content, sharedWith, OffsetDateTime.now());
+    Story story = new Story(UUID.randomUUID(), authorId, content, sharedWith, OffsetDateTime.now());
     Story persisted = storyPort.save(story);
     log.debug("createStory: story persisted with id {}", persisted.getId());
     return persisted;
@@ -43,6 +42,7 @@ public class StoryDomainService {
    * Get a story if the requesting member has permission to view it.
    *
    * <p>A story is accessible if:
+   *
    * <ul>
    *   <li>The requesting member is the author, OR
    *   <li>The story's shared level permits access based on the relationship type:
@@ -63,12 +63,14 @@ public class StoryDomainService {
   @Transactional(readOnly = true)
   public Story getStory(UUID storyId, UUID requesterId, String bearerToken) {
     log.debug("getStory: retrieving story {}", storyId);
-    Story story = storyPort.findById(storyId)
-        .orElseThrow(
-            () -> {
-              log.debug("getStory: story not found");
-              return new StoryAccessDeniedException("Story not found");
-            });
+    Story story =
+        storyPort
+            .findById(storyId)
+            .orElseThrow(
+                () -> {
+                  log.debug("getStory: story not found");
+                  return new StoryAccessDeniedException("Story not found");
+                });
 
     // Author can always view their own stories
     if (story.getAuthorId().equals(requesterId)) {
@@ -77,7 +79,8 @@ public class StoryDomainService {
     }
 
     // Check relationship and shared with level
-    RelationshipType relationship = communityServicePort.getRelationship(story.getAuthorId(), bearerToken);
+    RelationshipType relationship =
+        communityServicePort.getRelationship(story.getAuthorId(), bearerToken);
     boolean accessDenied = isAccessDeniedByRelationship(story.getSharedWith(), relationship);
 
     if (accessDenied) {
@@ -103,11 +106,13 @@ public class StoryDomainService {
    * @param relationship the relationship between the story author and the requester
    * @return true if access is denied
    */
-  private boolean isAccessDeniedByRelationship(SharedWith sharedWith, RelationshipType relationship) {
+  private boolean isAccessDeniedByRelationship(
+      SharedWith sharedWith, RelationshipType relationship) {
     return switch (sharedWith) {
       case PUBLIC -> false;
       case COMMUNITY -> false;
-      case CONNECTED -> relationship != RelationshipType.TRUSTED && relationship != RelationshipType.CONNECTED;
+      case CONNECTED ->
+          relationship != RelationshipType.TRUSTED && relationship != RelationshipType.CONNECTED;
       case TRUSTED -> relationship != RelationshipType.TRUSTED;
     };
   }
