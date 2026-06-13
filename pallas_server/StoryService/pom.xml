@@ -129,6 +129,7 @@
         <version>${openapi-generator.version}</version>
         <executions>
           <execution>
+            <id>story-service-api</id>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -145,6 +146,22 @@
                 <delegatePattern>false</delegatePattern>
                 <useBeanValidation>true</useBeanValidation>
                 <performBeanValidation>true</performBeanValidation>
+              </configOptions>
+            </configuration>
+          </execution>
+          <execution>
+            <id>community-service-client</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/../../api-specs/community-service/openapi.yaml</inputSpec>
+              <generatorName>java</generatorName>
+              <apiPackage>com.pallas.communityservice.client.communityservice</apiPackage>
+              <modelPackage>com.pallas.communityservice.client.communityservice.model</modelPackage>
+              <configOptions>
+                <useSpringBoot3>true</useSpringBoot3>
+                <useTags>true</useTags>
               </configOptions>
             </configuration>
           </execution>
