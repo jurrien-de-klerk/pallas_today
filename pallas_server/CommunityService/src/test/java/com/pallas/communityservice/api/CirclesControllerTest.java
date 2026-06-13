@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.pallas.communityservice.domain.CircleMembership;
 import com.pallas.communityservice.domain.CircleMembershipPort;
 import com.pallas.communityservice.domain.CircleType;
-import com.pallas.communityservice.domain.MemberServicePort;
+import com.pallas.integrations.member.MemberServicePort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;

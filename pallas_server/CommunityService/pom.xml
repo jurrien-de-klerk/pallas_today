@@ -76,6 +76,11 @@
       <version>0.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>com.pallas</groupId>
+      <artifactId>pallas-integrations</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
@@ -180,22 +185,6 @@
                 <delegatePattern>false</delegatePattern>
                 <useBeanValidation>true</useBeanValidation>
                 <performBeanValidation>true</performBeanValidation>
-              </configOptions>
-            </configuration>
-          </execution>
-          <execution>
-            <id>generate-member-client</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <inputSpec>${project.basedir}/../../api-specs/member-service/openapi.yaml</inputSpec>
-              <generatorName>java</generatorName>
-              <apiPackage>com.pallas.communityservice.client.memberservice</apiPackage>
-              <modelPackage>com.pallas.communityservice.client.memberservice.model</modelPackage>
-              <configOptions>
-                <library>okhttp-gson</library>
-                <dateLibrary>java8</dateLibrary>
               </configOptions>
             </configuration>
           </execution>

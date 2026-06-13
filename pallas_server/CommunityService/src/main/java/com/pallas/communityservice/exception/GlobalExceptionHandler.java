@@ -1,7 +1,7 @@
 package com.pallas.communityservice.exception;
 
-import com.pallas.communityservice.data.MemberServiceUnavailableException;
 import com.pallas.communityservice.model.Error;
+import com.pallas.integrations.member.MemberServiceUnavailableException;
 import lombok.CustomLog;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

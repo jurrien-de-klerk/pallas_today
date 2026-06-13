@@ -1,9 +1,8 @@
-package com.pallas.communityservice.data;
+package com.pallas.integrations.member;
 
-import com.pallas.communityservice.client.ApiClient;
-import com.pallas.communityservice.client.ApiException;
-import com.pallas.communityservice.client.memberservice.MembersApi;
-import com.pallas.communityservice.domain.MemberServicePort;
+import com.pallas.integrations.client.ApiClient;
+import com.pallas.integrations.client.ApiException;
+import com.pallas.integrations.client.memberservice.MembersApi;
 import java.util.UUID;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;

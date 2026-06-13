@@ -1,4 +1,4 @@
-package com.pallas.communityservice.domain;
+package com.pallas.integrations.member;
 
 import java.util.UUID;
 
