@@ -29,6 +29,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
  *
  * <p>The shared buffer capacity is configurable via {@link #configure(int)}.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class PallasLogger {
 
   /**
@@ -37,7 +38,7 @@ public final class PallasLogger {
    * <p>Package-private so tests can inspect and reset it directly. Production code outside this
    * class must not write to the buffer.
    */
-  @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
+  @SuppressWarnings("PMD.MutableStaticState")
   static BacktraceBuffer BUFFER = new BacktraceBuffer(BacktraceBuffer.DEFAULT_CAPACITY);
 
   private final Logger delegate;
@@ -199,7 +200,7 @@ public final class PallasLogger {
    * Formats {@code message} with {@code args} using Log4j2's {@link ParameterizedMessage} — which
    * also extracts a trailing {@link Throwable} argument — before storing the record.
    */
-  private void captureParameterized(Level level, String message, Object[] args) {
+  private void captureParameterized(Level level, String message, Object... args) {
     ParameterizedMessage pm = new ParameterizedMessage(message, args);
     BUFFER.add(
         new BacktraceRecord(

@@ -7,6 +7,8 @@ package com.pallas.memberservice.domain;
  */
 public class IdentityProviderException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   public IdentityProviderException(String message, Throwable cause) {
     super(message, cause);
   }

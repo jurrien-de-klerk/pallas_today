@@ -12,18 +12,18 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member_identity_mapping")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 public class MemberIdentityMapping {
 
   @Id
   @Column(name = "member_id", nullable = false, updatable = false)
-  private UUID memberId;
+  private final UUID memberId;
 
   @Column(name = "keycloak_sub", nullable = false, updatable = false, unique = true)
-  private String keycloakSub;
+  private final String keycloakSub;
 
   @Column(name = "created_at", nullable = false, updatable = false)
-  private OffsetDateTime createdAt;
+  private final OffsetDateTime createdAt;
 
   public MemberIdentityMapping(UUID memberId, String keycloakSub, OffsetDateTime createdAt) {
     this.memberId = memberId;

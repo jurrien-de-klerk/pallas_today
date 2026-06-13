@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class KeycloakAdminConfig {
 
   @Bean
-  public Keycloak keycloakAdminClient(
+  public Keycloak keycloakAdminClient( // NOPMD
       @Value("${keycloak.auth-server-url}") String authServerUrl,
       @Value("${keycloak.realm}") String realm,
       @Value("${keycloak.admin-client-id}") String clientId,
