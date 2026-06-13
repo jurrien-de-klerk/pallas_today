@@ -12,4 +12,8 @@
   <Match>
     <Class name="~com\.pallas\.[^.]+\.api\.ApiUtil"/>
   </Match>
+  <!-- Exclude auto-generated client code from cross-service communication -->
+  <Match>
+    <Package name="~com\.pallas\.[^.]+\.client\..*"/>
+  </Match>
 </FindBugsFilter>

@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Pallas PMD ruleset" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0                         https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
-  <description>Pallas quickstart ruleset with project-specific exclusions.</description>
-  <rule ref="rulesets/java/quickstart.xml">
-    <!--
-      GuardLogStatement fires on every parameterised log call (e.g. log.warn("…", arg))
-      even though Log4j2 / SLF4J already evaluates arguments lazily via {} placeholders.
-      Guards would also keep log records out of the log-backtrace buffer (see ADR 16).
-    -->
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Pallas PMD ruleset" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+  <description>Pallas PMD rules with project-specific exclusions and generated code filtering.</description>
+  <!-- Use default rule sets but exclude generated code and known exceptions -->
+  <rule ref="category/java/bestpractices.xml">
+    <!-- Exclude GuardLogStatement: guards keep log records out of the log-backtrace buffer (see ADR 16) -->
     <exclude name="GuardLogStatement"/>
   </rule>
+  <rule ref="category/java/design.xml">
+    <!-- Exclude SignatureDeclareThrowsException: Spring Security filter chains require Exception declaration -->
+    <exclude name="SignatureDeclareThrowsException"/>
+    <!-- Exclude LawOfDemeter: too strict for domain layer object traversal -->
+    <exclude name="LawOfDemeter"/>
+  </rule>
+  <rule ref="category/java/errorprone.xml"/>
+  <rule ref="category/java/performance.xml"/>
+  <rule ref="category/java/security.xml"/>
+  <!-- Exclude generated code from all services -->
+  <exclude-pattern>.*/target/generated-sources/.*</exclude-pattern>
 </ruleset>

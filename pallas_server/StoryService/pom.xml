@@ -178,23 +178,6 @@
           <excludes>**/target/generated-sources/**/*</excludes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <configuration>
-          <rulesets>
-            <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
-          </rulesets>
-          <sourceEncoding>UTF-8</sourceEncoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <configuration>
-          <excludeFilterFile>${project.basedir}/spotbugs-excludes.xml</excludeFilterFile>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>
