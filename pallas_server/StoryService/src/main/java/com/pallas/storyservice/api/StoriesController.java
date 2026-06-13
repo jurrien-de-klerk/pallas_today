@@ -2,13 +2,16 @@ package com.pallas.storyservice.api;
 
 import com.pallas.storyservice.application.StoryApplicationService;
 import com.pallas.storyservice.domain.SharedWith;
+import com.pallas.storyservice.domain.StoryAccessDeniedException;
 import com.pallas.storyservice.model.Story;
 import com.pallas.storyservice.model.StoryInput;
+import java.net.URI;
 import java.util.UUID;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,7 +31,9 @@ public class StoriesController implements StoriesApi {
     com.pallas.storyservice.domain.Story story =
         applicationService.createStory(
             storyInput.getContent(), SharedWith.valueOf(storyInput.getSharedWith().toString()));
-    return ResponseEntity.status(HttpStatus.CREATED).body(toModel(story));
+    Story model = toModel(story);
+    URI location = URI.create(String.format("/stories/story/%s", story.getId()));
+    return ResponseEntity.created(location).body(model);
   }
 
   @Override
@@ -49,6 +54,22 @@ public class StoriesController implements StoriesApi {
     log.info("PUT /stories/story/{}", storyId);
     throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, NOT_IMPLEMENTED);
   }
+
+  /**
+   * Exception handler for access denied or not found errors.
+   *
+   * <p>Both scenarios (story not found and access denied) throw {@link StoryAccessDeniedException}
+   * and should return 404 to prevent information leakage.
+   */
+  @ExceptionHandler(StoryAccessDeniedException.class)
+  public ResponseEntity<Void> handleAccessDenied(StoryAccessDeniedException ex) {
+    log.debug("Story access denied or not found: {}", ex.getMessage());
+    return ResponseEntity.notFound().build();
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
 
   private Story toModel(com.pallas.storyservice.domain.Story domain) {
     Story model = new Story();

@@ -223,7 +223,12 @@ Perform this review after a pull request is created or when explicitly asked.
 
 ## Workflow: Running Maven (`mvn`) commands
 
-Maven builds are expensive in time. Follow these rules every time before executing a `mvn` command.
+**CRITICAL RULE: Never run `mvn` commands automatically. Only execute Maven commands when explicitly requested by the
+user (e.g., "run tests", "compile", "build", etc.). Do not execute `mvn` as part of code changes or edits unless the
+user explicitly asks.**
+
+Maven builds are expensive in time. Follow these rules every time before executing a `mvn` command when explicitly
+requested:
 
 ### Step 1 — Assess purpose and required phase
 
