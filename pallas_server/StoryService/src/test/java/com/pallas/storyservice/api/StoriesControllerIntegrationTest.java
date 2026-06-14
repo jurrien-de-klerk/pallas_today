@@ -54,7 +54,6 @@ class StoriesControllerIntegrationTest {
   @MockitoBean private CommunityServicePort communityServicePort;
 
   private static final UUID AUTHOR_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001");
-  private static final UUID REQUESTER_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002");
   private static final UUID STORY_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440003");
 
   @BeforeEach

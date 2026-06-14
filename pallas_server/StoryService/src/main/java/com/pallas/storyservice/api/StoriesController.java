@@ -6,11 +6,13 @@ import com.pallas.storyservice.domain.StoryAccessDeniedException;
 import com.pallas.storyservice.model.Story;
 import com.pallas.storyservice.model.StoryInput;
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +29,7 @@ public class StoriesController implements StoriesApi {
 
   @Override
   public ResponseEntity<Story> createStory(StoryInput storyInput) {
-    log.info("POST /stories");
+    log.info("POST /stories — content length: {}", storyInput.getContent().length());
     com.pallas.storyservice.domain.Story story =
         applicationService.createStory(
             storyInput.getContent(), SharedWith.valueOf(storyInput.getSharedWith().toString()));
@@ -65,6 +67,29 @@ public class StoriesController implements StoriesApi {
   public ResponseEntity<Void> handleAccessDenied(StoryAccessDeniedException ex) {
     log.debug("Story access denied or not found: {}", ex.getMessage());
     return ResponseEntity.notFound().build();
+  }
+
+  /**
+   * Exception handler for JSON deserialization errors.
+   *
+   * <p>Logs detailed information about the cause of deserialization failures to help diagnose
+   * malformed requests or invalid enum values.
+   */
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<Map<String, String>> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex) {
+    log.error("Request body deserialization failed", ex);
+    Throwable cause = ex.getCause();
+    if (cause != null) {
+      log.debug("Deserialization cause: {}", cause.getMessage());
+    }
+    return ResponseEntity.badRequest()
+        .body(
+            Map.of(
+                "error",
+                "Invalid request body",
+                "message",
+                ex.getMessage() != null ? ex.getMessage() : "Malformed JSON"));
   }
 
   // -------------------------------------------------------------------------

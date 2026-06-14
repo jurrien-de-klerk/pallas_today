@@ -22,19 +22,23 @@ public class JpaStoryAdapter implements StoryPort {
 
   @Override
   public Story save(Story story) {
-    log.debug("save: persisting new story");
+    log.debug("save: persisting story with id {}", story.getId());
     StoryEntity entity = toEntity(story);
     entity.setPublishedAt(OffsetDateTime.now());
     Story saved = toDomain(repository.save(entity));
-    log.debug("save: story persisted with id {}", saved.getId());
+    log.debug("save: story persisted");
     return saved;
   }
 
   @Override
   public Optional<Story> findById(UUID id) {
-    log.debug("findById: querying story");
+    log.debug("findById: retrieving story {}", id);
     Optional<Story> result = repository.findById(id).map(this::toDomain);
-    log.debug("findById: story {}", result.isPresent() ? "found" : "not found");
+    if (result.isPresent()) {
+      log.debug("findById: story found");
+    } else {
+      log.debug("findById: story not found");
+    }
     return result;
   }
 

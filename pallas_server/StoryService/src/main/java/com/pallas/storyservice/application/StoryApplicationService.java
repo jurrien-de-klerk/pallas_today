@@ -38,8 +38,9 @@ public class StoryApplicationService {
    * @return the persisted story
    */
   public Story createStory(String content, SharedWith sharedWith) {
-    log.info("createStory: content length={} sharedWith={}", content.length(), sharedWith);
+    log.debug("createStory: resolving current user UUID");
     UUID authorId = getCurrentUserUuid();
+    log.debug("createStory: delegating to domain service for author {}", authorId);
     return storyDomainService.createStory(authorId, content, sharedWith);
   }
 
@@ -51,9 +52,13 @@ public class StoryApplicationService {
    * @throws com.pallas.storyservice.domain.StoryAccessDeniedException if not accessible
    */
   public Story getStory(UUID storyId) {
-    log.info("getStory: storyId={}", storyId);
+    log.debug("getStory: resolving current user and retrieving bearer token");
     UUID requesterId = getCurrentUserUuid();
     String bearerToken = bearerToken(currentJwt());
+    log.debug(
+        "getStory: delegating to domain service for requester {} and story {}",
+        requesterId,
+        storyId);
     return storyDomainService.getStory(storyId, requesterId, bearerToken);
   }
 
@@ -67,7 +72,10 @@ public class StoryApplicationService {
    * @return the Member Service UUID of the current user
    */
   private UUID getCurrentUserUuid() {
-    return memberServicePort.resolveCurrentMemberId(bearerToken(currentJwt()));
+    log.debug("getCurrentUserUuid: resolving member ID via member service");
+    UUID memberId = memberServicePort.resolveCurrentMemberId(bearerToken(currentJwt()));
+    log.debug("getCurrentUserUuid: resolved to {}", memberId);
+    return memberId;
   }
 
   private Jwt currentJwt() {

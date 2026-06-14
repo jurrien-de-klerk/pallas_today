@@ -34,15 +34,15 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
 
   @Override
   public RelationshipType getRelationship(UUID memberId, String bearerToken) {
-    log.debug("getRelationship: querying relationship with member {}", memberId);
+    log.debug("getRelationship: calling community service for member {}", memberId);
     try {
       apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
       var response = relationshipsApi.getRelationship(memberId);
       RelationshipType result = toDomainRelationshipType(response.getRelationshipType());
-      log.debug("getRelationship: relationship type is {}", result);
+      log.debug("getRelationship: community service returned {}", result);
       return result;
     } catch (ApiException ex) {
-      log.error("getRelationship: error communicating with community service", ex);
+      log.error("getRelationship: community service call failed: {}", ex.getMessage());
       throw new CommunityServiceException("Failed to get relationship from community service", ex);
     }
   }
