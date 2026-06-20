@@ -4,6 +4,7 @@ import com.pallas.storyservice.model.Error;
 import lombok.CustomLog;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,22 @@ public final class GlobalExceptionHandler {
     error.setMessage(message);
     error.setCode(HttpStatus.BAD_REQUEST.toString());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+  public ResponseEntity<Error> handleOptimisticLockingFailure(
+      ObjectOptimisticLockingFailureException ex) {
+    log.error("Entity persistence failed: optimistic locking constraint");
+    String exceptionMessage =
+        ex.getCause() != null
+            ? ex.getCause().getClass().getSimpleName()
+            : ex.getClass().getSimpleName();
+    log.error("Underlying cause: {}", exceptionMessage);
+    log.backtrace();
+    Error error = new Error();
+    error.setMessage("Resource conflict: unable to save due to concurrent modification");
+    error.setCode(HttpStatus.CONFLICT.toString());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
   }
 
   @ExceptionHandler(Exception.class)

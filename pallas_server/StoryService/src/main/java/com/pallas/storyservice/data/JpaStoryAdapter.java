@@ -3,7 +3,6 @@ package com.pallas.storyservice.data;
 import com.pallas.storyservice.domain.SharedWith;
 import com.pallas.storyservice.domain.Story;
 import com.pallas.storyservice.domain.StoryPort;
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.CustomLog;
@@ -24,7 +23,6 @@ public class JpaStoryAdapter implements StoryPort {
   public Story save(Story story) {
     log.debug("save: persisting story with id {}", story.getId());
     StoryEntity entity = toEntity(story);
-    entity.setPublishedAt(OffsetDateTime.now());
     Story saved = toDomain(repository.save(entity));
     log.debug("save: story persisted");
     return saved;
