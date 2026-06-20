@@ -71,14 +71,13 @@ class StoriesControllerIntegrationTest {
   void testCreateStorySuccessReturns201() throws Exception {
     // Arrange
     StoryInput input = new StoryInput();
-    input.setContent("Test story content");
+    input.setContent(java.util.List.of(java.util.Map.of("insert", "Test story content")));
     input.setSharedWith(com.pallas.storyservice.model.SharedWith.TRUSTED);
 
+    String contentJson = "[{\"insert\":\"Test story content\"}]";
     Story domainStory =
-        new Story(
-            STORY_ID, AUTHOR_ID, "Test story content", SharedWith.TRUSTED, OffsetDateTime.now());
-    when(applicationService.createStory("Test story content", SharedWith.TRUSTED))
-        .thenReturn(domainStory);
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.TRUSTED, OffsetDateTime.now());
+    when(applicationService.createStory(contentJson, SharedWith.TRUSTED)).thenReturn(domainStory);
 
     // Act & Assert
     MvcResult result =
@@ -91,7 +90,7 @@ class StoriesControllerIntegrationTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(STORY_ID.toString()))
             .andExpect(jsonPath("$.authorId").value(AUTHOR_ID.toString()))
-            .andExpect(jsonPath("$.content").value("Test story content"))
+            .andExpect(jsonPath("$.content").isArray())
             .andExpect(jsonPath("$.sharedWith").value("TRUSTED"))
             .andExpect(jsonPath("$.publishedAt").isNotEmpty())
             .andExpect(header().exists("Location"))
@@ -108,19 +107,15 @@ class StoriesControllerIntegrationTest {
   void testCreateStoryPersistsAuthorCorrectly() throws Exception {
     // Arrange
     StoryInput input = new StoryInput();
-    input.setContent("Story by authenticated user");
+    input.setContent(java.util.List.of(java.util.Map.of("insert", "Story by authenticated user")));
     input.setSharedWith(com.pallas.storyservice.model.SharedWith.COMMUNITY);
 
     UUID expectedAuthorId = AUTHOR_ID;
+    String contentJson = "[{\"insert\":\"Story by authenticated user\"}]";
     Story domainStory =
         new Story(
-            STORY_ID,
-            expectedAuthorId,
-            "Story by authenticated user",
-            SharedWith.COMMUNITY,
-            OffsetDateTime.now());
-    when(applicationService.createStory("Story by authenticated user", SharedWith.COMMUNITY))
-        .thenReturn(domainStory);
+            STORY_ID, expectedAuthorId, contentJson, SharedWith.COMMUNITY, OffsetDateTime.now());
+    when(applicationService.createStory(contentJson, SharedWith.COMMUNITY)).thenReturn(domainStory);
 
     // Act & Assert
     mockMvc
@@ -138,12 +133,13 @@ class StoriesControllerIntegrationTest {
   void testCreateStoryRespectsSharedWithLevel() throws Exception {
     // Arrange
     StoryInput input = new StoryInput();
-    input.setContent("Public story");
+    input.setContent(java.util.List.of(java.util.Map.of("insert", "Public story")));
     input.setSharedWith(com.pallas.storyservice.model.SharedWith.PUBLIC);
 
+    String contentJson = "[{\"insert\":\"Public story\"}]";
     Story domainStory =
-        new Story(STORY_ID, AUTHOR_ID, "Public story", SharedWith.PUBLIC, OffsetDateTime.now());
-    when(applicationService.createStory("Public story", SharedWith.PUBLIC)).thenReturn(domainStory);
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.PUBLIC, OffsetDateTime.now());
+    when(applicationService.createStory(contentJson, SharedWith.PUBLIC)).thenReturn(domainStory);
 
     // Act & Assert
     mockMvc
@@ -160,7 +156,7 @@ class StoriesControllerIntegrationTest {
   void testCreateStoryUnauthorizedWhenNotAuthenticated() throws Exception {
     // Arrange
     StoryInput input = new StoryInput();
-    input.setContent("Test story");
+    input.setContent(java.util.List.of(java.util.Map.of("insert", "Test story")));
     input.setSharedWith(com.pallas.storyservice.model.SharedWith.TRUSTED);
 
     // Act & Assert
@@ -181,8 +177,9 @@ class StoriesControllerIntegrationTest {
   @DisplayName("GET /stories/story/{storyId} should return 200 when author retrieves their story")
   void testGetStoryByAuthorReturns200() throws Exception {
     // Arrange
+    String contentJson = "[{\"insert\":\"My story\"}]";
     Story story =
-        new Story(STORY_ID, AUTHOR_ID, "My story", SharedWith.TRUSTED, OffsetDateTime.now());
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.TRUSTED, OffsetDateTime.now());
     when(applicationService.getStory(STORY_ID)).thenReturn(story);
 
     // Act & Assert
@@ -192,7 +189,7 @@ class StoriesControllerIntegrationTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(STORY_ID.toString()))
         .andExpect(jsonPath("$.authorId").value(AUTHOR_ID.toString()))
-        .andExpect(jsonPath("$.content").value("My story"))
+        .andExpect(jsonPath("$.content").isArray())
         .andExpect(jsonPath("$.sharedWith").value("TRUSTED"))
         .andExpect(jsonPath("$.publishedAt").isNotEmpty());
   }
@@ -202,8 +199,9 @@ class StoriesControllerIntegrationTest {
   @DisplayName("GET /stories/story/{storyId} should return 200 when story is PUBLIC")
   void testGetPublicStoryReturns200() throws Exception {
     // Arrange
+    String contentJson = "[{\"insert\":\"Public story\"}]";
     Story story =
-        new Story(STORY_ID, AUTHOR_ID, "Public story", SharedWith.PUBLIC, OffsetDateTime.now());
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.PUBLIC, OffsetDateTime.now());
     when(applicationService.getStory(STORY_ID)).thenReturn(story);
 
     // Act & Assert
@@ -218,9 +216,9 @@ class StoriesControllerIntegrationTest {
   @DisplayName("GET /stories/story/{storyId} should return 200 when story is COMMUNITY shared")
   void testGetCommunitySharedStoryReturns200() throws Exception {
     // Arrange
+    String contentJson = "[{\"insert\":\"Community story\"}]";
     Story story =
-        new Story(
-            STORY_ID, AUTHOR_ID, "Community story", SharedWith.COMMUNITY, OffsetDateTime.now());
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.COMMUNITY, OffsetDateTime.now());
     when(applicationService.getStory(STORY_ID)).thenReturn(story);
 
     // Act & Assert
@@ -261,9 +259,9 @@ class StoriesControllerIntegrationTest {
       "GET /stories/story/{storyId} should return 200 when CONNECTED story accessed by CONNECTED member")
   void testGetConnectedStoryAllowedToConnectedMemberReturns200() throws Exception {
     // Arrange
+    String contentJson = "[{\"insert\":\"Connected story\"}]";
     Story story =
-        new Story(
-            STORY_ID, AUTHOR_ID, "Connected story", SharedWith.CONNECTED, OffsetDateTime.now());
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.CONNECTED, OffsetDateTime.now());
     when(applicationService.getStory(STORY_ID)).thenReturn(story);
 
     // Act & Assert
@@ -279,8 +277,9 @@ class StoriesControllerIntegrationTest {
       "GET /stories/story/{storyId} should return 200 when TRUSTED story accessed by TRUSTED member")
   void testGetTrustedStoryAllowedToTrustedMemberReturns200() throws Exception {
     // Arrange
+    String contentJson = "[{\"insert\":\"Trusted story\"}]";
     Story story =
-        new Story(STORY_ID, AUTHOR_ID, "Trusted story", SharedWith.TRUSTED, OffsetDateTime.now());
+        new Story(STORY_ID, AUTHOR_ID, contentJson, SharedWith.TRUSTED, OffsetDateTime.now());
     when(applicationService.getStory(STORY_ID)).thenReturn(story);
 
     // Act & Assert

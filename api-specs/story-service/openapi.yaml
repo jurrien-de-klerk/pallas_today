@@ -294,6 +294,40 @@ components:
         - COMMUNITY
         - PUBLIC
       example: TRUSTED
+    QuillDeltaOperation:
+      type: object
+      description: >-
+        A single Quill Delta operation. Each operation represents an insert,
+        format, or delete action. Most commonly, insert operations with
+        optional attributes.
+      required:
+        - insert
+      properties:
+        insert:
+          description: The content to insert (text or embedded object reference)
+          oneOf:
+            - type: string
+            - type: object
+        attributes:
+          type: object
+          description: >-
+            Optional formatting attributes applied to the inserted content
+            (e.g., bold, italic, link, image URL).
+          additionalProperties: true
+      example:
+        insert: "Today was a great day.\n"
+    QuillDelta:
+      type: array
+      description: >-
+        A Quill Delta document: an array of insert operations representing
+        the story content. Image references within operations must be URLs
+        pointing to file storage; inline base64 image data is not permitted.
+      minItems: 1
+      maxItems: 10000
+      items:
+        $ref: '#/components/schemas/QuillDeltaOperation'
+      example:
+        - insert: "Today was a great day.\n"
     Story:
       type: object
       required:
@@ -314,14 +348,12 @@ components:
           description: The memberId of the member who published the story
           example: 987fcdeb-51a2-43d7-b012-345678901234
         content:
-          type: string
-          description: >-
-            The story body as a JSON-serialised Quill Delta array of insert
-            operations. Image references within the Delta are URLs pointing to
-            file storage; raw image data is never embedded.
-          minLength: 1
-          maxLength: 100000
-          example: '[{"insert":"Today was a great day.\n"}]'
+          allOf:
+            - $ref: '#/components/schemas/QuillDelta'
+            - description: >-
+                The story body as a Quill Delta array of insert operations.
+                Image references within the Delta are URLs pointing to file
+                storage; raw image data is never embedded.
         sharedWith:
           $ref: '#/components/schemas/SharedWith'
         publishedAt:
@@ -337,14 +369,12 @@ components:
         - content
       properties:
         content:
-          type: string
-          description: >-
-            The story body as a JSON-serialised Quill Delta array of insert
-            operations. Image references within the Delta must be URLs pointing
-            to file storage; inline base64 image data is not permitted.
-          minLength: 1
-          maxLength: 100000
-          example: '[{"insert":"Today was a great day.\n"}]'
+          allOf:
+            - $ref: '#/components/schemas/QuillDelta'
+            - description: |
+                The story body as a Quill Delta array of insert operations.
+                Image references must be URLs pointing to file storage;
+                inline base64 image data is not permitted.
         sharedWith:
           allOf:
             - $ref: '#/components/schemas/SharedWith'

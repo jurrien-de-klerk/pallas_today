@@ -1,11 +1,15 @@
 package com.pallas.storyservice.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pallas.storyservice.application.StoryApplicationService;
 import com.pallas.storyservice.domain.SharedWith;
 import com.pallas.storyservice.domain.StoryAccessDeniedException;
 import com.pallas.storyservice.model.Story;
 import com.pallas.storyservice.model.StoryInput;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.CustomLog;
@@ -27,12 +31,20 @@ public class StoriesController implements StoriesApi {
 
   private final StoryApplicationService applicationService;
 
+  @SuppressFBWarnings(
+      value = "EI_EXPOSE_REP2",
+      justification = "ObjectMapper is thread-safe and intended to be shared as a Spring bean")
+  private final ObjectMapper objectMapper;
+
   @Override
   public ResponseEntity<Story> createStory(StoryInput storyInput) {
-    log.info("POST /stories — content length: {}", storyInput.getContent().length());
+    @SuppressWarnings("unchecked")
+    List<Object> deltaOperations = (List<Object>) storyInput.getContent();
+    log.info("POST /stories — received {} Quill Delta operations", deltaOperations.size());
+    String contentJson = serializeContent(deltaOperations);
     com.pallas.storyservice.domain.Story story =
         applicationService.createStory(
-            storyInput.getContent(), SharedWith.valueOf(storyInput.getSharedWith().toString()));
+            contentJson, SharedWith.valueOf(storyInput.getSharedWith().toString()));
     Story model = toModel(story);
     URI location = URI.create(String.format("/stories/story/%s", story.getId()));
     return ResponseEntity.created(location).body(model);
@@ -100,10 +112,32 @@ public class StoriesController implements StoriesApi {
     Story model = new Story();
     model.setId(domain.getId());
     model.setAuthorId(domain.getAuthorId());
-    model.setContent(domain.getContent());
+    List<Object> deltaOperations = deserializeContent(domain.getContent());
+    model.setContent(deltaOperations);
     model.setSharedWith(
         com.pallas.storyservice.model.SharedWith.valueOf(domain.getSharedWith().toString()));
     model.setPublishedAt(domain.getPublishedAt());
     return model;
+  }
+
+  private String serializeContent(List<Object> deltaOperations) {
+    try {
+      return objectMapper.writeValueAsString(deltaOperations);
+    } catch (JsonProcessingException ex) {
+      log.error("Failed to serialize Quill Delta operations", ex);
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Failed to serialize story content", ex);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<Object> deserializeContent(String contentJson) {
+    try {
+      return objectMapper.readValue(contentJson, List.class);
+    } catch (JsonProcessingException ex) {
+      log.error("Failed to deserialize story content", ex);
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deserialize story content", ex);
+    }
   }
 }
