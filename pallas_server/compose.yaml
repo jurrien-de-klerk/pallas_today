@@ -52,6 +52,7 @@ services:
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/pallas/protocol/openid-connect/certs
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
       KEYCLOAK_REALM: pallas
+      MEMBER_SERVICE_BASE_URL: http://member-service:8081
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://story-db:5432/storyservice
       SPRING_DATASOURCE_USERNAME: storyservice
