@@ -24,12 +24,14 @@ public interface StoryPort {
   Optional<Story> findById(UUID id);
 
   /**
-   * Find all stories written by members in the given list, with offset/count pagination.
+   * Find all stories written by trusted and connected members, with offset/count pagination.
    *
-   * @param authorIds the list of member UUIDs
+   * @param trustedAuthorIds the list of member UUIDs in the trusted circle
+   * @param connectedAuthorIds the list of member UUIDs in the connected circle
    * @param offset the number of stories to skip
    * @param count the maximum number of stories to return
-   * @return a list of stories for the requested page
+   * @return a list of stories for the requested page, ordered by most recent first
    */
-  List<Story> findStoriesByAuthorIds(List<UUID> authorIds, int offset, int count);
+  List<Story> findStoriesByAuthorIds(
+      List<UUID> trustedAuthorIds, List<UUID> connectedAuthorIds, int offset, int count);
 }

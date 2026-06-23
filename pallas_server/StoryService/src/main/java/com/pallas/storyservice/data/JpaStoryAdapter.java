@@ -42,14 +42,16 @@ public class JpaStoryAdapter implements StoryPort {
   }
 
   @Override
-  public List<Story> findStoriesByAuthorIds(List<UUID> authorIds, int offset, int count) {
+  public List<Story> findStoriesByAuthorIds(
+      List<UUID> trustedAuthorIds, List<UUID> connectedAuthorIds, int offset, int count) {
     log.debug(
-        "findStoriesByAuthorIds: retrieving stories for {} authors with offset={}, count={}",
-        authorIds.size(),
+        "findStoriesByAuthorIds: retrieving stories for {} trusted and {} connected authors with offset={}, count={}",
+        trustedAuthorIds.size(),
+        connectedAuthorIds.size(),
         offset,
         count);
     List<Story> result =
-        repository.findByAuthorIdInOrderByPublishedAtDesc(authorIds, offset, count).stream()
+        repository.findByAuthorId(trustedAuthorIds, connectedAuthorIds, offset, count).stream()
             .map(this::toDomain)
             .toList();
     log.debug("findStoriesByAuthorIds: found {} stories", result.size());
