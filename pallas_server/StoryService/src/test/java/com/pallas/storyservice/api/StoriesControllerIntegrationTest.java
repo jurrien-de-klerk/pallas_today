@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pallas.integrations.member.MemberServicePort;
 import com.pallas.storyservice.application.StoryApplicationService;
+import com.pallas.storyservice.config.SecurityConfig;
 import com.pallas.storyservice.domain.CommunityServicePort;
 import com.pallas.storyservice.domain.SharedWith;
 import com.pallas.storyservice.domain.Story;
@@ -25,7 +26,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +41,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * implemented endpoints: POST /stories and GET /stories/story/{storyId}.
  */
 @WebMvcTest(StoriesController.class)
+@Import(SecurityConfig.class)
 @DisplayName("Story API Integration Tests")
 class StoriesControllerIntegrationTest {
 
@@ -52,6 +56,8 @@ class StoriesControllerIntegrationTest {
   @MockitoBean private MemberServicePort memberServicePort;
 
   @MockitoBean private CommunityServicePort communityServicePort;
+
+  @MockitoBean private JwtDecoder jwtDecoder;
 
   private static final UUID AUTHOR_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001");
   private static final UUID STORY_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440003");

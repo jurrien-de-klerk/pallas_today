@@ -6,7 +6,7 @@ package com.pallas.storyservice.data;
  * <p>Persisted as text via {@code @Enumerated(EnumType.STRING)}; the constant names match the
  * uppercase values enforced by the {@code chk_stories_shared_with} database constraint.
  */
-enum SharedWithEntity {
+public enum SharedWithEntity {
   TRUSTED,
   CONNECTED,
   COMMUNITY,
