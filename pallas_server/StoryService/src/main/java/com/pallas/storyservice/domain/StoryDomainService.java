@@ -1,6 +1,7 @@
 package com.pallas.storyservice.domain;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -95,9 +96,32 @@ public class StoryDomainService {
     return story;
   }
 
-  // -------------------------------------------------------------------------
-  // Private helpers
-  // -------------------------------------------------------------------------
+  /**
+   * Get stories from the authenticated member's trusted and connected circles, with pagination.
+   *
+   * <p>Retrieves the member's circles using the Community Service, then queries stories published
+   * by members in those circles. Stories are returned in descending order by publication time (most
+   * recent first) with offset/count pagination for infinite scrolling.
+   *
+   * @param bearerToken the bearer token from the authenticated request
+   * @param offset the number of stories to skip
+   * @param count the maximum number of stories to return
+   * @return a list of stories from the member's circles
+   */
+  @Transactional(readOnly = true)
+  public List<Story> getStoriesNearMe(String bearerToken, int offset, int count) {
+    log.debug("getStoriesNearMe: retrieving stories with offset={}, count={}", offset, count);
+    MyCircles circles = communityServicePort.getMyCircles(bearerToken);
+    log.debug(
+        "getStoriesNearMe: retrieved circles with {} trusted and {} connected members",
+        circles.trustedMembers().size(),
+        circles.connectedMembers().size());
+    List<Story> stories =
+        storyPort.findStoriesByAuthorIds(
+            circles.trustedMembers(), circles.connectedMembers(), offset, count);
+    log.debug("getStoriesNearMe: found {} stories", stories.size());
+    return stories;
+  }
 
   /**
    * Determine if a story with a given shared level is denied access based on the relationship type.
