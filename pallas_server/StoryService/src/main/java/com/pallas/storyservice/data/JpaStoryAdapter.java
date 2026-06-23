@@ -3,6 +3,7 @@ package com.pallas.storyservice.data;
 import com.pallas.storyservice.domain.SharedWith;
 import com.pallas.storyservice.domain.Story;
 import com.pallas.storyservice.domain.StoryPort;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.CustomLog;
@@ -37,6 +38,21 @@ public class JpaStoryAdapter implements StoryPort {
     } else {
       log.debug("findById: story not found");
     }
+    return result;
+  }
+
+  @Override
+  public List<Story> findStoriesByAuthorIds(List<UUID> authorIds, int offset, int count) {
+    log.debug(
+        "findStoriesByAuthorIds: retrieving stories for {} authors with offset={}, count={}",
+        authorIds.size(),
+        offset,
+        count);
+    List<Story> result =
+        repository.findByAuthorIdInOrderByPublishedAtDesc(authorIds, offset, count).stream()
+            .map(this::toDomain)
+            .toList();
+    log.debug("findStoriesByAuthorIds: found {} stories", result.size());
     return result;
   }
 
