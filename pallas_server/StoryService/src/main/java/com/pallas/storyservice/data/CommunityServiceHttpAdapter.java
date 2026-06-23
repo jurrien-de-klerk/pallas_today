@@ -2,9 +2,14 @@ package com.pallas.storyservice.data;
 
 import com.pallas.communityservice.client.ApiClient;
 import com.pallas.communityservice.client.ApiException;
+import com.pallas.communityservice.client.communityservice.CirclesApi;
 import com.pallas.communityservice.client.communityservice.RelationshipsApi;
+import com.pallas.communityservice.client.communityservice.model.MemberReference;
 import com.pallas.storyservice.domain.CommunityServicePort;
+import com.pallas.storyservice.domain.MyCircles;
 import com.pallas.storyservice.domain.RelationshipType;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +29,14 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
 
   private final ApiClient apiClient;
   private final RelationshipsApi relationshipsApi;
+  private final CirclesApi circlesApi;
 
   public CommunityServiceHttpAdapter(
       @Value("${community-service.base-url:http://localhost:8082}") String baseUrl) {
     this.apiClient = new ApiClient();
     this.apiClient.setBasePath(baseUrl);
     this.relationshipsApi = new RelationshipsApi(apiClient);
+    this.circlesApi = new CirclesApi(apiClient);
   }
 
   @Override
@@ -47,9 +54,40 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
     }
   }
 
+  @Override
+  public MyCircles getMyCircles(String bearerToken) {
+    log.debug("getMyCircles: calling community service");
+    try {
+      apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
+      var response = circlesApi.getMyCircles();
+      MyCircles result = toDomainMyCircles(response);
+      log.debug(
+          "getMyCircles: community service returned circles with {} trusted and {} connected members",
+          result.trustedMembers().size(),
+          result.connectedMembers().size());
+      return result;
+    } catch (ApiException ex) {
+      log.error("getMyCircles: community service call failed: {}", ex.getMessage());
+      throw new CommunityServiceException("Failed to get circles from community service", ex);
+    }
+  }
+
   // -------------------------------------------------------------------------
   // Mapping helpers
   // -------------------------------------------------------------------------
+
+  private MyCircles toDomainMyCircles(
+      com.pallas.communityservice.client.communityservice.model.Circles apiCircles) {
+    return new MyCircles(
+        Optional.ofNullable(apiCircles.getConnectedCircle()).stream()
+            .flatMap(List::stream)
+            .map(MemberReference::getMemberId)
+            .toList(),
+        Optional.ofNullable(apiCircles.getTrustedCircle()).stream()
+            .flatMap(List::stream)
+            .map(MemberReference::getMemberId)
+            .toList());
+  }
 
   private RelationshipType toDomainRelationshipType(
       com.pallas.communityservice.client.communityservice.model.RelationshipType apiType) {

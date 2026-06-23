@@ -13,4 +13,12 @@ public interface CommunityServicePort {
    * @return the relationship type
    */
   RelationshipType getRelationship(UUID memberId, String bearerToken);
+
+  /**
+   * Retrieve the authenticated member's circles.
+   *
+   * @param bearerToken the bearer token from the authenticated request
+   * @return the member's trusted and connected circles
+   */
+  MyCircles getMyCircles(String bearerToken);
 }
