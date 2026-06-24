@@ -77,13 +77,12 @@ class StoryDomainServiceTest {
     // Arrange
     UUID storyId = UUID.randomUUID();
     UUID authorId = UUID.randomUUID();
-    UUID requesterId = authorId; // Same person
 
     Story story = new Story(storyId, authorId, "content", SharedWith.TRUSTED, OffsetDateTime.now());
     when(storyPort.findById(storyId)).thenReturn(Optional.of(story));
 
     // Act
-    Story result = service.getStory(storyId, requesterId, "bearer-token");
+    Story result = service.getStory(storyId, authorId, "bearer-token");
 
     // Assert
     assertEquals(story, result);
@@ -309,6 +308,7 @@ class StoryDomainServiceTest {
   @DisplayName("getStoriesNearMe should retrieve circles and query stories with pagination")
   void testGetStoriesNearMeRetrievesStoriesFromCircles() {
     // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
     UUID trustedMemberId1 = UUID.randomUUID();
     UUID trustedMemberId2 = UUID.randomUUID();
     UUID connectedMemberId1 = UUID.randomUUID();
@@ -336,11 +336,15 @@ class StoryDomainServiceTest {
     List<Story> stories = List.of(story1, story2);
 
     when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
-    when(storyPort.findStoriesByAuthorIds(trustedMembers, connectedMembers, 0, 10))
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId1, trustedMemberId2, authenticatedMemberId),
+            connectedMembers,
+            0,
+            10))
         .thenReturn(stories);
 
     // Act
-    List<Story> result = service.getStoriesNearMe("bearer-token", 0, 10);
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 0, 10);
 
     // Assert
     assertEquals(2, result.size());
@@ -348,13 +352,19 @@ class StoryDomainServiceTest {
     assertEquals(story2, result.get(1));
 
     verify(communityServicePort).getMyCircles("bearer-token");
-    verify(storyPort).findStoriesByAuthorIds(trustedMembers, connectedMembers, 0, 10);
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId1, trustedMemberId2, authenticatedMemberId),
+            connectedMembers,
+            0,
+            10);
   }
 
   @Test
   @DisplayName("getStoriesNearMe should handle pagination with offset and count")
   void testGetStoriesNearMeHandlesPagination() {
     // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
     UUID trustedMemberId = UUID.randomUUID();
     UUID connectedMemberId = UUID.randomUUID();
 
@@ -369,21 +379,25 @@ class StoryDomainServiceTest {
     List<Story> stories = List.of(story);
 
     when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
-    when(storyPort.findStoriesByAuthorIds(trustedMembers, connectedMembers, 10, 20))
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 10, 20))
         .thenReturn(stories);
 
     // Act
-    List<Story> result = service.getStoriesNearMe("bearer-token", 10, 20);
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 10, 20);
 
     // Assert
     assertEquals(1, result.size());
-    verify(storyPort).findStoriesByAuthorIds(trustedMembers, connectedMembers, 10, 20);
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 10, 20);
   }
 
   @Test
   @DisplayName("getStoriesNearMe should return empty list when no stories found")
   void testGetStoriesNearMeReturnsEmptyList() {
     // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
     UUID trustedMemberId = UUID.randomUUID();
     UUID connectedMemberId = UUID.randomUUID();
 
@@ -393,15 +407,18 @@ class StoryDomainServiceTest {
     MyCircles circles = new MyCircles(trustedMembers, connectedMembers);
 
     when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
-    when(storyPort.findStoriesByAuthorIds(trustedMembers, connectedMembers, 0, 10))
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 0, 10))
         .thenReturn(List.of());
 
     // Act
-    List<Story> result = service.getStoriesNearMe("bearer-token", 0, 10);
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 0, 10);
 
     // Assert
     assertTrue(result.isEmpty());
     verify(communityServicePort).getMyCircles("bearer-token");
-    verify(storyPort).findStoriesByAuthorIds(trustedMembers, connectedMembers, 0, 10);
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 0, 10);
   }
 }

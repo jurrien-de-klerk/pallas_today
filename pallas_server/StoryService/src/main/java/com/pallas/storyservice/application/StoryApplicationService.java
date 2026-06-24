@@ -75,7 +75,7 @@ public class StoryApplicationService {
     String bearerToken = bearerToken(currentJwt());
     log.debug(
         "getStoriesNearMe: delegating to domain service with offset={}, count={}", offset, count);
-    return storyDomainService.getStoriesNearMe(bearerToken, offset, count);
+    return storyDomainService.getStoriesNearMe(bearerToken, getCurrentUserUuid(), offset, count);
   }
 
   // -------------------------------------------------------------------------

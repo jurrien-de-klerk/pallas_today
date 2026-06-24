@@ -555,7 +555,8 @@ class StoriesNearMeIntegrationTest {
   }
 
   @Test
-  @DisplayName("GET /stories/near-me should return filtered stories when only connected circle has members")
+  @DisplayName(
+      "GET /stories/near-me should return filtered stories when only connected circle has members")
   void testGetStoriesNearMeWithOnlyConnectedCirclePopulated() throws Exception {
     // Arrange - Only connected circle has members, trusted circle is empty
     UUID connectedMemberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440013");
@@ -569,8 +570,7 @@ class StoriesNearMeIntegrationTest {
     StoryEntity trustedStory = new StoryEntity();
     trustedStory.setId(trustedStoryId);
     trustedStory.setAuthorId(connectedMemberId);
-    trustedStory.setContent(
-        objectMapper.writeValueAsString(List.of(Map.of("insert", "TRUSTED"))));
+    trustedStory.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "TRUSTED"))));
     trustedStory.setSharedWith(SharedWithEntity.TRUSTED);
     trustedStory.setPublishedAt(now);
     storyRepository.save(trustedStory);
@@ -599,8 +599,7 @@ class StoriesNearMeIntegrationTest {
     StoryEntity publicStory = new StoryEntity();
     publicStory.setId(publicStoryId);
     publicStory.setAuthorId(connectedMemberId);
-    publicStory.setContent(
-        objectMapper.writeValueAsString(List.of(Map.of("insert", "PUBLIC"))));
+    publicStory.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "PUBLIC"))));
     publicStory.setSharedWith(SharedWithEntity.PUBLIC);
     publicStory.setPublishedAt(now.plusSeconds(3));
     storyRepository.save(publicStory);

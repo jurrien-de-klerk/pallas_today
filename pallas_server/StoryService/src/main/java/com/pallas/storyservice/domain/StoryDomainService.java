@@ -3,6 +3,7 @@ package com.pallas.storyservice.domain;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -109,7 +110,8 @@ public class StoryDomainService {
    * @return a list of stories from the member's circles
    */
   @Transactional(readOnly = true)
-  public List<Story> getStoriesNearMe(String bearerToken, int offset, int count) {
+  public List<Story> getStoriesNearMe(
+      String bearerToken, UUID authenticatedMember, int offset, int count) {
     log.debug("getStoriesNearMe: retrieving stories with offset={}, count={}", offset, count);
     MyCircles circles = communityServicePort.getMyCircles(bearerToken);
     log.debug(
@@ -118,7 +120,11 @@ public class StoryDomainService {
         circles.connectedMembers().size());
     List<Story> stories =
         storyPort.findStoriesByAuthorIds(
-            circles.trustedMembers(), circles.connectedMembers(), offset, count);
+            Stream.concat(circles.trustedMembers().stream(), Stream.of(authenticatedMember))
+                .toList(),
+            circles.connectedMembers(),
+            offset,
+            count);
     log.debug("getStoriesNearMe: found {} stories", stories.size());
     return stories;
   }
