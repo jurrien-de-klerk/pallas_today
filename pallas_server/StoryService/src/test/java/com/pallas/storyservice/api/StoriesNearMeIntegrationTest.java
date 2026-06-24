@@ -1,5 +1,13 @@
 package com.pallas.storyservice.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pallas.integrations.member.MemberServicePort;
 import com.pallas.storyservice.data.SharedWithEntity;
@@ -9,6 +17,10 @@ import com.pallas.storyservice.domain.CommunityServicePort;
 import com.pallas.storyservice.domain.MyCircles;
 import com.pallas.storyservice.domain.RelationshipType;
 import com.pallas.storyservice.model.StoryInput;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,19 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Full-stack integration tests for Story API with real database persistence.
@@ -286,7 +285,8 @@ class StoriesNearMeIntegrationTest {
     StoryEntity story = new StoryEntity();
     story.setId(storyId);
     story.setAuthorId(trustedMemberId);
-    story.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Shared with connected"))));
+    story.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "Shared with connected"))));
     story.setSharedWith(SharedWithEntity.CONNECTED);
     story.setPublishedAt(now);
     storyRepository.save(story);
@@ -417,8 +417,7 @@ class StoriesNearMeIntegrationTest {
     // Arrange - Connected member shares at all levels: TRUSTED, CONNECTED, COMMUNITY, PUBLIC
     UUID connectedMemberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440022");
     when(communityServicePort.getMyCircles(anyString()))
-        .thenReturn(
-            new MyCircles(List.of(AUTHENTICATED_MEMBER_ID), List.of(connectedMemberId)));
+        .thenReturn(new MyCircles(List.of(AUTHENTICATED_MEMBER_ID), List.of(connectedMemberId)));
 
     OffsetDateTime now = OffsetDateTime.now();
     UUID trustedStoryId = UUID.randomUUID();
@@ -429,7 +428,8 @@ class StoriesNearMeIntegrationTest {
     StoryEntity trustedStory = new StoryEntity();
     trustedStory.setId(trustedStoryId);
     trustedStory.setAuthorId(connectedMemberId);
-    trustedStory.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Trusted only"))));
+    trustedStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "Trusted only"))));
     trustedStory.setSharedWith(SharedWithEntity.TRUSTED);
     trustedStory.setPublishedAt(now);
     storyRepository.save(trustedStory);
@@ -437,7 +437,8 @@ class StoriesNearMeIntegrationTest {
     StoryEntity connectedStory = new StoryEntity();
     connectedStory.setId(connectedStoryId);
     connectedStory.setAuthorId(connectedMemberId);
-    connectedStory.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Connected"))));
+    connectedStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "Connected"))));
     connectedStory.setSharedWith(SharedWithEntity.CONNECTED);
     connectedStory.setPublishedAt(now.plusSeconds(1));
     storyRepository.save(connectedStory);
@@ -445,7 +446,8 @@ class StoriesNearMeIntegrationTest {
     StoryEntity communityStory = new StoryEntity();
     communityStory.setId(communityStoryId);
     communityStory.setAuthorId(connectedMemberId);
-    communityStory.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Community"))));
+    communityStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "Community"))));
     communityStory.setSharedWith(SharedWithEntity.COMMUNITY);
     communityStory.setPublishedAt(now.plusSeconds(2));
     storyRepository.save(communityStory);
@@ -474,4 +476,151 @@ class StoriesNearMeIntegrationTest {
     // TRUSTED story should NOT be in results
   }
 
+  @Test
+  @DisplayName("GET /stories/near-me should return empty array when both circles are empty")
+  void testGetStoriesNearMeEmptyWhenBothCirclesEmpty() throws Exception {
+    // Arrange - No members in either circle (new user with no relationships)
+    when(communityServicePort.getMyCircles(anyString()))
+        .thenReturn(new MyCircles(List.of(), List.of()));
+
+    // Create a story by an unrelated member
+    UUID strangerMemberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440011");
+    OffsetDateTime now = OffsetDateTime.now();
+    UUID storyId = UUID.randomUUID();
+    StoryEntity story = new StoryEntity();
+    story.setId(storyId);
+    story.setAuthorId(strangerMemberId);
+    story.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Public story"))));
+    story.setSharedWith(SharedWithEntity.PUBLIC);
+    story.setPublishedAt(now);
+    storyRepository.save(story);
+
+    // Act & Assert - Should return empty list (no members in circles, so no visible stories)
+    mockMvc
+        .perform(
+            get("/stories/near-me")
+                .with(jwt().jwt(jwt -> jwt.claim("sub", AUTHENTICATED_MEMBER_ID.toString()))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.stories").isArray())
+        .andExpect(jsonPath("$.stories.length()").value(0));
+  }
+
+  @Test
+  @DisplayName("GET /stories/near-me should return stories when only trusted circle has members")
+  void testGetStoriesNearMeWithOnlyTrustedCirclePopulated() throws Exception {
+    // Arrange - Only trusted circle has members, connected circle is empty
+    UUID trustedMemberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440012");
+    when(communityServicePort.getMyCircles(anyString()))
+        .thenReturn(new MyCircles(List.of(trustedMemberId, AUTHENTICATED_MEMBER_ID), List.of()));
+
+    OffsetDateTime now = OffsetDateTime.now();
+
+    // Create story by trusted member with all sharing levels
+    java.util.List<UUID> storyIds = new java.util.ArrayList<>();
+    com.pallas.storyservice.model.SharedWith[] levels = {
+      com.pallas.storyservice.model.SharedWith.TRUSTED,
+      com.pallas.storyservice.model.SharedWith.CONNECTED,
+      com.pallas.storyservice.model.SharedWith.PUBLIC
+    };
+
+    for (int i = 0; i < levels.length; i++) {
+      UUID storyId = UUID.randomUUID();
+      StoryEntity story = new StoryEntity();
+      story.setId(storyId);
+      story.setAuthorId(trustedMemberId);
+      story.setContent(
+          objectMapper.writeValueAsString(List.of(Map.of("insert", "Story " + levels[i]))));
+      story.setSharedWith(SharedWithEntity.valueOf(levels[i].toString()));
+      story.setPublishedAt(now.plusSeconds(i));
+      storyRepository.save(story);
+      storyIds.add(storyId);
+    }
+
+    // Act & Assert - All trusted member stories should be visible
+    mockMvc
+        .perform(
+            get("/stories/near-me")
+                .with(jwt().jwt(jwt -> jwt.claim("sub", AUTHENTICATED_MEMBER_ID.toString()))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.stories.length()").value(3))
+        // Most recent (PUBLIC) first
+        .andExpect(jsonPath("$.stories[0].id").value(storyIds.get(2).toString()))
+        .andExpect(jsonPath("$.stories[0].sharedWith").value("PUBLIC"))
+        // Then CONNECTED
+        .andExpect(jsonPath("$.stories[1].id").value(storyIds.get(1).toString()))
+        .andExpect(jsonPath("$.stories[1].sharedWith").value("CONNECTED"))
+        // Oldest (TRUSTED)
+        .andExpect(jsonPath("$.stories[2].id").value(storyIds.get(0).toString()))
+        .andExpect(jsonPath("$.stories[2].sharedWith").value("TRUSTED"));
+  }
+
+  @Test
+  @DisplayName("GET /stories/near-me should return filtered stories when only connected circle has members")
+  void testGetStoriesNearMeWithOnlyConnectedCirclePopulated() throws Exception {
+    // Arrange - Only connected circle has members, trusted circle is empty
+    UUID connectedMemberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440013");
+    when(communityServicePort.getMyCircles(anyString()))
+        .thenReturn(new MyCircles(List.of(AUTHENTICATED_MEMBER_ID), List.of(connectedMemberId)));
+
+    OffsetDateTime now = OffsetDateTime.now();
+
+    // Create stories at all sharing levels by connected member
+    UUID trustedStoryId = UUID.randomUUID();
+    StoryEntity trustedStory = new StoryEntity();
+    trustedStory.setId(trustedStoryId);
+    trustedStory.setAuthorId(connectedMemberId);
+    trustedStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "TRUSTED"))));
+    trustedStory.setSharedWith(SharedWithEntity.TRUSTED);
+    trustedStory.setPublishedAt(now);
+    storyRepository.save(trustedStory);
+
+    UUID connectedStoryId = UUID.randomUUID();
+    StoryEntity connectedStory = new StoryEntity();
+    connectedStory.setId(connectedStoryId);
+    connectedStory.setAuthorId(connectedMemberId);
+    connectedStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "CONNECTED"))));
+    connectedStory.setSharedWith(SharedWithEntity.CONNECTED);
+    connectedStory.setPublishedAt(now.plusSeconds(1));
+    storyRepository.save(connectedStory);
+
+    UUID communityStoryId = UUID.randomUUID();
+    StoryEntity communityStory = new StoryEntity();
+    communityStory.setId(communityStoryId);
+    communityStory.setAuthorId(connectedMemberId);
+    communityStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "COMMUNITY"))));
+    communityStory.setSharedWith(SharedWithEntity.COMMUNITY);
+    communityStory.setPublishedAt(now.plusSeconds(2));
+    storyRepository.save(communityStory);
+
+    UUID publicStoryId = UUID.randomUUID();
+    StoryEntity publicStory = new StoryEntity();
+    publicStory.setId(publicStoryId);
+    publicStory.setAuthorId(connectedMemberId);
+    publicStory.setContent(
+        objectMapper.writeValueAsString(List.of(Map.of("insert", "PUBLIC"))));
+    publicStory.setSharedWith(SharedWithEntity.PUBLIC);
+    publicStory.setPublishedAt(now.plusSeconds(3));
+    storyRepository.save(publicStory);
+
+    // Act & Assert - Only CONNECTED and above should be visible (TRUSTED excluded)
+    mockMvc
+        .perform(
+            get("/stories/near-me")
+                .with(jwt().jwt(jwt -> jwt.claim("sub", AUTHENTICATED_MEMBER_ID.toString()))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.stories.length()").value(3))
+        // Most recent (PUBLIC) first
+        .andExpect(jsonPath("$.stories[0].id").value(publicStoryId.toString()))
+        .andExpect(jsonPath("$.stories[0].sharedWith").value("PUBLIC"))
+        // Then COMMUNITY
+        .andExpect(jsonPath("$.stories[1].id").value(communityStoryId.toString()))
+        .andExpect(jsonPath("$.stories[1].sharedWith").value("COMMUNITY"))
+        // Then CONNECTED
+        .andExpect(jsonPath("$.stories[2].id").value(connectedStoryId.toString()))
+        .andExpect(jsonPath("$.stories[2].sharedWith").value("CONNECTED"));
+    // TRUSTED story should NOT be visible
+  }
 }
