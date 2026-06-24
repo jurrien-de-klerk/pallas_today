@@ -115,22 +115,21 @@ class StoriesNearMeIntegrationTest {
   @Test
   @DisplayName("GET /stories/near-me should respect offset and count pagination parameters")
   void testGetStoriesNearMeWithPagination() throws Exception {
-    // Arrange - Create 3 stories
+    // Arrange - Create 3 stories with controlled timestamps (newest to oldest)
+    OffsetDateTime now = OffsetDateTime.now();
     for (int i = 1; i <= 3; i++) {
-      StoryInput input = new StoryInput();
-      input.setContent(List.of(Map.of("insert", "Story " + i)));
-      input.setSharedWith(com.pallas.storyservice.model.SharedWith.TRUSTED);
-
-      mockMvc
-          .perform(
-              post("/stories")
-                  .with(jwt().jwt(jwt -> jwt.claim("sub", AUTHENTICATED_MEMBER_ID.toString())))
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(input)))
-          .andExpect(status().isCreated());
+      UUID storyId = UUID.randomUUID();
+      StoryEntity story = new StoryEntity();
+      story.setId(storyId);
+      story.setAuthorId(AUTHENTICATED_MEMBER_ID);
+      story.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Story " + i))));
+      story.setSharedWith(SharedWithEntity.TRUSTED);
+      // Set distinct timestamps: Story 1 oldest, Story 3 newest
+      story.setPublishedAt(now.plusSeconds(4 - i));
+      storyRepository.save(story);
     }
 
-    // Act & Assert - Get second story (offset=1, count=1)
+    // Act & Assert - Get second story with offset=1, count=1 (should be Story 2)
     mockMvc
         .perform(
             get("/stories/near-me?offset=1&count=1")
@@ -139,7 +138,7 @@ class StoriesNearMeIntegrationTest {
         .andExpect(jsonPath("$.stories.length()").value(1))
         .andExpect(jsonPath("$.stories[0].content[0].insert").value("Story 2"));
 
-    // Act & Assert - Get first 2 stories (offset=0, count=2)
+    // Act & Assert - Get first 2 stories with offset=0, count=2
     mockMvc
         .perform(
             get("/stories/near-me?offset=0&count=2")
@@ -173,25 +172,19 @@ class StoriesNearMeIntegrationTest {
   void testGetStoriesNearMeOrderByNewest() throws Exception {
     // Arrange - Create stories with slight delays to ensure different timestamps
     List<String> storyIds = new java.util.ArrayList<>();
+
+    OffsetDateTime now = OffsetDateTime.now();
     for (int i = 1; i <= 3; i++) {
-      StoryInput input = new StoryInput();
-      input.setContent(List.of(Map.of("insert", "Story " + i)));
-      input.setSharedWith(com.pallas.storyservice.model.SharedWith.TRUSTED);
-
-      String response =
-          mockMvc
-              .perform(
-                  post("/stories")
-                      .with(jwt().jwt(jwt -> jwt.claim("sub", AUTHENTICATED_MEMBER_ID.toString())))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(objectMapper.writeValueAsString(input)))
-              .andExpect(status().isCreated())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      storyIds.add(objectMapper.readTree(response).get("id").asText());
-      Thread.sleep(10); // Small delay to ensure different timestamps
+      UUID storyId = UUID.randomUUID();
+      StoryEntity story = new StoryEntity();
+      story.setId(storyId);
+      story.setAuthorId(AUTHENTICATED_MEMBER_ID);
+      story.setContent(objectMapper.writeValueAsString(List.of(Map.of("insert", "Story " + i))));
+      story.setSharedWith(SharedWithEntity.TRUSTED);
+      // Set distinct timestamps: Story 1 oldest, Story 3 newest
+      story.setPublishedAt(now.plusSeconds(i));
+      var entity = storyRepository.save(story);
+      storyIds.add(entity.getId().toString());
     }
 
     // Act & Assert - Most recent story should be first
