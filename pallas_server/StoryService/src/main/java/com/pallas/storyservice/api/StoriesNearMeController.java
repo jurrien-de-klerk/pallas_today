@@ -55,6 +55,11 @@ public class StoriesNearMeController implements StoriesNearMeApi {
 
   @SuppressWarnings("unchecked")
   private List<Object> deserializeContent(String contentJson) {
+    if (contentJson == null || contentJson.isBlank()) {
+      log.error("Story content is null or blank");
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deserialize story content");
+    }
     try {
       return objectMapper.readValue(contentJson, List.class);
     } catch (JsonProcessingException ex) {
