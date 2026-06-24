@@ -2,8 +2,11 @@ package com.pallas.storyservice.data;
 
 import com.pallas.communityservice.client.ApiClient;
 import com.pallas.communityservice.client.ApiException;
+import com.pallas.communityservice.client.communityservice.CirclesApi;
 import com.pallas.communityservice.client.communityservice.RelationshipsApi;
+import com.pallas.communityservice.client.communityservice.model.MemberReference;
 import com.pallas.storyservice.domain.CommunityServicePort;
+import com.pallas.storyservice.domain.MyCircles;
 import com.pallas.storyservice.domain.RelationshipType;
 import java.util.UUID;
 import lombok.CustomLog;
@@ -22,22 +25,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommunityServiceHttpAdapter implements CommunityServicePort {
 
-  private final ApiClient apiClient;
-  private final RelationshipsApi relationshipsApi;
+  private final String baseUrl;
 
   public CommunityServiceHttpAdapter(
       @Value("${community-service.base-url:http://localhost:8082}") String baseUrl) {
-    this.apiClient = new ApiClient();
-    this.apiClient.setBasePath(baseUrl);
-    this.relationshipsApi = new RelationshipsApi(apiClient);
+    this.baseUrl = baseUrl;
   }
 
   @Override
   public RelationshipType getRelationship(UUID memberId, String bearerToken) {
     log.debug("getRelationship: calling community service for member {}", memberId);
     try {
-      apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
-      var response = relationshipsApi.getRelationship(memberId);
+      ApiClient apiClient = createAuthenticatedApiClient(bearerToken);
+      var response = new RelationshipsApi(apiClient).getRelationship(memberId);
       RelationshipType result = toDomainRelationshipType(response.getRelationshipType());
       log.debug("getRelationship: community service returned {}", result);
       return result;
@@ -47,9 +47,45 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
     }
   }
 
+  @Override
+  public MyCircles getMyCircles(String bearerToken) {
+    log.debug("getMyCircles: calling community service");
+    try {
+      ApiClient apiClient = createAuthenticatedApiClient(bearerToken);
+      var response = new CirclesApi(apiClient).getMyCircles();
+      MyCircles result = toDomainMyCircles(response);
+      log.debug(
+          "getMyCircles: community service returned circles with {} trusted and {} connected members",
+          result.trustedMembers().size(),
+          result.connectedMembers().size());
+      return result;
+    } catch (ApiException ex) {
+      log.error("getMyCircles: community service call failed: {}", ex.getMessage());
+      throw new CommunityServiceException("Failed to get circles from community service", ex);
+    }
+  }
+
+  /**
+   * Creates a new ApiClient instance with the bearer token set as a default header. Each request
+   * gets its own ApiClient to avoid token leakage between concurrent requests.
+   */
+  private ApiClient createAuthenticatedApiClient(String bearerToken) {
+    ApiClient apiClient = new ApiClient();
+    apiClient.setBasePath(baseUrl);
+    apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, bearerToken);
+    return apiClient;
+  }
+
   // -------------------------------------------------------------------------
   // Mapping helpers
   // -------------------------------------------------------------------------
+
+  private MyCircles toDomainMyCircles(
+      com.pallas.communityservice.client.communityservice.model.Circles apiCircles) {
+    return new MyCircles(
+        apiCircles.getConnectedCircle().stream().map(MemberReference::getMemberId).toList(),
+        apiCircles.getTrustedCircle().stream().map(MemberReference::getMemberId).toList());
+  }
 
   private RelationshipType toDomainRelationshipType(
       com.pallas.communityservice.client.communityservice.model.RelationshipType apiType) {

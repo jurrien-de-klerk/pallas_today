@@ -16,8 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pallas.integrations.member.MemberServicePort;
 import com.pallas.storyservice.data.StoryRepository;
 import com.pallas.storyservice.domain.CommunityServicePort;
+import com.pallas.storyservice.domain.MyCircles;
 import com.pallas.storyservice.domain.RelationshipType;
 import com.pallas.storyservice.model.StoryInput;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +48,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("Story API Full-Stack Integration Tests")
-class StoriesFullStackIntegrationTest {
+class StoriesIntegrationTest {
 
   @Autowired private MockMvc mockMvc;
 
@@ -67,6 +69,8 @@ class StoriesFullStackIntegrationTest {
     when(memberServicePort.resolveCurrentMemberId(anyString())).thenReturn(AUTHENTICATED_MEMBER_ID);
     when(communityServicePort.getRelationship(any(UUID.class), anyString()))
         .thenReturn(RelationshipType.TRUSTED);
+    when(communityServicePort.getMyCircles(anyString()))
+        .thenReturn(new MyCircles(List.of(AUTHENTICATED_MEMBER_ID), List.of()));
   }
 
   // =========================================================================

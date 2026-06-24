@@ -4,6 +4,7 @@ import com.pallas.integrations.member.MemberServicePort;
 import com.pallas.storyservice.domain.SharedWith;
 import com.pallas.storyservice.domain.Story;
 import com.pallas.storyservice.domain.StoryDomainService;
+import java.util.List;
 import java.util.UUID;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,21 @@ public class StoryApplicationService {
         requesterId,
         storyId);
     return storyDomainService.getStory(storyId, requesterId, bearerToken);
+  }
+
+  /**
+   * Get stories from the authenticated member's trusted and connected circles.
+   *
+   * @param offset the number of stories to skip (for pagination)
+   * @param count the maximum number of stories to return
+   * @return a list of stories visible to the authenticated member
+   */
+  public List<Story> getStoriesNearMe(int offset, int count) {
+    log.debug("getStoriesNearMe: resolving current user and retrieving bearer token");
+    String bearerToken = bearerToken(currentJwt());
+    log.debug(
+        "getStoriesNearMe: delegating to domain service with offset={}, count={}", offset, count);
+    return storyDomainService.getStoriesNearMe(bearerToken, getCurrentUserUuid(), offset, count);
   }
 
   // -------------------------------------------------------------------------

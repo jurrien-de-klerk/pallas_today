@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,13 +77,12 @@ class StoryDomainServiceTest {
     // Arrange
     UUID storyId = UUID.randomUUID();
     UUID authorId = UUID.randomUUID();
-    UUID requesterId = authorId; // Same person
 
     Story story = new Story(storyId, authorId, "content", SharedWith.TRUSTED, OffsetDateTime.now());
     when(storyPort.findById(storyId)).thenReturn(Optional.of(story));
 
     // Act
-    Story result = service.getStory(storyId, requesterId, "bearer-token");
+    Story result = service.getStory(storyId, authorId, "bearer-token");
 
     // Assert
     assertEquals(story, result);
@@ -298,5 +298,127 @@ class StoryDomainServiceTest {
     assertThrows(
         StoryAccessDeniedException.class,
         () -> service.getStory(storyId, requesterId, "bearer-token"));
+  }
+
+  // =========================================================================
+  // getStoriesNearMe tests
+  // =========================================================================
+
+  @Test
+  @DisplayName("getStoriesNearMe should retrieve circles and query stories with pagination")
+  void testGetStoriesNearMeRetrievesStoriesFromCircles() {
+    // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
+    UUID trustedMemberId1 = UUID.randomUUID();
+    UUID trustedMemberId2 = UUID.randomUUID();
+    UUID connectedMemberId1 = UUID.randomUUID();
+    UUID connectedMemberId2 = UUID.randomUUID();
+
+    List<UUID> trustedMembers = List.of(trustedMemberId1, trustedMemberId2);
+    List<UUID> connectedMembers = List.of(connectedMemberId1, connectedMemberId2);
+
+    MyCircles circles = new MyCircles(trustedMembers, connectedMembers);
+
+    Story story1 =
+        new Story(
+            UUID.randomUUID(),
+            trustedMemberId1,
+            "story 1",
+            SharedWith.TRUSTED,
+            OffsetDateTime.now());
+    Story story2 =
+        new Story(
+            UUID.randomUUID(),
+            connectedMemberId1,
+            "story 2",
+            SharedWith.CONNECTED,
+            OffsetDateTime.now());
+    List<Story> stories = List.of(story1, story2);
+
+    when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId1, trustedMemberId2, authenticatedMemberId),
+            connectedMembers,
+            0,
+            10))
+        .thenReturn(stories);
+
+    // Act
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 0, 10);
+
+    // Assert
+    assertEquals(2, result.size());
+    assertEquals(story1, result.get(0));
+    assertEquals(story2, result.get(1));
+
+    verify(communityServicePort).getMyCircles("bearer-token");
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId1, trustedMemberId2, authenticatedMemberId),
+            connectedMembers,
+            0,
+            10);
+  }
+
+  @Test
+  @DisplayName("getStoriesNearMe should handle pagination with offset and count")
+  void testGetStoriesNearMeHandlesPagination() {
+    // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
+    UUID trustedMemberId = UUID.randomUUID();
+    UUID connectedMemberId = UUID.randomUUID();
+
+    List<UUID> trustedMembers = List.of(trustedMemberId);
+    List<UUID> connectedMembers = List.of(connectedMemberId);
+
+    MyCircles circles = new MyCircles(trustedMembers, connectedMembers);
+
+    Story story =
+        new Story(
+            UUID.randomUUID(), trustedMemberId, "story", SharedWith.TRUSTED, OffsetDateTime.now());
+    List<Story> stories = List.of(story);
+
+    when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 10, 20))
+        .thenReturn(stories);
+
+    // Act
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 10, 20);
+
+    // Assert
+    assertEquals(1, result.size());
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 10, 20);
+  }
+
+  @Test
+  @DisplayName("getStoriesNearMe should return empty list when no stories found")
+  void testGetStoriesNearMeReturnsEmptyList() {
+    // Arrange
+    UUID authenticatedMemberId = UUID.randomUUID();
+    UUID trustedMemberId = UUID.randomUUID();
+    UUID connectedMemberId = UUID.randomUUID();
+
+    List<UUID> trustedMembers = List.of(trustedMemberId);
+    List<UUID> connectedMembers = List.of(connectedMemberId);
+
+    MyCircles circles = new MyCircles(trustedMembers, connectedMembers);
+
+    when(communityServicePort.getMyCircles("bearer-token")).thenReturn(circles);
+    when(storyPort.findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 0, 10))
+        .thenReturn(List.of());
+
+    // Act
+    List<Story> result = service.getStoriesNearMe("bearer-token", authenticatedMemberId, 0, 10);
+
+    // Assert
+    assertTrue(result.isEmpty());
+    verify(communityServicePort).getMyCircles("bearer-token");
+    verify(storyPort)
+        .findStoriesByAuthorIds(
+            List.of(trustedMemberId, authenticatedMemberId), connectedMembers, 0, 10);
   }
 }

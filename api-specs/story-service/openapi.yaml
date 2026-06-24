@@ -183,6 +183,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /stories/near-me:
+    get:
+      summary: Get your Stories near you feed
+      description: >-
+        Returns your personal Stories near you feed, aggregating stories
+        published by you, by members in your trusted circle, and by members
+        in your connected circle, ordered by publication time descending
+        (newest first). Uses offset-based pagination for infinite scrolling.
+      operationId: getStoriesNearMe
+      tags:
+        - stories-near-me
+      parameters:
+        - name: offset
+          in: query
+          description: Number of stories to skip (for pagination)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+        - name: count
+          in: query
+          description: Maximum number of stories to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Your Stories near you feed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoriesPage'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /stories/near/{memberId}:
     get:
       summary: Get Stories near you for a member
@@ -236,7 +292,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StoriesNearYouPage'
+                $ref: '#/components/schemas/StoriesPage'
         '400':
           description: Invalid parameters
           content:
@@ -378,7 +434,7 @@ components:
         sharedWith:
           allOf:
             - $ref: '#/components/schemas/SharedWith'
-    StoriesNearYouPage:
+    StoriesPage:
       type: object
       required:
         - stories
@@ -391,13 +447,6 @@ components:
           description: >-
             Stories ordered by publishedAt descending. Only stories visible to
             the requesting member are included.
-        nextBefore:
-          type: string
-          format: date-time
-          description: >-
-            Pass this value as the `before` query parameter to fetch the next
-            page. Absent when there are no more stories to return.
-          example: '2026-05-14T18:32:00Z'
     Error:
       type: object
       required:
