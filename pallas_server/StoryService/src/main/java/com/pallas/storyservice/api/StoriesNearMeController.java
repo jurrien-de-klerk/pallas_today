@@ -21,6 +21,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class StoriesNearMeController implements StoriesNearMeApi {
 
+  private static final int MIN_OFFSET = 0;
+  private static final int MIN_COUNT = 1;
+  private static final int MAX_COUNT = 100;
+  private static final int DEFAULT_OFFSET = 0;
+  private static final int DEFAULT_COUNT = 20;
+
   private final StoryApplicationService storyApplicationService;
 
   @SuppressFBWarnings(
@@ -30,10 +36,26 @@ public class StoriesNearMeController implements StoriesNearMeApi {
 
   @Override
   public ResponseEntity<StoriesPage> getStoriesNearMe(Integer offset, Integer count) {
-    // Delegate to application service with defaults
-    var stories =
-        storyApplicationService.getStoriesNearMe(
-            offset != null ? offset : 0, count != null ? count : 20);
+    // Apply defaults from API contract
+    int offsetValue = offset != null ? offset : DEFAULT_OFFSET;
+    int countValue = count != null ? count : DEFAULT_COUNT;
+
+    // Validate pagination parameters against API contract
+    if (offsetValue < MIN_OFFSET) {
+      log.debug("getStoriesNearMe: invalid offset {} (must be >= {})", offsetValue, MIN_OFFSET);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "offset must be >= " + MIN_OFFSET);
+    }
+    if (countValue < MIN_COUNT) {
+      log.debug("getStoriesNearMe: invalid count {} (must be >= {})", countValue, MIN_COUNT);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "count must be >= " + MIN_COUNT);
+    }
+    if (countValue > MAX_COUNT) {
+      log.debug("getStoriesNearMe: invalid count {} (must be <= {})", countValue, MAX_COUNT);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "count must be <= " + MAX_COUNT);
+    }
+
+    // Delegate to application service with validated parameters
+    var stories = storyApplicationService.getStoriesNearMe(offsetValue, countValue);
 
     // Map domain stories to API model
     StoriesPage page = new StoriesPage();
