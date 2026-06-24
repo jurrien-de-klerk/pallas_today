@@ -8,8 +8,6 @@ import com.pallas.communityservice.client.communityservice.model.MemberReference
 import com.pallas.storyservice.domain.CommunityServicePort;
 import com.pallas.storyservice.domain.MyCircles;
 import com.pallas.storyservice.domain.RelationshipType;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,12 +83,8 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
   private MyCircles toDomainMyCircles(
       com.pallas.communityservice.client.communityservice.model.Circles apiCircles) {
     return new MyCircles(
-        apiCircles.getConnectedCircle().stream()
-            .map(MemberReference::getMemberId)
-            .toList(),
-        apiCircles.getTrustedCircle().stream()
-            .map(MemberReference::getMemberId)
-            .toList());
+        apiCircles.getConnectedCircle().stream().map(MemberReference::getMemberId).toList(),
+        apiCircles.getTrustedCircle().stream().map(MemberReference::getMemberId).toList());
   }
 
   private RelationshipType toDomainRelationshipType(
