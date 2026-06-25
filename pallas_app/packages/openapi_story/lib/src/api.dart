@@ -10,6 +10,7 @@ import 'package:openapi_story/src/auth/basic_auth.dart';
 import 'package:openapi_story/src/auth/bearer_auth.dart';
 import 'package:openapi_story/src/auth/oauth.dart';
 import 'package:openapi_story/src/api/stories_api.dart';
+import 'package:openapi_story/src/api/stories_near_me_api.dart';
 import 'package:openapi_story/src/api/stories_near_you_api.dart';
 
 class OpenapiStory {
@@ -81,6 +82,12 @@ class OpenapiStory {
   /// by doing that all interceptors will not be executed
   StoriesApi getStoriesApi() {
     return StoriesApi(dio, serializers);
+  }
+
+  /// Get StoriesNearMeApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  StoriesNearMeApi getStoriesNearMeApi() {
+    return StoriesNearMeApi(dio, serializers);
   }
 
   /// Get StoriesNearYouApi instance, base route and serializer can be overridden by a given but be careful,

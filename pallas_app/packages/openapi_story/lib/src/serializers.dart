@@ -15,8 +15,10 @@ import 'package:openapi_story/src/date_serializer.dart';
 import 'package:openapi_story/src/model/date.dart';
 
 import 'package:openapi_story/src/model/error.dart';
+import 'package:openapi_story/src/model/quill_delta_operation.dart';
+import 'package:openapi_story/src/model/quill_delta_operation_insert.dart';
 import 'package:openapi_story/src/model/shared_with.dart';
-import 'package:openapi_story/src/model/stories_near_you_page.dart';
+import 'package:openapi_story/src/model/stories_page.dart';
 import 'package:openapi_story/src/model/story.dart';
 import 'package:openapi_story/src/model/story_input.dart';
 
@@ -24,8 +26,10 @@ part 'serializers.g.dart';
 
 @SerializersFor([
   Error,
+  QuillDeltaOperation,
+  QuillDeltaOperationInsert,
   SharedWith,
-  StoriesNearYouPage,
+  StoriesPage,
   Story,
   StoryInput,
 ])
@@ -33,7 +37,11 @@ Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())
       ..add(const DateSerializer())
-      ..add(Iso8601DateTimeSerializer()))
+      ..add(Iso8601DateTimeSerializer())
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(JsonObject)]),
+        () => ListBuilder<JsonObject>(),
+      ))
     .build();
 
 Serializers standardSerializers =

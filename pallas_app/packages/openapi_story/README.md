@@ -69,14 +69,17 @@ Class | Method | HTTP request | Description
 [*StoriesApi*](doc/StoriesApi.md) | [**deleteStory**](doc/StoriesApi.md#deletestory) | **DELETE** /stories/story/{storyId} | Delete a story
 [*StoriesApi*](doc/StoriesApi.md) | [**getStory**](doc/StoriesApi.md#getstory) | **GET** /stories/story/{storyId} | Get a story
 [*StoriesApi*](doc/StoriesApi.md) | [**updateStory**](doc/StoriesApi.md#updatestory) | **PUT** /stories/story/{storyId} | Update a story
+[*StoriesNearMeApi*](doc/StoriesNearMeApi.md) | [**getStoriesNearMe**](doc/StoriesNearMeApi.md#getstoriesnearme) | **GET** /stories/near-me | Get your Stories near you feed
 [*StoriesNearYouApi*](doc/StoriesNearYouApi.md) | [**getStoriesNearYou**](doc/StoriesNearYouApi.md#getstoriesnearyou) | **GET** /stories/near/{memberId} | Get Stories near you for a member
 
 
 ## Documentation For Models
 
  - [Error](doc/Error.md)
+ - [QuillDeltaOperation](doc/QuillDeltaOperation.md)
+ - [QuillDeltaOperationInsert](doc/QuillDeltaOperationInsert.md)
  - [SharedWith](doc/SharedWith.md)
- - [StoriesNearYouPage](doc/StoriesNearYouPage.md)
+ - [StoriesPage](doc/StoriesPage.md)
  - [Story](doc/Story.md)
  - [StoryInput](doc/StoryInput.md)
 

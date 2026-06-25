@@ -6,14 +6,14 @@ import '../application/story_service.dart';
 
 final _log = PallasLogger('MyBubbleStoryScreen');
 
-class MyBubbleStoryScreen extends StatefulWidget {
-  const MyBubbleStoryScreen({super.key});
+class StoriesNearMeScreen extends StatefulWidget {
+  const StoriesNearMeScreen({super.key});
 
   @override
-  State<MyBubbleStoryScreen> createState() => _MyBubbleStoryScreenState();
+  State<StoriesNearMeScreen> createState() => _StoriesNearMeScreenState();
 }
 
-class _MyBubbleStoryScreenState extends State<MyBubbleStoryScreen> {
+class _StoriesNearMeScreenState extends State<StoriesNearMeScreen> {
   final _storyService = StoryService();
   List<Document>? _stories;
   bool _loading = true;

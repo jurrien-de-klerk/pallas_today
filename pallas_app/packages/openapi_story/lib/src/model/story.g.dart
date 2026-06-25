@@ -12,7 +12,7 @@ class _$Story extends Story {
   @override
   final String authorId;
   @override
-  final String content;
+  final BuiltList<dynamic> content;
   @override
   final SharedWith sharedWith;
   @override
@@ -81,9 +81,10 @@ class StoryBuilder implements Builder<Story, StoryBuilder> {
   String? get authorId => _$this._authorId;
   set authorId(String? authorId) => _$this._authorId = authorId;
 
-  String? _content;
-  String? get content => _$this._content;
-  set content(String? content) => _$this._content = content;
+  ListBuilder<dynamic>? _content;
+  ListBuilder<dynamic> get content =>
+      _$this._content ??= ListBuilder<dynamic>();
+  set content(ListBuilder<dynamic>? content) => _$this._content = content;
 
   SharedWith? _sharedWith;
   SharedWith? get sharedWith => _$this._sharedWith;
@@ -102,7 +103,7 @@ class StoryBuilder implements Builder<Story, StoryBuilder> {
     if ($v != null) {
       _id = $v.id;
       _authorId = $v.authorId;
-      _content = $v.content;
+      _content = $v.content.toBuilder();
       _sharedWith = $v.sharedWith;
       _publishedAt = $v.publishedAt;
       _$v = null;
@@ -124,18 +125,29 @@ class StoryBuilder implements Builder<Story, StoryBuilder> {
   Story build() => _build();
 
   _$Story _build() {
-    final _$result = _$v ??
-        _$Story._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'Story', 'id'),
-          authorId: BuiltValueNullFieldError.checkNotNull(
-              authorId, r'Story', 'authorId'),
-          content: BuiltValueNullFieldError.checkNotNull(
-              content, r'Story', 'content'),
-          sharedWith: BuiltValueNullFieldError.checkNotNull(
-              sharedWith, r'Story', 'sharedWith'),
-          publishedAt: BuiltValueNullFieldError.checkNotNull(
-              publishedAt, r'Story', 'publishedAt'),
-        );
+    _$Story _$result;
+    try {
+      _$result = _$v ??
+          _$Story._(
+            id: BuiltValueNullFieldError.checkNotNull(id, r'Story', 'id'),
+            authorId: BuiltValueNullFieldError.checkNotNull(
+                authorId, r'Story', 'authorId'),
+            content: content.build(),
+            sharedWith: BuiltValueNullFieldError.checkNotNull(
+                sharedWith, r'Story', 'sharedWith'),
+            publishedAt: BuiltValueNullFieldError.checkNotNull(
+                publishedAt, r'Story', 'publishedAt'),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'content';
+        content.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(r'Story', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

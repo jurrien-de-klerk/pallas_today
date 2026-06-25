@@ -8,7 +8,7 @@ part of 'story_input.dart';
 
 class _$StoryInput extends StoryInput {
   @override
-  final String content;
+  final BuiltList<dynamic> content;
   @override
   final SharedWith? sharedWith;
 
@@ -52,9 +52,10 @@ class _$StoryInput extends StoryInput {
 class StoryInputBuilder implements Builder<StoryInput, StoryInputBuilder> {
   _$StoryInput? _$v;
 
-  String? _content;
-  String? get content => _$this._content;
-  set content(String? content) => _$this._content = content;
+  ListBuilder<dynamic>? _content;
+  ListBuilder<dynamic> get content =>
+      _$this._content ??= ListBuilder<dynamic>();
+  set content(ListBuilder<dynamic>? content) => _$this._content = content;
 
   SharedWith? _sharedWith;
   SharedWith? get sharedWith => _$this._sharedWith;
@@ -67,7 +68,7 @@ class StoryInputBuilder implements Builder<StoryInput, StoryInputBuilder> {
   StoryInputBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _content = $v.content;
+      _content = $v.content.toBuilder();
       _sharedWith = $v.sharedWith;
       _$v = null;
     }
@@ -88,12 +89,24 @@ class StoryInputBuilder implements Builder<StoryInput, StoryInputBuilder> {
   StoryInput build() => _build();
 
   _$StoryInput _build() {
-    final _$result = _$v ??
-        _$StoryInput._(
-          content: BuiltValueNullFieldError.checkNotNull(
-              content, r'StoryInput', 'content'),
-          sharedWith: sharedWith,
-        );
+    _$StoryInput _$result;
+    try {
+      _$result = _$v ??
+          _$StoryInput._(
+            content: content.build(),
+            sharedWith: sharedWith,
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'content';
+        content.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'StoryInput', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

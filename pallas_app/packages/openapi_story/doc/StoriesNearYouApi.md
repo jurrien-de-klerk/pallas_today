@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 
 # **getStoriesNearYou**
-> StoriesNearYouPage getStoriesNearYou(memberId, limit, before)
+> StoriesPage getStoriesNearYou(memberId, limit, before)
 
 Get Stories near you for a member
 
@@ -48,7 +48,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**StoriesNearYouPage**](StoriesNearYouPage.md)
+[**StoriesPage**](StoriesPage.md)
 
 ### Authorization
 
