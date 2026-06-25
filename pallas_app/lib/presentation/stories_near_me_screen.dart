@@ -96,14 +96,55 @@ class _StoryCardState extends State<_StoryCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: QuillEditor(
-          controller: _controller,
-          scrollController: _scrollController,
-          focusNode: _focusNode,
-          config: const QuillEditorConfig(showCursor: false, autoFocus: false),
-        ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
+                  foregroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onPrimaryContainer,
+                  child: const Icon(Icons.article_outlined, size: 18),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Story',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: QuillEditor(
+              controller: _controller,
+              scrollController: _scrollController,
+              focusNode: _focusNode,
+              config: const QuillEditorConfig(
+                showCursor: false,
+                autoFocus: false,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
