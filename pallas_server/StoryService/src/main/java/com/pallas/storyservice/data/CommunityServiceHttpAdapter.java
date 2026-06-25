@@ -83,8 +83,8 @@ public class CommunityServiceHttpAdapter implements CommunityServicePort {
   private MyCircles toDomainMyCircles(
       com.pallas.communityservice.client.communityservice.model.Circles apiCircles) {
     return new MyCircles(
-        apiCircles.getConnectedCircle().stream().map(MemberReference::getMemberId).toList(),
-        apiCircles.getTrustedCircle().stream().map(MemberReference::getMemberId).toList());
+        apiCircles.getTrustedCircle().stream().map(MemberReference::getMemberId).toList(),
+        apiCircles.getConnectedCircle().stream().map(MemberReference::getMemberId).toList());
   }
 
   private RelationshipType toDomainRelationshipType(
