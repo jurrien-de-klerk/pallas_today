@@ -86,7 +86,9 @@ class CachedStoryRepository implements StoryRepository {
       return [];
     }
 
-    final end = (offset + count).clamp(0, _cacheByOffset.length);
+    final end = offset + count <= _cacheByOffset.length
+        ? offset + count
+        : _cacheByOffset.length;
     return _cacheByOffset.sublist(offset, end);
   }
 }

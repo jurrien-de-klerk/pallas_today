@@ -32,6 +32,7 @@ class StoryService extends Cubit<StoryServiceState> {
 
   final StoryRepository _storyRepository;
   final MemberRepository _memberRepository;
+  int _activeLoadRequestId = 0;
 
   /// Temporary compatibility stub until story publishing is refactored.
   Future<bool> publishStory(dynamic document) async {
@@ -42,32 +43,54 @@ class StoryService extends Cubit<StoryServiceState> {
   /// Loads a page of stories and emits the story content before resolving the
   /// related members.
   Future<void> loadStories({required int offset, required int count}) async {
+    final requestId = ++_activeLoadRequestId;
     _log.debug('loadStories started.');
-    _startLoadingStories(offset: offset, count: count);
+    _startLoadingStories(offset: offset, count: count, requestId: requestId);
 
     try {
       final stories = await _fetchStoriesPage(offset: offset, count: count);
-      _emitStoriesLoaded(stories);
+      if (!_canEmitForRequest(requestId)) {
+        _log.debug(
+          'Ignoring stale or closed loadStories completion after story fetch.',
+        );
+        return;
+      }
+      _emitStoriesLoaded(stories, requestId: requestId);
 
       final memberIds = _extractMemberIds(stories);
       _log.debug(
         'Extracted member IDs for story page. uniqueMemberCount=${memberIds.length}',
       );
       if (memberIds.isEmpty) {
-        _stopLoadingMembers();
+        _stopLoadingMembers(requestId: requestId);
         _log.debug('loadStories completed without member resolution.');
         return;
       }
 
-      await _resolveAndEmitMembers(memberIds);
+      await _resolveAndEmitMembers(memberIds, requestId: requestId);
       _log.debug('loadStories completed with member resolution.');
     } catch (error, stackTrace) {
-      _emitLoadingFailed(error: error, stackTrace: stackTrace);
+      if (!_canEmitForRequest(requestId)) {
+        _log.debug('Ignoring stale or closed loadStories failure.');
+        return;
+      }
+      _emitLoadingFailed(
+        error: error,
+        stackTrace: stackTrace,
+        requestId: requestId,
+      );
     }
   }
 
-  void _startLoadingStories({required int offset, required int count}) {
+  void _startLoadingStories({
+    required int offset,
+    required int count,
+    required int requestId,
+  }) {
     _log.info('Loading stories page: offset=$offset, count=$count');
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
     emit(
       state.copyWith(
         isLoadingStories: true,
@@ -92,10 +115,13 @@ class StoryService extends Cubit<StoryServiceState> {
     return stories;
   }
 
-  void _emitStoriesLoaded(List<Story> stories) {
+  void _emitStoriesLoaded(List<Story> stories, {required int requestId}) {
     _log.debug(
       'Emitting stories-loaded state. storyCount=${stories.length}, willResolveMembers=${stories.isNotEmpty}',
     );
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
     emit(
       state.copyWith(
         isLoadingStories: false,
@@ -115,31 +141,48 @@ class StoryService extends Cubit<StoryServiceState> {
     return stories.map((story) => story.authorId).toSet();
   }
 
-  Future<void> _resolveAndEmitMembers(Set<String> memberIds) async {
+  Future<void> _resolveAndEmitMembers(
+    Set<String> memberIds, {
+    required int requestId,
+  }) async {
     _log.debug(
       'Resolving members for story page. requestedMemberCount=${memberIds.length}',
     );
     final members = await _resolveMembers(memberIds);
+    if (!_canEmitForRequest(requestId)) {
+      _log.debug('Ignoring stale or closed member resolution result.');
+      return;
+    }
     final membersById = {for (final member in members) member.memberId: member};
     _log.debug(
       'Resolved members for story page. resolvedMemberCount=${membersById.length}',
     );
 
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
     emit(state.copyWith(isLoadingMembers: false, membersById: membersById));
   }
 
-  void _stopLoadingMembers() {
+  void _stopLoadingMembers({required int requestId}) {
     _log.debug('No member resolution needed. Emitting loading-members=false.');
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
     emit(state.copyWith(isLoadingMembers: false));
   }
 
   void _emitLoadingFailed({
     required Object error,
     required StackTrace stackTrace,
+    required int requestId,
   }) {
     _log.error('Failed to load stories page', error, stackTrace);
     _log.debug('loadStories failed. errorType=${error.runtimeType}');
     _log.backtrace();
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
     emit(
       state.copyWith(
         isLoadingStories: false,
@@ -152,6 +195,10 @@ class StoryService extends Cubit<StoryServiceState> {
   Future<List<Member>> _resolveMembers(Set<String> memberIds) async {
     final members = await _memberRepository.getMembersByIds(memberIds);
     return members.toList(growable: false);
+  }
+
+  bool _canEmitForRequest(int requestId) {
+    return !isClosed && requestId == _activeLoadRequestId;
   }
 }
 

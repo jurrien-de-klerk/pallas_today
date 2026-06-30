@@ -6,7 +6,7 @@ import 'package:pallas_logger/pallas_logger.dart';
 import '../application/story_service.dart';
 import '../domain/story.dart';
 
-final _log = PallasLogger('MyBubbleStoryScreen');
+final _log = PallasLogger('StoriesNearMeScreen');
 
 class StoriesNearMeScreen extends StatefulWidget {
   const StoriesNearMeScreen({super.key});
