@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** | Unique identifier of the story | 
 **authorId** | **String** | The memberId of the member who published the story | 
-**content** | **String** | The story body as a JSON-serialised Quill Delta array of insert operations. Image references within the Delta are URLs pointing to file storage; raw image data is never embedded. | 
+**content** | [**BuiltList**](BuiltList.md) |  | 
 **sharedWith** | [**SharedWith**](SharedWith.md) |  | 
 **publishedAt** | [**DateTime**](DateTime.md) | The date and time at which the story was published (ISO 8601, UTC). Used to order stories in the Stories near you feed. | 
 

@@ -185,9 +185,9 @@ paths:
                 $ref: '#/components/schemas/Error'
   /stories/near-me:
     get:
-      summary: Get your Stories near you feed
+      summary: Get your Stories near me feed
       description: >-
-        Returns your personal Stories near you feed, aggregating stories
+        Returns your personal Stories near me feed, aggregating stories
         published by you, by members in your trusted circle, and by members
         in your connected circle, ordered by publication time descending
         (newest first). Uses offset-based pagination for infinite scrolling.
@@ -216,7 +216,7 @@ paths:
             default: 20
       responses:
         '200':
-          description: Your Stories near you feed
+          description: Your Stories near me feed
           content:
             application/json:
               schema:

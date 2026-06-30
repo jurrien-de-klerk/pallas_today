@@ -36,6 +36,8 @@ public class StoriesNearMeController implements StoriesNearMeApi {
 
   @Override
   public ResponseEntity<StoriesPage> getStoriesNearMe(Integer offset, Integer count) {
+    log.info("GET /stories/near-me?offset={}&count={}", offset, count);
+
     // Apply defaults from API contract
     int offsetValue = offset != null ? offset : DEFAULT_OFFSET;
     int countValue = count != null ? count : DEFAULT_COUNT;

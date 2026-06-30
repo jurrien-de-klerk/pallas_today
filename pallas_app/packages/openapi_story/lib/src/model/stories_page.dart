@@ -3,70 +3,57 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:openapi_story/src/model/shared_with.dart';
+import 'package:openapi_story/src/model/story.dart';
 import 'package:built_collection/built_collection.dart';
-import 'package:openapi_story/src/model/quill_delta_operation.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'story_input.g.dart';
+part 'stories_page.g.dart';
 
-/// StoryInput
+/// StoriesPage
 ///
 /// Properties:
-/// * [content]
-/// * [sharedWith]
+/// * [stories] - Stories ordered by publishedAt descending. Only stories visible to the requesting member are included.
 @BuiltValue()
-abstract class StoryInput implements Built<StoryInput, StoryInputBuilder> {
-  @BuiltValueField(wireName: r'content')
-  BuiltList get content;
+abstract class StoriesPage implements Built<StoriesPage, StoriesPageBuilder> {
+  /// Stories ordered by publishedAt descending. Only stories visible to the requesting member are included.
+  @BuiltValueField(wireName: r'stories')
+  BuiltList<Story> get stories;
 
-  @BuiltValueField(wireName: r'sharedWith')
-  SharedWith? get sharedWith;
-  // enum sharedWithEnum {  TRUSTED,  CONNECTED,  COMMUNITY,  PUBLIC,  };
+  StoriesPage._();
 
-  StoryInput._();
-
-  factory StoryInput([void updates(StoryInputBuilder b)]) = _$StoryInput;
+  factory StoriesPage([void updates(StoriesPageBuilder b)]) = _$StoriesPage;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(StoryInputBuilder b) => b;
+  static void _defaults(StoriesPageBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<StoryInput> get serializer => _$StoryInputSerializer();
+  static Serializer<StoriesPage> get serializer => _$StoriesPageSerializer();
 }
 
-class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
+class _$StoriesPageSerializer implements PrimitiveSerializer<StoriesPage> {
   @override
-  final Iterable<Type> types = const [StoryInput, _$StoryInput];
+  final Iterable<Type> types = const [StoriesPage, _$StoriesPage];
 
   @override
-  final String wireName = r'StoryInput';
+  final String wireName = r'StoriesPage';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    StoryInput object, {
+    StoriesPage object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'content';
+    yield r'stories';
     yield serializers.serialize(
-      object.content,
-      specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
+      object.stories,
+      specifiedType: const FullType(BuiltList, [FullType(Story)]),
     );
-    if (object.sharedWith != null) {
-      yield r'sharedWith';
-      yield serializers.serialize(
-        object.sharedWith,
-        specifiedType: const FullType(SharedWith),
-      );
-    }
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    StoryInput object, {
+    StoriesPage object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -79,26 +66,19 @@ class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required StoryInputBuilder result,
+    required StoriesPageBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'content':
+        case r'stories':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
-          ) as BuiltList;
-          result.content.replace(valueDes);
-          break;
-        case r'sharedWith':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(SharedWith),
-          ) as SharedWith;
-          result.sharedWith = valueDes;
+            specifiedType: const FullType(BuiltList, [FullType(Story)]),
+          ) as BuiltList<Story>;
+          result.stories.replace(valueDes);
           break;
         default:
           unhandled.add(key);
@@ -109,12 +89,12 @@ class _$StoryInputSerializer implements PrimitiveSerializer<StoryInput> {
   }
 
   @override
-  StoryInput deserialize(
+  StoriesPage deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = StoryInputBuilder();
+    final result = StoriesPageBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

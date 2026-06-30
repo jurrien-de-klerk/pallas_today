@@ -4,6 +4,9 @@
 
 // ignore_for_file: unused_element
 import 'package:openapi_story/src/model/shared_with.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:openapi_story/src/model/quill_delta_operation.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -14,7 +17,7 @@ part 'story.g.dart';
 /// Properties:
 /// * [id] - Unique identifier of the story
 /// * [authorId] - The memberId of the member who published the story
-/// * [content] - The story body as a JSON-serialised Quill Delta array of insert operations. Image references within the Delta are URLs pointing to file storage; raw image data is never embedded.
+/// * [content]
 /// * [sharedWith]
 /// * [publishedAt] - The date and time at which the story was published (ISO 8601, UTC). Used to order stories in the Stories near you feed.
 @BuiltValue()
@@ -27,9 +30,8 @@ abstract class Story implements Built<Story, StoryBuilder> {
   @BuiltValueField(wireName: r'authorId')
   String get authorId;
 
-  /// The story body as a JSON-serialised Quill Delta array of insert operations. Image references within the Delta are URLs pointing to file storage; raw image data is never embedded.
   @BuiltValueField(wireName: r'content')
-  String get content;
+  BuiltList get content;
 
   @BuiltValueField(wireName: r'sharedWith')
   SharedWith get sharedWith;
@@ -75,7 +77,7 @@ class _$StorySerializer implements PrimitiveSerializer<Story> {
     yield r'content';
     yield serializers.serialize(
       object.content,
-      specifiedType: const FullType(String),
+      specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
     );
     yield r'sharedWith';
     yield serializers.serialize(
@@ -129,9 +131,9 @@ class _$StorySerializer implements PrimitiveSerializer<Story> {
         case r'content':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.content = valueDes;
+            specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
+          ) as BuiltList;
+          result.content.replace(valueDes);
           break;
         case r'sharedWith':
           final valueDes = serializers.deserialize(

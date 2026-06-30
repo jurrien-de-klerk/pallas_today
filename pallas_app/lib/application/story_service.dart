@@ -1,73 +1,237 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:openapi_story/openapi.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
-import '../config/api_config.dart';
-import 'auth_service.dart';
+import '../domain/member.dart';
+import '../domain/member_repository.dart';
+import '../domain/member_service_port.dart';
+import '../domain/story.dart';
+import '../domain/story_repository.dart';
+import '../proxy/adapters/member_service_adapter.dart';
+import '../proxy/adapters/stories_service_adapter.dart';
 
 final _log = PallasLogger('StoryService');
 
-/// Application service that bridges the presentation layer and the proxy layer.
-/// Transforms presentation data into proxy calls and translates proxy results
-/// back into application-level outcomes.
-class StoryService {
-  StoryService({StoriesApi? api}) : _api = api ?? _buildApi();
+const Object _storyServiceStateUnset = Object();
 
-  static StoriesApi _buildApi() {
-    return OpenapiStory(
-      basePathOverride: storyServiceBaseUrl,
-      interceptors: [
-        InterceptorsWrapper(
-          onRequest: (options, handler) async {
-            await AuthService.instance.refreshIfNeeded();
-            final token = AuthService.instance.accessToken;
-            if (token != null) {
-              options.headers['Authorization'] = 'Bearer $token';
-            }
-            handler.next(options);
-          },
-        ),
-      ],
-    ).getStoriesApi();
+/// Application Cubit that loads stories, emits their content immediately, and
+/// resolves member information as a later progressive update.
+class StoryService extends Cubit<StoryServiceState> {
+  StoryService({
+    StoryRepository? storyRepository,
+    MemberRepository? memberRepository,
+    MemberServicePort? memberServicePort,
+  }) : _storyRepository =
+           storyRepository ??
+           CachedStoryRepository(storiesServicePort: StoriesServiceAdapter()),
+       _memberRepository =
+           memberRepository ??
+           CachedMemberRepository(
+             memberServicePort: memberServicePort ?? MemberServiceAdapter(),
+           ),
+       super(const StoryServiceState());
+
+  final StoryRepository _storyRepository;
+  final MemberRepository _memberRepository;
+  int _activeLoadRequestId = 0;
+
+  /// Temporary compatibility stub until story publishing is refactored.
+  Future<bool> publishStory(dynamic document) async {
+    _log.warn('publishStory is not wired into the refactor yet.');
+    return false;
   }
 
-  final StoriesApi _api;
+  /// Loads a page of stories and emits the story content before resolving the
+  /// related members.
+  Future<void> loadStories({required int offset, required int count}) async {
+    final requestId = ++_activeLoadRequestId;
+    _log.debug('loadStories started.');
+    _startLoadingStories(offset: offset, count: count, requestId: requestId);
 
-  /// Publishes [document] to the StoryService microservice.
-  ///
-  /// The document is serialised as a Quill Delta JSON string before sending.
-  /// Returns `true` on success, `false` when the document is empty or the
-  /// request fails.
-  Future<bool> publishStory(Document document) async {
-    if (document.toPlainText().trim().isEmpty) return false;
     try {
-      final deltaJson = jsonEncode(document.toDelta().toJson());
-      final input = StoryInput((b) => b..content = deltaJson);
-      await _api.createStory(storyInput: input);
-      _log.info('Story published');
-      return true;
-    } on DioException catch (e) {
-      _log.warn(
-        'publishStory failed: ${e.type} (status ${e.response?.statusCode})',
+      final stories = await _fetchStoriesPage(offset: offset, count: count);
+      if (!_canEmitForRequest(requestId)) {
+        _log.debug(
+          'Ignoring stale or closed loadStories completion after story fetch.',
+        );
+        return;
+      }
+      _emitStoriesLoaded(stories, requestId: requestId);
+
+      final memberIds = _extractMemberIds(stories);
+      _log.debug(
+        'Extracted member IDs for story page. uniqueMemberCount=${memberIds.length}',
       );
-      return false;
-    } catch (e, st) {
-      _log.error('publishStory unexpected error', e, st);
-      _log.backtrace();
-      return false;
+      if (memberIds.isEmpty) {
+        _stopLoadingMembers(requestId: requestId);
+        _log.debug('loadStories completed without member resolution.');
+        return;
+      }
+
+      await _resolveAndEmitMembers(memberIds, requestId: requestId);
+      _log.debug('loadStories completed with member resolution.');
+    } catch (error, stackTrace) {
+      if (!_canEmitForRequest(requestId)) {
+        _log.debug('Ignoring stale or closed loadStories failure.');
+        return;
+      }
+      _emitLoadingFailed(
+        error: error,
+        stackTrace: stackTrace,
+        requestId: requestId,
+      );
     }
   }
 
-  /// Fetches all stories from the StoryService microservice.
-  ///
-  /// Returns an empty list — the list endpoint has been removed from the
-  /// StoryService spec. Use [getStoriesNearYou] once it is implemented.
-  // TODO: replace with getStoriesNearYou once the backend is implemented.
-  Future<List<Document>> listStories() async {
-    _log.warn('listStories is not available: endpoint removed from spec');
-    return [];
+  void _startLoadingStories({
+    required int offset,
+    required int count,
+    required int requestId,
+  }) {
+    _log.info('Loading stories page: offset=$offset, count=$count');
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        isLoadingStories: true,
+        isLoadingMembers: false,
+        error: null,
+      ),
+    );
+  }
+
+  Future<List<Story>> _fetchStoriesPage({
+    required int offset,
+    required int count,
+  }) async {
+    _log.debug(
+      'Fetching stories from repository. offset=$offset, count=$count',
+    );
+    final stories = await _storyRepository.fetchStories(
+      offset: offset,
+      count: count,
+    );
+    _log.debug('Fetched stories from repository. storyCount=${stories.length}');
+    return stories;
+  }
+
+  void _emitStoriesLoaded(List<Story> stories, {required int requestId}) {
+    _log.debug(
+      'Emitting stories-loaded state. storyCount=${stories.length}, willResolveMembers=${stories.isNotEmpty}',
+    );
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        isLoadingStories: false,
+        isLoadingMembers: stories.isNotEmpty,
+        stories: stories,
+        membersById: const <String, Member>{},
+        error: null,
+      ),
+    );
+  }
+
+  Set<String> _extractMemberIds(List<Story> stories) {
+    if (stories.isEmpty) {
+      return <String>{};
+    }
+
+    return stories.map((story) => story.authorId).toSet();
+  }
+
+  Future<void> _resolveAndEmitMembers(
+    Set<String> memberIds, {
+    required int requestId,
+  }) async {
+    _log.debug(
+      'Resolving members for story page. requestedMemberCount=${memberIds.length}',
+    );
+    final members = await _resolveMembers(memberIds);
+    if (!_canEmitForRequest(requestId)) {
+      _log.debug('Ignoring stale or closed member resolution result.');
+      return;
+    }
+    final membersById = {for (final member in members) member.memberId: member};
+    _log.debug(
+      'Resolved members for story page. resolvedMemberCount=${membersById.length}',
+    );
+
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
+    emit(state.copyWith(isLoadingMembers: false, membersById: membersById));
+  }
+
+  void _stopLoadingMembers({required int requestId}) {
+    _log.debug('No member resolution needed. Emitting loading-members=false.');
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
+    emit(state.copyWith(isLoadingMembers: false));
+  }
+
+  void _emitLoadingFailed({
+    required Object error,
+    required StackTrace stackTrace,
+    required int requestId,
+  }) {
+    _log.error('Failed to load stories page', error, stackTrace);
+    _log.debug('loadStories failed. errorType=${error.runtimeType}');
+    _log.backtrace();
+    if (!_canEmitForRequest(requestId)) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        isLoadingStories: false,
+        isLoadingMembers: false,
+        error: error,
+      ),
+    );
+  }
+
+  Future<List<Member>> _resolveMembers(Set<String> memberIds) async {
+    final members = await _memberRepository.getMembersByIds(memberIds);
+    return members.toList(growable: false);
+  }
+
+  bool _canEmitForRequest(int requestId) {
+    return !isClosed && requestId == _activeLoadRequestId;
+  }
+}
+
+class StoryServiceState {
+  const StoryServiceState({
+    this.isLoadingStories = false,
+    this.isLoadingMembers = false,
+    this.stories = const <Story>[],
+    this.membersById = const <String, Member>{},
+    this.error,
+  });
+
+  final bool isLoadingStories;
+  final bool isLoadingMembers;
+  final List<Story> stories;
+  final Map<String, Member> membersById;
+  final Object? error;
+
+  bool get isInitialLoading => isLoadingStories && stories.isEmpty;
+
+  StoryServiceState copyWith({
+    bool? isLoadingStories,
+    bool? isLoadingMembers,
+    List<Story>? stories,
+    Map<String, Member>? membersById,
+    Object? error = _storyServiceStateUnset,
+  }) {
+    return StoryServiceState(
+      isLoadingStories: isLoadingStories ?? this.isLoadingStories,
+      isLoadingMembers: isLoadingMembers ?? this.isLoadingMembers,
+      stories: stories ?? this.stories,
+      membersById: membersById ?? this.membersById,
+      error: identical(error, _storyServiceStateUnset) ? this.error : error,
+    );
   }
 }

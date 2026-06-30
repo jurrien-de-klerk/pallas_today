@@ -1,4 +1,4 @@
-# openapi_story.model.StoryInput
+# openapi_story.model.QuillDeltaOperationInsert
 
 ## Load the model package
 ```dart
@@ -8,8 +8,6 @@ import 'package:openapi_story/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**content** | [**BuiltList**](BuiltList.md) |  | 
-**sharedWith** | [**SharedWith**](SharedWith.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

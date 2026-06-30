@@ -12,20 +12,19 @@ import 'package:openapi_story/src/api_util.dart';
 import 'package:openapi_story/src/model/error.dart';
 import 'package:openapi_story/src/model/stories_page.dart';
 
-class StoriesNearYouApi {
+class StoriesNearMeApi {
   final Dio _dio;
 
   final Serializers _serializers;
 
-  const StoriesNearYouApi(this._dio, this._serializers);
+  const StoriesNearMeApi(this._dio, this._serializers);
 
-  /// Get Stories near you for a member
-  /// Returns the Stories near you feed for the member identified by &#x60;memberId&#x60;. The feed aggregates stories published by that member, by members in their trusted circle, and by members in their connected circle, ordered by publication time descending (newest first). When a requesting member browses another member&#39;s feed, stories are filtered by their Shared With level: only stories visible to the requesting member are included. Stories the requesting member is not permitted to see are silently excluded.
+  /// Get your Stories near you feed
+  /// Returns your personal Stories near you feed, aggregating stories published by you, by members in your trusted circle, and by members in your connected circle, ordered by publication time descending (newest first). Uses offset-based pagination for infinite scrolling.
   ///
   /// Parameters:
-  /// * [memberId] - The ID of the member whose Stories near you feed is being requested. Use the authenticated member's own ID to get their personal feed.
-  /// * [limit] - Maximum number of stories to return
-  /// * [before] - Return only stories published before this timestamp (ISO 8601). Use for cursor-based pagination: pass the `publishedAt` value of the last story received to fetch the next page.
+  /// * [offset] - Number of stories to skip (for pagination)
+  /// * [count] - Maximum number of stories to return
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -35,10 +34,9 @@ class StoriesNearYouApi {
   ///
   /// Returns a [Future] containing a [Response] with a [StoriesPage] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<StoriesPage>> getStoriesNearYou({
-    required String memberId,
-    int? limit = 20,
-    DateTime? before,
+  Future<Response<StoriesPage>> getStoriesNearMe({
+    int? offset = 0,
+    int? count = 20,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -46,10 +44,7 @@ class StoriesNearYouApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/stories/near/{memberId}'.replaceAll(
-        '{' r'memberId' '}',
-        encodeQueryParameter(_serializers, memberId, const FullType(String))
-            .toString());
+    final _path = r'/stories/near-me';
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -68,12 +63,12 @@ class StoriesNearYouApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(int)),
-      if (before != null)
-        r'before': encodeQueryParameter(
-            _serializers, before, const FullType(DateTime)),
+      if (offset != null)
+        r'offset':
+            encodeQueryParameter(_serializers, offset, const FullType(int)),
+      if (count != null)
+        r'count':
+            encodeQueryParameter(_serializers, count, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(

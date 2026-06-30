@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'my_bubble_story_screen.dart';
+import 'stories_near_me_screen.dart';
 import 'post_story_screen.dart';
 
-enum AppScreen { myBubbleStory, postStory }
+enum AppScreen { storiesNearMe, postStory }
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -13,7 +13,7 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  AppScreen _current = AppScreen.myBubbleStory;
+  AppScreen _current = AppScreen.storiesNearMe;
 
   void _navigate(AppScreen screen) {
     setState(() => _current = screen);
@@ -26,8 +26,8 @@ class _HomeShellState extends State<HomeShell> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(
-          _current == AppScreen.myBubbleStory
-              ? 'Stories of my bubble'
+          _current == AppScreen.storiesNearMe
+              ? 'Stories near me'
               : 'Post story',
         ),
       ),
@@ -42,10 +42,10 @@ class _HomeShellState extends State<HomeShell> {
               child: const Text('Pallas', style: TextStyle(fontSize: 24)),
             ),
             ListTile(
-              leading: const Icon(Icons.bubble_chart),
-              title: const Text('Stories of my bubble'),
-              selected: _current == AppScreen.myBubbleStory,
-              onTap: () => _navigate(AppScreen.myBubbleStory),
+              leading: const Icon(Icons.near_me),
+              title: const Text('Stories near me'),
+              selected: _current == AppScreen.storiesNearMe,
+              onTap: () => _navigate(AppScreen.storiesNearMe),
             ),
             ListTile(
               leading: const Icon(Icons.edit),
@@ -56,8 +56,8 @@ class _HomeShellState extends State<HomeShell> {
           ],
         ),
       ),
-      body: _current == AppScreen.myBubbleStory
-          ? const MyBubbleStoryScreen()
+      body: _current == AppScreen.storiesNearMe
+          ? const StoriesNearMeScreen()
           : const PostStoryScreen(),
     );
   }

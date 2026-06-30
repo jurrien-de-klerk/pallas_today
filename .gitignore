@@ -5,12 +5,4 @@
 target/
 # Generated OpenAPI client dummy tests
 pallas_app/packages/openapi_*/test/
-/.idea/.gitignore
-/.idea/compiler.xml
-/.idea/encodings.xml
-/.idea/gradle.xml
-/.idea/jarRepositories.xml
-/.idea/misc.xml
-/.idea/modules.xml
-/.idea/pallas_today.iml
-/.idea/vcs.xml
+.idea/
