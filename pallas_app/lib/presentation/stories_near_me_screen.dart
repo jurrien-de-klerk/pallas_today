@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:pallas_logger/pallas_logger.dart';
 
 import '../application/story_service.dart';
+import '../domain/story.dart';
 
 final _log = PallasLogger('MyBubbleStoryScreen');
 
@@ -14,55 +16,104 @@ class StoriesNearMeScreen extends StatefulWidget {
 }
 
 class _StoriesNearMeScreenState extends State<StoriesNearMeScreen> {
-  final _storyService = StoryService();
-  List<Document>? _stories;
-  bool _loading = true;
+  static const _pageSize = 20;
+
+  late final StoryService _storyService;
 
   @override
   void initState() {
     super.initState();
+    _storyService = StoryService();
     _loadStories();
+  }
+
+  @override
+  void dispose() {
+    _storyService.close();
+    super.dispose();
   }
 
   Future<void> _loadStories() async {
     _log.info('Loading stories');
-    final stories = await _storyService.listStories();
-    if (mounted) {
-      setState(() {
-        _stories = stories;
-        _loading = false;
-      });
-    }
+    await _storyService.loadStories(offset: 0, count: _pageSize);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    return BlocBuilder<StoryService, StoryServiceState>(
+      bloc: _storyService,
+      builder: (context, state) {
+        if (state.isInitialLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    final stories = _stories!;
-    if (stories.isEmpty) {
-      return const Center(child: Text('No stories yet.'));
-    }
+        if (state.error != null && state.stories.isEmpty) {
+          return Center(child: Text('Failed to load stories: ${state.error}'));
+        }
 
-    return RefreshIndicator(
-      onRefresh: _loadStories,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: stories.length,
-        separatorBuilder: (_, _) => const Divider(),
-        itemBuilder: (context, index) => _StoryCard(document: stories[index]),
-      ),
+        if (state.stories.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: _loadStories,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: const [
+                SizedBox(height: 160),
+                Center(child: Text('No stories yet.')),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _loadStories,
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: state.stories.length,
+            separatorBuilder: (_, _) => const Divider(),
+            itemBuilder: (context, index) {
+              final story = state.stories[index];
+              final member = state.membersById[story.authorId];
+              return _StoryCard(
+                document: _storyDocument(story),
+                authorName: member?.name,
+                isMemberLoading: state.isLoadingMembers && member == null,
+              );
+            },
+          ),
+        );
+      },
     );
+  }
+
+  Document _storyDocument(Story story) {
+    final deltaJson = story.content
+        .map((op) => Map<String, dynamic>.from(op))
+        .toList(growable: true);
+
+    if (deltaJson.isEmpty) {
+      deltaJson.add({'insert': '\n'});
+    } else {
+      final lastInsert = deltaJson.last['insert'];
+      if (lastInsert is! String || !lastInsert.endsWith('\n')) {
+        deltaJson.add({'insert': '\n'});
+      }
+    }
+
+    return Document.fromJson(deltaJson);
   }
 }
 
 /// A card that renders a single story as read-only rich text.
 class _StoryCard extends StatefulWidget {
-  const _StoryCard({required this.document});
+  const _StoryCard({
+    required this.document,
+    required this.authorName,
+    required this.isMemberLoading,
+  });
 
   final Document document;
+  final String? authorName;
+  final bool isMemberLoading;
 
   @override
   State<_StoryCard> createState() => _StoryCardState();
@@ -117,14 +168,19 @@ class _StoryCardState extends State<_StoryCard> {
                   child: const Icon(Icons.article_outlined, size: 18),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Story',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        widget.authorName ?? 'Story',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
+                      if (widget.isMemberLoading)
+                        Text(
+                          'Loading author...',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                     ],
                   ),
                 ),
